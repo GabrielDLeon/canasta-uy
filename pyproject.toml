@@ -1,0 +1,8 @@
+[project]
+name = "open-price-uy"
+version = "0.1.0"
+description = "Proyecto de investigación sobre el dataset de Precios de Productos en Uruguay 2025"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.3.3",
+]
