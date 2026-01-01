@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """
-Script para procesar el dataset completo de precios 2025 y generar agregaciones por producto por día.
+Script para procesar el dataset completo de precios y generar agregaciones por producto por día.
 Genera un archivo con estadísticas diarias para cada producto.
+
+Uso:
+    python scripts/procesar_dataset_completo.py -i data/raw/precios_2024.csv -o data/processed/precios_agregados_2024.csv
 """
 
 import pandas as pd
 import sys
+import argparse
 from datetime import datetime
 
-# Nombres de las columnas originales del CSV
-COLUMN_NAMES = [
+# Schema nuevo (2018-2025): 11 columnas
+COLUMN_NAMES_NEW = [
     "ID_PrecioDiario",
     "Declaracion",
     "Fecha",
@@ -21,6 +25,15 @@ COLUMN_NAMES = [
     "Establecimiento",
     "Feria_id",
     "Presentacion_Producto",
+]
+
+# Schema antiguo (2016-2017): 5 columnas
+COLUMN_NAMES_OLD = [
+    "Establecimiento",
+    "Presentacion_Producto",
+    "Precio",
+    "Fecha",
+    "Oferta",
 ]
 
 
@@ -61,7 +74,7 @@ def procesar_dataset_completo(input_file, output_file, chunk_size=100000):
     for i, chunk in enumerate(
         pd.read_csv(
             input_file,
-            names=COLUMN_NAMES,
+            names=COLUMN_NAMES_NEW,
             chunksize=chunk_size,
             na_values=["\\N"],
             on_bad_lines="skip",
@@ -84,11 +97,13 @@ def procesar_dataset_completo(input_file, output_file, chunk_size=100000):
             chunk["Presentacion_Producto"], errors="coerce"
         ).astype("Int64")
 
-        # Filtrar filas con datos inválidos (sin precio, producto o establecimiento)
+        # Filtrar filas inválidas y precios anómalos (>$10,000 probablemente errores)
         valid_rows = chunk[
             chunk["Precio"].notna()
             & chunk["Presentacion_Producto"].notna()
             & chunk["Establecimiento"].notna()
+            & (chunk["Precio"] > 0)
+            & (chunk["Precio"] <= 10000)
         ].copy()
 
         invalid_count = len(chunk) - len(valid_rows)
@@ -298,17 +313,51 @@ def mostrar_estadisticas(df):
     print(f"\n{'=' * 70}")
     print("MUESTRA DE DATOS (primeros 10 registros)")
     print(f"{'=' * 70}")
-    print(agregado.head(10).to_string(index=False))
+    print(df.head(10).to_string(index=False))
 
     print(f"\n{'=' * 70}")
 
 
 def main():
-    input_file = "data/raw/precios_2025.csv"
-    output_file = "data/processed/prices_aggregated_full.csv"
+    parser = argparse.ArgumentParser(
+        description="Procesa datasets de precios y genera agregaciones por producto por día",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ejemplos de uso:
+  # Procesar dataset 2024
+  python scripts/procesar_dataset_completo.py -i data/raw/precios_2024.csv -o data/processed/precios_agregados_2024.csv
+
+  # Procesar dataset 2025
+  python scripts/procesar_dataset_completo.py -i data/raw/precios_2025.csv -o data/processed/precios_agregados_2025.csv
+
+  # Cambiar tamaño de chunk
+  python scripts/procesar_dataset_completo.py -i data/raw/precios_2024.csv -o data/processed/precios_agregados_2024.csv --chunk-size 200000
+        """,
+    )
+
+    parser.add_argument(
+        "-i", "--input",
+        required=True,
+        help="Ruta del archivo CSV de entrada (ej: data/raw/precios_2024.csv)",
+    )
+
+    parser.add_argument(
+        "-o", "--output",
+        required=True,
+        help="Ruta del archivo CSV de salida (ej: data/processed/precios_agregados_2024.csv)",
+    )
+
+    parser.add_argument(
+        "--chunk-size",
+        type=int,
+        default=100000,
+        help="Tamaño de chunk para procesamiento (default: 100000)",
+    )
+
+    args = parser.parse_args()
 
     try:
-        resultado = procesar_dataset_completo(input_file, output_file)
+        resultado = procesar_dataset_completo(args.input, args.output, args.chunk_size)
 
         if resultado is not None:
             mostrar_estadisticas(resultado)
@@ -317,13 +366,13 @@ def main():
             print(f"   Columnas: {', '.join(resultado.columns.tolist())}")
 
     except FileNotFoundError:
-        print(f"\n❌ Error: No se encontró el archivo {input_file}")
+        print(f"\n❌ Error: No se encontró el archivo {args.input}")
         print(f"   Asegúrate de que el archivo existe en la ubicación correcta.")
         sys.exit(1)
     except MemoryError:
         print(f"\n❌ Error: Memoria insuficiente para procesar el archivo completo")
         print(
-            f"   Intenta aumentar el tamaño del chunk_size o procesar por rangos de fechas."
+            f"   Intenta aumentar el tamaño del chunk_size con --chunk-size"
         )
         sys.exit(1)
     except Exception as e:
