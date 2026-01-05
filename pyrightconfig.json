@@ -1,0 +1,11 @@
+{
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Linux",
+  "venvPath": ".",
+  "venv": ".venv",
+  "typeCheckingMode": "basic",
+  "include": ["scripts", "main.py"],
+  "exclude": [".venv", ".git"],
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false
+}

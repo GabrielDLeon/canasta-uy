@@ -1,0 +1,13 @@
+{
+  "neoconf": {
+    "plugins": {
+      "pyright": {
+        "enabled": true,
+        "settings": {
+          "python.venvPath": ".venv",
+          "python.pythonPath": ".venv/bin/python"
+        }
+      }
+    }
+  }
+}
