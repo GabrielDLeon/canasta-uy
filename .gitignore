@@ -12,6 +12,5 @@ wheels/
 # Data files (CSVs are too large for git)
 data/
 
-docs/
 visualizations
 outputs
