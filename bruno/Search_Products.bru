@@ -1,0 +1,20 @@
+meta {
+  name: Search Products
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{HOST}}/v1/products/search?query=arroz
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: arroz
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
