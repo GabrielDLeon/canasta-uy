@@ -1,29 +1,68 @@
 """
-Comprehensive descriptive statistics for all products - V4 IMPROVED CLEAN DATASET.
+Comprehensive descriptive statistics for all products.
 
-Same as v3 but using v4 (IQR method for outlier detection).
+Usage:
+    uv run python scripts/product_descriptive_statistics_v4.py [prices_file] [products_file]
+
+Examples:
+    uv run python scripts/product_descriptive_statistics_v4.py
+        Uses default: v4.csv and products_catalog.csv
+
+    uv run python scripts/product_descriptive_statistics_v4.py v4_clean
+        Uses: v4_clean.csv and products_catalog.csv
+
+    uv run python scripts/product_descriptive_statistics_v4.py v4_clean products_catalog_clean
+        Uses: v4_clean.csv and products_catalog_clean.csv
 """
 
 import pandas as pd
 import numpy as np
 from pathlib import Path
 from scipy import stats
+import sys
+
+# Parse arguments
+prices_arg = sys.argv[1] if len(sys.argv) > 1 else "v4"
+products_arg = sys.argv[2] if len(sys.argv) > 2 else "products_catalog"
 
 print("="*100)
-print("PRODUCT DESCRIPTIVE STATISTICS - V4 IMPROVED CLEAN DATASET")
+print("PRODUCT DESCRIPTIVE STATISTICS")
 print("="*100)
 
-# Load data
-v4_path = Path(__file__).parent.parent / "data" / "processed" / "prices_aggregated_all_years_v4.csv"
-products_path = Path(__file__).parent.parent / "data" / "processed" / "products_catalog.csv"
+# Build full paths - intelligently construct filenames
+data_dir = Path(__file__).parent.parent / "data" / "processed"
+
+# Handle prices file
+if prices_arg.startswith("prices_"):
+    v4_path = data_dir / f"{prices_arg}.csv"
+elif prices_arg == "v4" or prices_arg == "v4_clean":
+    v4_path = data_dir / f"prices_aggregated_all_years_{prices_arg}.csv"
+else:
+    v4_path = data_dir / f"{prices_arg}.csv"
+
+# Handle products file
+if products_arg.startswith("products_"):
+    products_path = data_dir / f"{products_arg}.csv"
+else:
+    products_path = data_dir / f"products_{products_arg}.csv" if products_arg != "catalog" else data_dir / "products_catalog.csv"
+
+print(f"\nLoading prices from: {v4_path.name}")
+print(f"Loading products from: {products_path.name}")
+
+# Validate files exist
+if not v4_path.exists():
+    print(f"❌ ERROR: Prices file not found: {v4_path}")
+    sys.exit(1)
+if not products_path.exists():
+    print(f"❌ ERROR: Products file not found: {products_path}")
+    sys.exit(1)
 
 prices_df = pd.read_csv(v4_path)
 products_df = pd.read_csv(products_path)
 
 prices_df['date'] = pd.to_datetime(prices_df['date'])
 
-print(f"\nLoaded {len(prices_df):,} CLEAN price records for {len(products_df)} products")
-print(f"All outliers have been removed using IQR method (v4 dataset)")
+print(f"\nLoaded {len(prices_df):,} price records for {len(products_df)} products")
 
 # Calculate statistics for each product
 stats_list = []
@@ -106,14 +145,25 @@ stats_df = pd.DataFrame(stats_list)
 
 print(f"Calculated statistics for {len(stats_df)} products")
 
-# SAVE TO CSV
-output_csv = Path(__file__).parent.parent / "data" / "processed" / "product_statistics_v4.csv"
+# SAVE TO CSV (dynamic name based on input file)
+# Extract version suffix from prices file
+if "v4_clean" in v4_path.name:
+    suffix = "v4_clean"
+elif "v4" in v4_path.name:
+    suffix = "v4"
+elif "v3" in v4_path.name:
+    suffix = "v3"
+else:
+    suffix = prices_arg
+
+output_name = f"product_statistics_{suffix}.csv"
+output_csv = data_dir / output_name
 stats_df.to_csv(output_csv, index=False)
 print(f"\n✓ Statistics saved to: {output_csv}")
 
 # IDENTIFY ANOMALOUS PRODUCTS
 print("\n" + "="*100)
-print("PRODUCTS WITH ANOMALOUS CHARACTERISTICS (V4 CLEAN DATA)")
+print("PRODUCTS WITH ANOMALOUS CHARACTERISTICS")
 print("="*100)
 
 # High Coefficient of Variation (>50% = high price volatility)
@@ -159,7 +209,7 @@ else:
 
 # Overall product quality assessment
 print("\n" + "="*100)
-print("PRODUCT QUALITY ASSESSMENT (V4)")
+print("PRODUCT QUALITY ASSESSMENT")
 print("="*100)
 
 # Define quality score based on multiple factors
@@ -212,7 +262,7 @@ else:
 
 # SUMMARY STATISTICS
 print("\n" + "="*100)
-print("DATASET-WIDE STATISTICS (V4)")
+print("DATASET-WIDE STATISTICS")
 print("="*100)
 
 print("\nCoefficient of Variation (CV%) - Price Volatility:")
@@ -246,5 +296,5 @@ print(f"  Products with |kurtosis| 1-3: {len(stats_df[(stats_df['kurtosis'].abs(
 print(f"  Products with |kurtosis| > 3: {len(stats_df[stats_df['kurtosis'].abs() > 3])} (heavy tails)")
 
 print("\n" + "="*100)
-print("✓ ANALYSIS COMPLETE (V4)")
+print("✓ ANALYSIS COMPLETE")
 print("="*100)
