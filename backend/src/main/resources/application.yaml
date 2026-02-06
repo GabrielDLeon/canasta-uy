@@ -3,9 +3,9 @@ spring:
     name: canastauy-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/canastauy
-    username: canastauy_user
-    password: canastauy_pass
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/canastauy}
+    username: ${DATABASE_USER:canastauy_user}
+    password: ${DATABASE_PASSWORD:canastauy_pass}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -24,8 +24,8 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   cache:
     type: redis
@@ -33,11 +33,7 @@ spring:
       time-to-live: 3600000
 
 server:
-  port: 8080
-
-jwt:
-  secret: ${JWT_SECRET:your-secret-key-min-256-bits}
-  expiration: 86400000
+  port: ${PORT:8080}
 
 api:
   rate-limit:
@@ -46,6 +42,17 @@ api:
 logging:
   level:
     root: INFO
-    uy.eleven.canasta: DEBUG
+    uy.eleven.canasta: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator endpoints (healthchecks)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
