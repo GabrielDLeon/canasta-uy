@@ -1,0 +1,60 @@
+// CanastaUY - Database Schema (DBML)
+// Visualizar en: https://dbml.dbdiagram.io/
+
+Table categories {
+  category_id integer [primary key, increment]
+  name varchar(255) [not null, unique]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+}
+
+Table products {
+  product_id integer [primary key]
+  name varchar(500) [not null, unique]
+  specification varchar(500)
+  category_id integer [not null]
+  brand varchar(255)
+  created_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+}
+
+Table prices {
+  product_id integer [not null]
+  date date [not null]
+  price_min numeric(10,2) [not null]
+  price_max numeric(10,2) [not null]
+  price_avg numeric(10,2) [not null]
+  price_median numeric(10,2) [not null]
+  price_std numeric(10,2)
+  store_count integer [default: 0]
+  offer_count integer [default: 0]
+  offer_percentage numeric(5,2) [default: 0.0]
+
+  indexes {
+    (product_id, date) [pk]
+  }
+
+  note: "
+  Composite primary key: (product_id, date)
+  Constraints:
+  - price_min <= price_avg <= price_max
+  - offer_percentage between 0 and 100
+  - All prices >= 0
+  "
+}
+
+Table clients {
+  client_id biginteger [primary key, increment]
+  username varchar(50) [not null, unique]
+  email varchar(100) [not null, unique]
+  password varchar(255) [not null]
+  api_key varchar(64) [not null, unique]
+  is_active boolean [default: true]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+
+  note: "Usuarios/clientes para autenticación (Phase 3)"
+}
+
+// Relaciones
+ref: products.category_id > categories.category_id [delete: restrict]
+ref: prices.product_id > products.product_id [delete: cascade]

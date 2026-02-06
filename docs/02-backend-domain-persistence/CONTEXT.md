@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: completed
 updated: 2026-02-06
 ---
 
@@ -7,11 +7,11 @@ updated: 2026-02-06
 
 ---
 
-## Objective
+## Objective ✅
 
 Create the domain layer (JPA entities) and persistence layer (repositories) so Spring Boot can read/write data to PostgreSQL using Java objects.
 
-Upon completing this phase, Spring Boot will have full access to data (774,716 records) through a basic REST API.
+**Status**: COMPLETED - Spring Boot now has full access to 774,716 price records through a functional REST API.
 
 ---
 
@@ -102,9 +102,10 @@ ProductController: Basic REST endpoints
 - Note: In controllers, use @Transactional or DTOs
 
 ### Composite Key in Price
-- Used: @IdClass(PriceId.class)
-- Alternative: @EmbeddedId (more verbose, more OOP)
-- Reason: Simpler, less code
+- Used: @EmbeddedId (PriceId.java)
+- Alternative: @IdClass (simpler but less OOP)
+- Reason: More professional, OOP approach, cohesive key object
+- Implementation: PriceId is @Embeddable and implements Serializable
 
 ### BigDecimal for prices
 - Mandatory: NEVER use double/float
@@ -131,17 +132,19 @@ public Product getProductWithCategory(Integer id) {
 }
 ```
 
-### Infinite recursion in JSON
+### Infinite recursion in JSON (RESOLVED)
 ```
-Error: StackOverflowError
+Error: StackOverflowError + hibernateLazyInitializer in response
 ```
-Cause: Product  Category  Product  Category...
+Cause: Product ↔ Category (bidirectional relationship)
 
-Solution:
+Solution Implemented:
 ```java
-@JsonIgnore // In Category.java
+@JsonIgnore  // In Category.java
+@OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
 private List<Product> products;
 ```
+Result: Clean JSON responses without circular references
 
 ### N+1 queries problem
 ```
@@ -152,6 +155,56 @@ Solution:
 ```java
 @Query("SELECT p FROM Product p JOIN FETCH p.category")
 List<Product> findAllWithCategory();
+```
+
+---
+
+## Artifacts Created
+
+### Entities (model/)
+- **Category.java**: Maps categories table (134 records)
+- **Product.java**: Maps products table (306 records)
+- **Price.java**: Maps prices table (774,716 records) with @EmbeddedId
+- **PriceId.java**: Composite key @Embeddable class
+- **Client.java**: Maps clients table (for Phase 3 auth)
+
+### Repositories (repository/)
+- **CategoryRepository**: findByName(), findAllByOrderByNameAsc()
+- **ProductRepository**: findByCategory(), findByBrand(), findByNameContainingIgnoreCase(), searchByNameKeyword()
+- **PriceRepository**: findByIdProductId(), findByIdDateBetween(), findByIdProductIdAndIdDateBetween()
+- **ClientRepository**: findByUsername(), findByEmail(), findByApiKey()
+
+### Services (service/)
+- **ProductService**: getAllProducts(), getProductById(), searchProducts()
+- **PriceService**: getPricesByProductId(), getPricesByDateRange(), getPricesByProductAndDateRange()
+- **CategoryService**: getAllCategories(), getCategoryByName()
+
+### Controllers (controller/)
+- **ProductController**:
+  - GET /api/v1/products → List of all products
+  - GET /api/v1/products/{id} → Single product or 404
+  - GET /api/v1/products/search?query=X → Search by name (LIKE)
+
+### Configuration (config/)
+- **SecurityConfig**: Disables Spring Security for development (allows all requests)
+
+---
+
+## Tested Endpoints
+
+All endpoints verified and returning correct JSON:
+
+```bash
+# Get all products (306 records)
+curl http://localhost:8080/api/v1/products
+
+# Get specific product
+curl http://localhost:8080/api/v1/products/15
+# Response: {"productId":15,"name":"Arroz blanco Blue Patna Bolsa 1 kg.","category":{...}}
+
+# Search products
+curl "http://localhost:8080/api/v1/products/search?query=arroz"
+# Response: Array of 6 rice products
 ```
 
 ---
