@@ -32,14 +32,6 @@ Table prices {
   indexes {
     (product_id, date) [pk]
   }
-
-  note: "
-  Composite primary key: (product_id, date)
-  Constraints:
-  - price_min <= price_avg <= price_max
-  - offer_percentage between 0 and 100
-  - All prices >= 0
-  "
 }
 
 Table clients {
@@ -47,14 +39,53 @@ Table clients {
   username varchar(50) [not null, unique]
   email varchar(100) [not null, unique]
   password varchar(255) [not null]
-  api_key varchar(64) [not null, unique]
   is_active boolean [default: true]
   created_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
   updated_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
 
-  note: "Usuarios/clientes para autenticación (Phase 3)"
+  note: "API users/accounts (humans with credentials)"
+}
+
+Table api_keys {
+  api_key_id biginteger [primary key, increment]
+  client_id biginteger [not null]
+  key_value varchar(74) [not null, unique]
+  name varchar(100) [default: 'Default']
+  is_active boolean [default: true]
+  last_used_at timestamp
+  created_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+  revoked_at timestamp
+
+  indexes {
+    client_id
+    key_value [unique]
+    is_active
+  }
+
+  note: "API Keys for programmatic access (scripts, notebooks, CI/CD). Multiple keys per client."
+}
+
+Table refresh_tokens {
+  refresh_token_id biginteger [primary key, increment]
+  client_id biginteger [not null]
+  token_value varchar(255) [not null, unique]
+  expires_at timestamp [not null]
+  is_revoked boolean [default: false]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`, not null]
+  revoked_at timestamp
+
+  indexes {
+    client_id
+    token_value [unique]
+    expires_at
+    is_revoked
+  }
+
+  note: "Refresh tokens for JWT authentication (web dashboard, mobile apps)"
 }
 
 // Relaciones
 ref: products.category_id > categories.category_id [delete: restrict]
 ref: prices.product_id > products.product_id [delete: cascade]
+ref: api_keys.client_id > clients.client_id [delete: cascade]
+ref: refresh_tokens.client_id > clients.client_id [delete: cascade]
