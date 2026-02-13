@@ -46,7 +46,16 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Actuator endpoints (healthchecks)
+# JWT Configuration
+# Note: JWT_SECRET must be Base64-encoded and at least 256 bits (32 bytes)
+# Generate with: openssl rand -base64 32
+canasta:
+  security:
+    jwt:
+      secret: "${JWT_SECRET}"
+      access-token-ttl: 900000
+      refresh-token-tl: 604800000
+
 management:
   endpoints:
     web:

@@ -17,7 +17,11 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     uy.eleven.canasta: DEBUG
 
-# Dev healthcheck shows details
+canasta:
+  security:
+    jwt:
+      secret: "${JWT_SECRET}"
+
 management:
   endpoint:
     health:

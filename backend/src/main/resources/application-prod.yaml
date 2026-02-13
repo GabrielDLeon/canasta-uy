@@ -4,6 +4,11 @@ server:
     include-message: never
     include-stacktrace: never
 
+canasta:
+  security:
+    jwt:
+      secret: "${JWT_SECRET}"
+
 management:
   endpoint:
     health:
