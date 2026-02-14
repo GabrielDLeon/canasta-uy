@@ -100,6 +100,8 @@ This phase implements dual authentication (JWT + API Keys) for the CanastaUY API
 - [ ] Uses ClientRepository for data access
 - [ ] Uses PasswordEncoder for password hashing (BCrypt)
 - [ ] Validates: unique username, unique email
+- [ ] Input validation: username (3-50 chars, alphanumeric+underscore), email (valid format), password (min 8 chars, 1 uppercase, 1 lowercase, 1 digit)
+- [ ] Does NOT create API key automatically on registration
 - [ ] Throws appropriate exceptions for errors
 - [ ] Transactional operations marked correctly (@Transactional)
 - [ ] Can be tested with mocks
@@ -280,9 +282,9 @@ This phase implements dual authentication (JWT + API Keys) for the CanastaUY API
 
 **POST /api/v1/auth/register** (Public, 201 Created)
 - Input: RegisterRequest (username, email, password)
-- Output: RegisterResponse (clientId, username, defaultApiKey)
+- Output: RegisterResponse (clientId, username)
 - Validation: username/email unique, password strength
-- Creates client + first API key automatically
+- Creates client account only (API keys created separately via /account/api-keys)
 
 **POST /api/v1/auth/login** (Public, 200 OK)
 - Input: LoginRequest (username, password)

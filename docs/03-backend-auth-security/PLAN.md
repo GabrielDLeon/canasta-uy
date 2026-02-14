@@ -221,9 +221,9 @@ updated: 2026-02-07
 
 **POST /api/v1/auth/register** (Public)
 - Input: username, email, password
-- Output: clientId, username, defaultApiKey
+- Output: clientId, username
 - Status: 201 Created
-- Creates client + first API key automatically
+- Creates client account only (no API key)
 
 **POST /api/v1/auth/login** (Public)
 - Input: username, password
