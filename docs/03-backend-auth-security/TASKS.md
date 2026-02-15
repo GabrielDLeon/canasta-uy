@@ -1,11 +1,45 @@
 ---
-status: pending
-updated: 2026-02-07
+status: in_progress
+updated: 2026-02-14
 ---
 
 # Phase 3: Backend - Authentication & Security - TASKS
 
 This phase implements dual authentication (JWT + API Keys) for the CanastaUY API.
+
+## Quick Links
+
+- **Architecture Overview**: See [CONTEXT.md](./CONTEXT.md)
+- **Implementation Plan**: See [PLAN.md](./PLAN.md)
+- **Sequence Diagrams**: See [DIAGRAMS.md](./DIAGRAMS.md) - Visual flow of all authentication scenarios
+- **Current Status**: Tasks 3.1-3.5 completed, starting 3.6
+
+---
+
+## Implementation Guide
+
+This guide provides a step-by-step approach to implementing the authentication system. Each step includes:
+1. **Concepts to understand** before coding
+2. **What to implement** (specific classes/methods)
+3. **How to test** your implementation
+4. **Common pitfalls** to avoid
+
+### Prerequisites
+
+Before starting Task 3.6 (ApiKeyService), ensure you have:
+- [x] Database migrations applied (V3)
+- [x] JPA entities created (ApiKey, RefreshToken)
+- [x] Utilities ready (ApiKeyGenerator, JwtUtil)
+- [x] ClientService implemented
+
+### Recommended Workflow
+
+For each task, follow this pattern:
+1. **Read the concept explanation** (I'll explain the "why")
+2. **Review existing code** (see how similar classes are structured)
+3. **Write the code** (I'll guide you, line by line if needed)
+4. **Run tests** (compile, check for errors)
+5. **Move to next task**
 
 ---
 

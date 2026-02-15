@@ -1,13 +1,13 @@
 package uy.eleven.canasta.controller;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,6 +19,7 @@ import uy.eleven.canasta.service.ClientService;
 import java.net.URI;
 
 @RestController
+@RequestMapping("/api/v1/auth")
 @AllArgsConstructor
 public class ClientController {
 
