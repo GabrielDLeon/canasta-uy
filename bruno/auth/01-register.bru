@@ -1,0 +1,60 @@
+meta {
+  name: Register User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "password": "{{password}}"
+  }
+}
+
+vars:pre-request {
+  email: gabriel@canasta.uy
+  password: TestPassword123
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("clientId", res.body.data.clientId);
+    console.log("User registered with clientId:", res.body.data.clientId);
+  }
+}
+
+tests {
+  test("should return 201 Created", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with clientId", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data.clientId).to.exist;
+    expect(res.body.data.clientId).to.be.a('number');
+  });
+  
+  test("should return data with email", function() {
+    expect(res.body.data.email).to.equal("gabriel@canasta.uy");
+  });
+  
+  test("should return message", function() {
+    expect(res.body.message).to.exist;
+    expect(res.body.message).to.be.a('string');
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}

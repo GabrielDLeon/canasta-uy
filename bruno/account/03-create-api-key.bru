@@ -1,0 +1,66 @@
+meta {
+  name: Create API Key
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/account/api-keys
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "my first api key"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("apiKey", res.body.data.keyValue);
+    bru.setVar("apiKeyId", res.body.data.id);
+    console.log("API Key created and saved.");
+    console.log("API Key ID:", res.body.data.id);
+  }
+}
+
+tests {
+  test("should return 201 Created", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with id", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data.id).to.exist;
+    expect(res.body.data.id).to.be.a('number');
+  });
+  
+  test("should return data with name", function() {
+    expect(res.body.data.name).to.equal("Test API Key");
+  });
+  
+  test("should return data with full keyValue (only shown once)", function() {
+    expect(res.body.data.keyValue).to.exist;
+    expect(res.body.data.keyValue).to.be.a('string');
+    expect(res.body.data.keyValue).to.match(/^sk_live_[a-f0-9]{64}$/);
+  });
+  
+  test("should return data with isActive true", function() {
+    expect(res.body.data.isActive).to.equal(true);
+  });
+  
+  test("should return message", function() {
+    expect(res.body.message).to.exist;
+    expect(res.body.message).to.be.a('string');
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}

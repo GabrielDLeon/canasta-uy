@@ -1,0 +1,37 @@
+meta {
+  name: Revoke API Key
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/account/api-keys/{{apiKeyId}}
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with message", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data.message).to.exist;
+    expect(res.body.data.message).to.be.a('string');
+  });
+  
+  test("should return message", function() {
+    expect(res.body.message).to.exist;
+    expect(res.body.message).to.be.a('string');
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}

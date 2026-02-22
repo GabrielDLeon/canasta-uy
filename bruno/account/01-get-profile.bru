@@ -1,0 +1,47 @@
+meta {
+  name: Get User Profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/account/profile
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with clientId", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data.clientId).to.exist;
+    expect(res.body.data.clientId).to.be.a('number');
+  });
+  
+  test("should return data with email", function() {
+    expect(res.body.data.email).to.exist;
+    expect(res.body.data.email).to.be.a('string');
+  });
+  
+  test("should return data with totalKeys", function() {
+    expect(res.body.data.totalKeys).to.exist;
+    expect(res.body.data.totalKeys).to.be.a('number');
+  });
+  
+  test("should return data with createdAt", function() {
+    expect(res.body.data.createdAt).to.exist;
+    expect(res.body.data.createdAt).to.be.a('string');
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}

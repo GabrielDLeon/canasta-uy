@@ -1,0 +1,31 @@
+meta {
+  name: Get All Products
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/products
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with products array", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data).to.be.an('array');
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}

@@ -1,0 +1,41 @@
+meta {
+  name: List API Keys
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/account/api-keys
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with apiKeys array", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data.apiKeys).to.exist;
+    expect(res.body.data.apiKeys).to.be.an('array');
+  });
+  
+  test("each key in data should have required fields", function() {
+    if (res.body.data.apiKeys && res.body.data.apiKeys.length > 0) {
+      const key = res.body.data.apiKeys[0];
+      expect(key.id).to.exist;
+      expect(key.name).to.exist;
+      expect(key.isActive).to.be.a('boolean');
+    }
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}

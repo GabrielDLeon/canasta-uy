@@ -1,0 +1,50 @@
+meta {
+  name: Logout User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/logout
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+script:post-response {
+  if (res.status === 200) {
+    console.log("Logout successful.");
+    // Clear tokens after logout
+    bru.setVar("accessToken", "");
+    bru.setVar("refreshToken", "");
+  }
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return success true", function() {
+    expect(res.body.success).to.equal(true);
+  });
+  
+  test("should return data with message", function() {
+    expect(res.body.data).to.exist;
+    expect(res.body.data.message).to.exist;
+    expect(res.body.data.message).to.be.a('string');
+  });
+  
+  test("should return message", function() {
+    expect(res.body.message).to.exist;
+    expect(res.body.message).to.be.a('string');
+  });
+  
+  test("should return timestamp", function() {
+    expect(res.body.timestamp).to.exist;
+    expect(res.body.timestamp).to.be.a('string');
+  });
+}
