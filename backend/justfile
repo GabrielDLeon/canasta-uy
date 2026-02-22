@@ -1,0 +1,57 @@
+# CanastaUY - Development Commands
+# Requires: just (https://github.com/casey/just)
+# Usage: just <command>
+
+set dotenv-load
+
+@default:
+    echo "Available commands:"
+    just --list
+
+infra-up:
+    docker compose up -d postgres redis pgadmin
+    @echo "Waiting for services to be ready..."
+    @sleep 3
+    @echo "PostgreSQL on localhost:5432"
+    @echo "Redis on localhost:6379"
+    @echo "pgAdmin on http://localhost:5050"
+
+infra-down:
+    docker compose down
+
+infra-logs:
+    docker compose logs -f postgres redis pgadmin
+
+dev:
+    export $(grep -v '^#' .env | xargs) && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+build:
+    ./mvnw clean package -DskipTests
+
+test: infra-up
+    ./mvnw test
+    just infra-down
+
+docker-build:
+    docker build -t canastauy-backend:latest .
+
+docker-run:
+    docker run -p 8080:8080 --env-file .env canastauy-backend:latest
+
+setup:
+    @if [ ! -f .env ]; then \
+        cp .env.example .env; \
+        echo "Created .env from .env.example"; \
+        echo "Please edit .env with your actual values"; \
+    else \
+        echo ".env already exists"; \
+    fi
+
+import-data:
+    cd .. && ./scripts/import_db_data.sh
+
+clean:
+    docker compose down -v
+    docker system prune -f
+    ./mvnw clean
+    @echo "Cleanup complete"

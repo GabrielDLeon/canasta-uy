@@ -2,19 +2,21 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
-    container_name: canastauy-postgres
+    image: postgres:16-alpine
+    container_name: canasta-postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: canastauy
-      POSTGRES_USER: canastauy_user
-      POSTGRES_PASSWORD: canastauy_pass
+      POSTGRES_DB: ${DATABASE_DB:-canastauy}
+      POSTGRES_USER: ${DATABASE_USER:-canastauy_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-canastauy_pass}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U canastauy_user" ]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-canastauy_user} -d ${DATABASE_DB:-canastauy}"]
+      interval: 5s
       timeout: 5s
       retries: 5
     networks:
@@ -22,16 +24,15 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: canastauy-redis
+    container_name: canasta-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
       retries: 5
     networks:
       - canastauy-network
@@ -40,8 +41,8 @@ services:
     image: dpage/pgadmin4:latest
     container_name: canastauy-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@canastauy.uy
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@canastauy.uy}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
       - "5050:80"
     depends_on:
