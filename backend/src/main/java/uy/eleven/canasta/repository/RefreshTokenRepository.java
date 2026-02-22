@@ -14,4 +14,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByTokenValue(String tokenValue);
 
     List<RefreshToken> findByIsRevokedFalseAndExpiresAtBefore(LocalDateTime now);
+
+    List<RefreshToken> findByClientClientIdAndIsRevokedFalse(Long clientId);
 }

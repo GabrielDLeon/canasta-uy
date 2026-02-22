@@ -62,6 +62,13 @@ public class ApiKeyService {
     }
 
     @Transactional(readOnly = true)
+    public int countActiveApiKeys(Long clientId) {
+        return (int) getClientApiKeys(clientId).stream()
+                .filter(ApiKey::isActive)
+                .count();
+    }
+
+    @Transactional(readOnly = true)
     public Client validateApiKey(String keyValue) {
         String cacheKey = API_KEY_CACHE_PREFIX + keyValue;
 
@@ -114,5 +121,12 @@ public class ApiKeyService {
     private void updateLastUsedInCache(String keyValue) {
         String lastUsedKey = LAST_USED_CACHE_PREFIX + keyValue;
         redisTemplate.opsForValue().set(lastUsedKey, LocalDateTime.now().toString(), CACHE_TTL);
+    }
+
+    public String maskApiKey(String keyValue) {
+        if (keyValue == null || keyValue.length() < 12) {
+            return keyValue;
+        }
+        return keyValue.substring(0, 10) + "..." + keyValue.substring(keyValue.length() - 4);
     }
 }

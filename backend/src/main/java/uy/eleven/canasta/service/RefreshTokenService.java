@@ -77,6 +77,19 @@ public class RefreshTokenService {
         refreshTokenRepository.save(token);
     }
 
+    @Transactional
+    public void revokeAllUserRefreshTokens(Long clientId) {
+        var tokens = refreshTokenRepository.findByClientClientIdAndIsRevokedFalse(clientId);
+
+        tokens.forEach(
+                token -> {
+                    token.setRevoked(true);
+                    token.setRevokedAt(LocalDateTime.now());
+                });
+
+        refreshTokenRepository.saveAll(tokens);
+    }
+
     @Scheduled(cron = "0 0 3 * * ?")
     @Transactional
     public void cleanupExpiredTokens() {

@@ -1,11 +1,10 @@
 package uy.eleven.canasta.security.util;
 
+import org.springframework.stereotype.Component;
+
 import java.security.SecureRandom;
 
-/**
- * Generates cryptographically secure API keys.
- * Format: sk_live_<64_hex_characters> (256-bit entropy)
- */
+@Component
 public class ApiKeyGenerator {
 
     private static final String PREFIX = "sk_live_";

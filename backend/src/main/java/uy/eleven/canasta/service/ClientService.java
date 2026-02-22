@@ -20,15 +20,12 @@ public class ClientService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Client register(String username, String password, String email) {
-        if (clientRepository.existsByUsername(username))
-            throw new DuplicateUsernameException(username);
-
+    public Client register(String email, String password) {
         if (clientRepository.existsByEmail(email)) throw new DuplicateEmailException(email);
 
         Client client =
                 Client.builder()
-                        .username(username)
+                        .username(email)
                         .email(email)
                         .password(passwordEncoder.encode(password))
                         .build();

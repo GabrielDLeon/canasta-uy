@@ -1,6 +1,6 @@
 ---
-status: pending
-updated: 2026-02-07
+status: core_complete
+updated: 2026-02-22
 ---
 
 # Phase 3: Backend - Authentication & Security - CONTEXT
@@ -13,7 +13,7 @@ Implement dual authentication system for CanastaUY API:
 - **JWT authentication** for web dashboard and account management
 - **API Key authentication** for programmatic data access (scripts, notebooks, integrations)
 
-**Status**: PENDING - Architecture decisions documented, implementation not started
+**Status**: CORE COMPLETE - Implementation finished, pending testing phase
 
 ---
 
@@ -25,10 +25,12 @@ Implement dual authentication system for CanastaUY API:
 
 #### 1. JWT Authentication (Web Dashboard)
 **Use case**: Human users managing their account via web interface
-- Login with username/password → receive JWT tokens
+- Login with email/password → receive JWT tokens
 - Access token (short-lived, 15 minutes)
 - Refresh token (long-lived, 7 days)
 - Used for account management endpoints
+
+**Note**: Username field deprecated. Email is the primary identifier.
 
 **Why JWT for web:**
 - ✅ Standard for web authentication
@@ -87,30 +89,15 @@ Implement dual authentication system for CanastaUY API:
 
 ---
 
-### Rate Limiting (Critical Security Layer)
+### Rate Limiting [NICE TO HAVE]
 
-**Why it's necessary:**
-- Without rate limiting, API Keys are vulnerable to abuse
-- Malicious user could hammer the API with thousands of requests
-- Accidental bugs (infinite loops in client code) could cause issues
-- DDoS attacks become possible
+**Priority**: Implement after core authentication is complete.
 
-**How it works:**
-- Track request count per API key per hour
-- Allow 100 requests per hour (conservative, data-science friendly)
-- Return HTTP 429 (Too Many Requests) when limit exceeded
-- Reset counter every hour
+**Purpose**: Prevent API abuse by limiting requests per API key.
 
-**Storage strategy:**
-- Cache in Redis (fast lookup, O(1) operation)
-- Sliding window approach (doesn't matter when requests arrive in the hour)
-- TTL auto-expires counters (no manual cleanup)
+**Target**: 100 requests/hour per API key, return HTTP 429 when exceeded.
 
-**Request frequency breakdown**:
-- 100 requests/hour = ~1.66 requests/minute average
-- Peak: ~2-3 requests/second (acceptable for programmatic access)
-- Typical data science workflow: 50-100 requests (fits within limit)
-- Data scientist downloading 300 products: 3 hours (justifies optimization)
+**Note**: This security layer will be implemented in a later phase of the project.
 
 ---
 
@@ -147,11 +134,11 @@ Implement dual authentication system for CanastaUY API:
 - Risk of spam is low (only need valid email eventually)
 
 **What happens during registration:**
-1. User provides username, email, password
-2. System validates uniqueness (no duplicate usernames/emails)
+1. User provides email, password (username field deprecated)
+2. System validates uniqueness (no duplicate emails)
 3. Password is hashed (never stored in plaintext)
-4. API key is generated randomly
-5. Client record saved to PostgreSQL
+4. Client record saved to PostgreSQL (email stored in username field for DB compatibility)
+5. User must create API key via /account/api-keys endpoint
 6. API key returned to user (only shown once!)
 7. User must save the key for future API calls
 
@@ -184,11 +171,7 @@ JwtAuthFilter: Validate JWT token
 ```
 Client sends request with API Key in header
     ↓
-RateLimitFilter: Check if requests exceeded 100/hour
-    ├─ Yes → Return HTTP 429
-    └─ No  → Continue
-         ↓
-    ApiKeyAuthFilter: Validate API key exists + active
+ApiKeyAuthFilter: Validate API key exists + active
          ├─ Check Redis cache first (fast)
          │   ├─ Cache miss → Query PostgreSQL
          │   └─ Cache result for 1 hour
@@ -306,9 +289,10 @@ RateLimitFilter: Check if requests exceeded 100/hour
 
 **POST /api/v1/auth/register**
 - Public endpoint (no authentication required)
-- Input: username, email, password
-- Output: clientId, username, defaultApiKey (first key created automatically)
+- Input: email, password (username deprecated)
+- Output: clientId, email
 - Response: HTTP 201 Created
+- Note: API key must be created separately via POST /account/api-keys
 
 **POST /api/v1/auth/login**
 - Public endpoint (no authentication required)

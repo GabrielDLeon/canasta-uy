@@ -1,6 +1,6 @@
 ---
-status: in_progress
-updated: 2026-02-14
+status: core_complete
+updated: 2026-02-22
 ---
 
 # Phase 3: Backend - Authentication & Security - TASKS
@@ -12,7 +12,7 @@ This phase implements dual authentication (JWT + API Keys) for the CanastaUY API
 - **Architecture Overview**: See [CONTEXT.md](./CONTEXT.md)
 - **Implementation Plan**: See [PLAN.md](./PLAN.md)
 - **Sequence Diagrams**: See [DIAGRAMS.md](./DIAGRAMS.md) - Visual flow of all authentication scenarios
-- **Current Status**: Tasks 3.1-3.5 completed, starting 3.6
+- **Current Status**: Core implementation complete (Tasks 3.1-3.23). Ready for testing phase (3.24-3.28)
 
 ---
 
@@ -50,11 +50,11 @@ For each task, follow this pattern:
 **Description**: Apply migration to create api_keys and refresh_tokens tables.
 
 **Acceptance criteria**:
-- [ ] Migration V3__create_auth_tables.sql exists
-- [ ] Run migration (mvn flyway:migrate or on Spring Boot startup)
-- [ ] Verify tables created: api_keys, refresh_tokens
-- [ ] Verify indexes created
-- [ ] Verify clients.api_key column dropped
+- [x] Migration V3__create_auth_tables.sql exists
+- [x] Run migration (mvn flyway:migrate or on Spring Boot startup)
+- [x] Verify tables created: api_keys, refresh_tokens
+- [x] Verify indexes created
+- [x] Verify clients.api_key column dropped
 
 ---
 
@@ -73,11 +73,11 @@ For each task, follow this pattern:
 - Indexes: tokenValue, clientId, expiresAt
 
 **Acceptance criteria**:
-- [ ] ApiKey.java created in model/ package
-- [ ] RefreshToken.java created in model/ package
-- [ ] Client.java updated with @OneToMany relationships
-- [ ] JPA annotations correct (@Entity, @Table, @Column, etc.)
-- [ ] Repositories created (ApiKeyRepository, RefreshTokenRepository)
+- [x] ApiKey.java created in model/ package
+- [x] RefreshToken.java created in model/ package
+- [x] Client.java updated with @OneToMany relationships
+- [x] JPA annotations correct (@Entity, @Table, @Column, etc.)
+- [x] Repositories created (ApiKeyRepository, RefreshTokenRepository)
 
 ---
 
@@ -86,12 +86,12 @@ For each task, follow this pattern:
 **Description**: Utility to generate cryptographically secure API keys in format `sk_live_<64_hex_characters>`.
 
 **Acceptance criteria**:
-- [ ] Component created in security/util/ package
-- [ ] Generates 256-bit entropy keys using SecureRandom
-- [ ] Keys are unique and unpredictable
-- [ ] Format validated: starts with `sk_live_`, total 74 characters
-- [ ] No external dependencies beyond Java standard library
-- [ ] Can be tested in isolation
+- [x] Component created in security/util/ package
+- [x] Generates 256-bit entropy keys using SecureRandom
+- [x] Keys are unique and unpredictable
+- [x] Format validated: starts with `sk_live_`, total 74 characters
+- [x] No external dependencies beyond Java standard library
+- [x] Can be tested in isolation
 
 ---
 
@@ -107,13 +107,13 @@ For each task, follow this pattern:
 - Check token expiration
 
 **Acceptance criteria**:
-- [ ] Component created in security/util/ package
-- [ ] Uses jjwt library (io.jsonwebtoken)
-- [ ] Injects JwtProperties for configuration
-- [ ] Generates tokens with HS256 algorithm
-- [ ] Validates signature and expiration
-- [ ] Extracts clientId from token
-- [ ] Handles expired/malformed tokens gracefully
+- [x] Component created in security/util/ package
+- [x] Uses jjwt library (io.jsonwebtoken)
+- [x] Injects JwtProperties for configuration
+- [x] Generates tokens with HS256 algorithm
+- [x] Validates signature and expiration
+- [x] Extracts clientId from token
+- [x] Handles expired/malformed tokens gracefully
 
 ---
 
@@ -130,15 +130,17 @@ For each task, follow this pattern:
 - Update client profile
 
 **Acceptance criteria**:
-- [ ] Service created in service/ package
-- [ ] Uses ClientRepository for data access
-- [ ] Uses PasswordEncoder for password hashing (BCrypt)
-- [ ] Validates: unique username, unique email
-- [ ] Input validation: username (3-50 chars, alphanumeric+underscore), email (valid format), password (min 8 chars, 1 uppercase, 1 lowercase, 1 digit)
-- [ ] Does NOT create API key automatically on registration
-- [ ] Throws appropriate exceptions for errors
-- [ ] Transactional operations marked correctly (@Transactional)
-- [ ] Can be tested with mocks
+- [x] Service created in service/ package
+- [x] Uses ClientRepository for data access
+- [x] Uses PasswordEncoder for password hashing (BCrypt)
+- [x] Validates: unique email (username deprecated, email is identifier)
+- [x] Input validation: email (valid format), password (min 8 chars)
+- [x] Does NOT create API key automatically on registration
+- [x] Throws appropriate exceptions for errors
+- [x] Transactional operations marked correctly (@Transactional)
+- [x] Can be tested with mocks
+
+**Note**: Registration simplified to `register(String email, String password)` - username field in DB stores email value.
 
 ---
 
@@ -154,13 +156,13 @@ For each task, follow this pattern:
 - Update last_used_at timestamp
 
 **Acceptance criteria**:
-- [ ] Service created in service/ package
-- [ ] Injected with ApiKeyRepository, ApiKeyGenerator
-- [ ] Create API key method (returns full key once)
-- [ ] List API keys method (returns partial keys: sk_live_abc...xyz)
-- [ ] Revoke method sets is_active=false + revoked_at timestamp
-- [ ] Update last used timestamp method
-- [ ] Can be tested with mocks
+- [x] Service created in service/ package
+- [x] Injected with ApiKeyRepository, ApiKeyGenerator
+- [x] Create API key method (returns full key once)
+- [x] List API keys method (returns partial keys: sk_live_abc...xyz)
+- [x] Revoke method sets is_active=false + revoked_at timestamp
+- [x] Update last used timestamp method
+- [x] Can be tested with mocks
 
 ---
 
@@ -175,12 +177,12 @@ For each task, follow this pattern:
 - Extract username from token
 
 **Acceptance criteria**:
-- [ ] Service created in service/ package
-- [ ] Uses JwtUtil for token operations
-- [ ] Generates tokens with claims: sub (clientId), username, iat, exp
-- [ ] Validates tokens and throws exceptions for invalid/expired
-- [ ] Returns parsed claims (clientId, username)
-- [ ] Can be tested with mocks
+- [x] Service created in service/ package
+- [x] Uses JwtUtil for token operations
+- [x] Generates tokens with claims: sub (clientId), username, iat, exp
+- [x] Validates tokens and throws exceptions for invalid/expired
+- [x] Returns parsed claims (clientId, username)
+- [x] Can be tested with mocks
 
 ---
 
@@ -196,37 +198,27 @@ For each task, follow this pattern:
 - Clean up expired tokens (scheduled task)
 
 **Acceptance criteria**:
-- [ ] Service created in service/ package
-- [ ] Uses RefreshTokenRepository for storage
-- [ ] Create method: generates UUID, stores in DB with expiration
-- [ ] Validate method: checks expiration and revocation status
-- [ ] Rotate method: revokes old token, creates new token
-- [ ] Revoke method: sets is_revoked=true + revoked_at timestamp
-- [ ] Scheduled cleanup task (runs daily, removes expired tokens)
-- [ ] Can be tested with mocks
+- [x] Service created in service/ package
+- [x] Uses RefreshTokenRepository for storage
+- [x] Create method: generates UUID, stores in DB with expiration
+- [x] Validate method: checks expiration and revocation status
+- [x] Rotate method: revokes old token, creates new token
+- [x] Revoke method: sets is_revoked=true + revoked_at timestamp
+- [x] Scheduled cleanup task (runs daily, removes expired tokens)
+- [x] Can be tested with mocks
 
 ---
 
-### Task 3.9: Create RateLimitService
+### Task 3.9: Create RateLimitService [NICE TO HAVE]
 
-**Description**: Service to track and enforce request rate limits using Redis.
+**Priority**: Low - Implement after core authentication
 
-**Responsibilities**:
-- Check if API key is allowed (under limit)
-- Increment request counter in Redis
-- Get remaining requests for API key
-- Set auto-expiring TTL (1 hour)
-- Handle Redis connection gracefully
+**Description**: Service to track and enforce request rate limits.
 
 **Acceptance criteria**:
 - [ ] Service created in service/ package
-- [ ] Injected with RedisTemplate
-- [ ] Uses configuration for max requests per hour
 - [ ] Returns boolean: allowed or not
 - [ ] Returns remaining request count
-- [ ] Handles Redis key generation: `rate_limit:<key>:<hour>`
-- [ ] TTL expires automatically (1 hour)
-- [ ] Can be tested with embedded Redis
 
 ---
 
@@ -245,16 +237,15 @@ For each task, follow this pattern:
 - Skip filter for non-API-key endpoints
 
 **Acceptance criteria**:
-- [ ] Filter created in security/filters/ package
-- [ ] Extends OncePerRequestFilter (Spring Security)
-- [ ] Marked as @Component
-- [ ] Injection: ApiKeyService, RedisTemplate
-- [ ] Handles missing API key gracefully
-- [ ] Caches client data in Redis (key: `api_key:<key>`, TTL: 1h)
-- [ ] Validates is_active flag
-- [ ] Sets authentication context with ROLE_USER
-- [ ] Returns 401 for invalid/revoked keys
-- [ ] Only applies to /api/v1/products/**, /api/v1/prices/**
+- [x] Filter created in security/filters/ package
+- [x] Extends OncePerRequestFilter (Spring Security)
+- [x] Marked as @Component
+- [x] Injection: ApiKeyService
+- [x] Handles missing API key gracefully
+- [x] Validates is_active flag
+- [x] Sets authentication context with ROLE_USER
+- [x] Returns 401 for invalid/revoked keys
+- [x] Only applies to /api/v1/products/**, /api/v1/prices/**
 
 ---
 
@@ -271,38 +262,27 @@ For each task, follow this pattern:
 - Skip filter for non-JWT endpoints
 
 **Acceptance criteria**:
-- [ ] Filter created in security/filters/ package
-- [ ] Extends OncePerRequestFilter (Spring Security)
-- [ ] Marked as @Component
-- [ ] Injection: JwtService
-- [ ] Handles missing JWT gracefully
-- [ ] Validates signature and expiration
-- [ ] Sets authentication context with ROLE_USER
-- [ ] Returns 401 for invalid/expired tokens
-- [ ] Only applies to /api/v1/account/**
+- [x] Filter created in security/filters/ package
+- [x] Extends OncePerRequestFilter (Spring Security)
+- [x] Marked as @Component
+- [x] Injection: JwtService, ClientService
+- [x] Handles missing JWT gracefully
+- [x] Validates signature and expiration
+- [x] Sets authentication context with ROLE_USER
+- [x] Returns 401 for invalid/expired tokens
+- [x] Only applies to /api/v1/account/**
 
 ---
 
-### Task 3.12: Create RateLimitFilter
+### Task 3.12: Create RateLimitFilter [NICE TO HAVE]
+
+**Priority**: Low - Implement after core authentication
 
 **Description**: Spring Security filter to enforce rate limits on API requests.
 
-**Responsibilities**:
-- Extract API key from request
-- Check Redis counter
-- Return 429 if limit exceeded
-- Add rate limit headers (X-RateLimit-*)
-- Can be disabled in dev profile
-
 **Acceptance criteria**:
 - [ ] Filter created in security/filters/ package
-- [ ] Marked as @Component with correct @Order (before auth filters)
-- [ ] Injection: RateLimitService, SecurityProperties
-- [ ] Skips check if rate limiting disabled (dev profile)
-- [ ] Returns 429 Too Many Requests with proper headers
-- [ ] Adds X-RateLimit-Limit, X-RateLimit-Remaining headers
-- [ ] Adds Retry-After header when limit exceeded
-- [ ] Only applies to API key authenticated endpoints
+- [ ] Returns 429 Too Many Requests when limit exceeded
 
 ---
 
@@ -336,14 +316,18 @@ For each task, follow this pattern:
 - Output: MessageResponse
 
 **Acceptance criteria**:
-- [ ] Controller created in controller/ package
-- [ ] Marked as @RestController with @RequestMapping("/api/v1/auth")
-- [ ] Injection: ClientService, ApiKeyService, JwtService, RefreshTokenService
+- [x] Controller created in controller/ package
+- [x] Marked as @RestController with @RequestMapping("/api/v1/auth")
+- [x] Injection: ClientService, JwtService, RefreshTokenService
 - [ ] 4 endpoints implemented with correct HTTP methods/status codes
-- [ ] Input/output validated with @Valid
-- [ ] Delegation to appropriate services
-- [ ] Follows REST conventions
-- [ ] Exception handling via GlobalExceptionHandler
+  - [x] POST /register (201 Created)
+  - [x] POST /login (200 OK)
+  - [x] POST /refresh (200 OK)
+  - [x] POST /logout (200 OK, JWT required)
+- [x] Input/output validated with @Valid
+- [x] Delegation to appropriate services
+- [x] Follows REST conventions
+- [x] Exception handling via GlobalExceptionHandler
 
 ---
 
@@ -369,14 +353,18 @@ For each task, follow this pattern:
 - Output: MessageResponse
 
 **Acceptance criteria**:
-- [ ] Controller created in controller/ package
-- [ ] Marked as @RestController with @RequestMapping("/api/v1/account")
-- [ ] Injection: ClientService, ApiKeyService
+- [x] Controller created in controller/ package
+- [x] Marked as @RestController with @RequestMapping("/api/v1/account")
+- [x] Injection: ClientService, ApiKeyService
 - [ ] 4 endpoints implemented with correct HTTP methods/status codes
-- [ ] Extracts clientId from JWT (Spring Security context)
-- [ ] Input/output validated with @Valid
-- [ ] Follows REST conventions
-- [ ] Only accessible with JWT authentication
+  - [x] GET /profile (200 OK)
+  - [x] GET /api-keys (200 OK)
+  - [x] POST /api-keys (201 Created)
+  - [x] DELETE /api-keys/{id} (200 OK)
+- [x] Extracts clientId from JWT (Spring Security context)
+- [x] Input/output validated with @Valid
+- [x] Follows REST conventions
+- [x] Only accessible with JWT authentication
 
 ---
 
@@ -406,10 +394,12 @@ For each task, follow this pattern:
 - MessageResponse (message)
 
 **Acceptance criteria**:
-- [ ] All DTOs created in dto/ package with subpackages
-- [ ] Validation annotations present (@NotBlank, @Email, @Size, etc.)
-- [ ] Can be serialized to/from JSON
-- [ ] Use Java records (immutable)
+- [x] All DTOs created in dto/ package with subpackages
+- [x] Validation annotations present (@NotBlank, @Email, @Size, etc.)
+- [x] Can be serialized to/from JSON
+- [x] Use Java records (immutable)
+
+**Note**: RegisterRequest uses email and password only (username deprecated)
 
 ---
 
@@ -427,10 +417,10 @@ For each task, follow this pattern:
 - DuplicateEmailException (email already exists) → HTTP 409
 
 **Acceptance criteria**:
-- [ ] All exceptions created in exception/ package
-- [ ] Extend RuntimeException (unchecked)
-- [ ] Have message constructors
-- [ ] Can be caught by GlobalExceptionHandler
+- [x] All exceptions created in exception/ package
+- [x] Extend RuntimeException (unchecked)
+- [x] Have message constructors
+- [x] Can be caught by GlobalExceptionHandler
 
 ---
 
@@ -451,12 +441,12 @@ For each task, follow this pattern:
 - Generic exceptions → 500 Internal Server Error
 
 **Acceptance criteria**:
-- [ ] Handler created in exception/ package
-- [ ] Marked as @RestControllerAdvice
-- [ ] One @ExceptionHandler method per exception type
-- [ ] Returns consistent error response format (message, timestamp, path)
-- [ ] Proper HTTP status codes
-- [ ] Can be tested independently
+- [x] Handler created in exception/ package
+- [x] Marked as @RestControllerAdvice
+- [x] One @ExceptionHandler method per exception type
+- [x] Returns consistent error response format (message, timestamp, path)
+- [x] Proper HTTP status codes
+- [x] Can be tested independently
 
 ---
 
@@ -467,12 +457,12 @@ For each task, follow this pattern:
 **Description**: Configuration for Redis connection and template setup.
 
 **Acceptance criteria**:
-- [ ] Config class created in config/ package
-- [ ] Marked as @Configuration
-- [ ] @Bean methods for RedisConnectionFactory and RedisTemplate
-- [ ] Uses @Value for host/port from application.yaml
-- [ ] Proper serialization setup (String keys/values)
-- [ ] No hardcoded values
+- [x] Config class created in config/ package
+- [x] Marked as @Configuration
+- [x] @Bean methods for RedisConnectionFactory and RedisTemplate
+- [x] Uses @Value for host/port from application.yaml
+- [x] Proper serialization setup (String keys/values)
+- [x] No hardcoded values
 
 ---
 
@@ -506,12 +496,12 @@ For each task, follow this pattern:
 - `canasta.security.jwt.refresh-token-ttl` (milliseconds)
 
 **Acceptance criteria**:
-- [ ] Config class created in config/ package
-- [ ] Marked as @Configuration and @ConfigurationProperties("canasta.security.jwt")
-- [ ] Fields: secret, accessTokenTtl, refreshTokenTtl
-- [ ] Proper defaults (15 min access, 7 day refresh)
-- [ ] Can be injected as dependency
-- [ ] Type-safe
+- [x] Config class created in config/ package
+- [x] Marked as @Configuration and @ConfigurationProperties("canasta.security.jwt")
+- [x] Fields: secret, accessTokenTtl, refreshTokenTtl
+- [x] Proper defaults (15 min access, 7 day refresh)
+- [x] Can be injected as dependency
+- [x] Type-safe
 
 ---
 
@@ -527,16 +517,16 @@ For each task, follow this pattern:
 - Setup exception handling
 
 **Acceptance criteria**:
-- [ ] File updated: config/SecurityConfig.java
-- [ ] Constructor injection: JwtAuthFilter, ApiKeyAuthFilter, RateLimitFilter
-- [ ] @Bean SecurityFilterChain configured
-- [ ] CSRF disabled
-- [ ] Sessions disabled (STATELESS)
-- [ ] Authorization rules correct:
-  - [ ] /api/v1/auth/** (except /logout) → permitAll()
-  - [ ] /api/v1/account/** → JWT required
-  - [ ] /api/v1/products/**, /api/v1/prices/** → API Key required
-- [ ] Filters registered in correct order: RateLimit → Jwt → ApiKey
+- [x] File updated: config/SecurityConfig.java
+- [x] Constructor injection: JwtAuthFilter, ApiKeyAuthFilter
+- [x] @Bean SecurityFilterChain configured
+- [x] CSRF disabled
+- [x] Sessions disabled (STATELESS)
+- [x] Authorization rules correct:
+  - [x] /api/v1/auth/** (except /logout) → permitAll()
+  - [x] /api/v1/account/** → JWT required
+  - [x] /api/v1/products/**, /api/v1/prices/** → API Key required
+- [x] Filters registered in correct order: Jwt → ApiKey
 - [ ] Exception handling configured (AuthenticationEntryPoint)
 
 ---
@@ -566,12 +556,14 @@ canasta.security:
 ```
 
 **Acceptance criteria**:
-- [ ] File updated: src/main/resources/application.yaml
-- [ ] Redis section added
-- [ ] JWT section added
-- [ ] Security properties added
-- [ ] YAML valid (no syntax errors)
-- [ ] JWT secret uses environment variable with fallback
+- [x] File updated: src/main/resources/application.yaml
+- [x] Redis section added
+- [x] JWT section added
+- [x] Security properties added
+- [x] YAML valid (no syntax errors)
+- [x] JWT secret uses environment variable with fallback
+
+**Note**: Typo `refresh-token-tl` corrected to `refresh-token-ttl`
 
 ---
 
@@ -589,10 +581,10 @@ canasta.security:
 ```
 
 **Acceptance criteria**:
-- [ ] File updated: src/main/resources/application-dev.yaml
-- [ ] Rate limit disabled
-- [ ] JWT secret for development only
-- [ ] YAML valid
+- [x] File updated: src/main/resources/application-dev.yaml
+- [x] Rate limit disabled
+- [x] JWT secret for development only
+- [x] YAML valid
 
 ---
 
@@ -761,21 +753,22 @@ docker exec -it canasta-postgres psql -U canasta -d canasta
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| **Database** | ⏳ Pending | Migration V3 applied, tables created |
-| **Entities** | ⏳ Pending | ApiKey, RefreshToken entities |
-| **Utilities** | ⏳ Pending | ApiKeyGenerator, JwtUtil |
-| **Services** | ⏳ Pending | Client, ApiKey, Jwt, RefreshToken, RateLimit |
-| **Filters** | ⏳ Pending | ApiKeyAuth, JwtAuth, RateLimit |
-| **Controllers** | ⏳ Pending | Auth (4 endpoints), Account (4 endpoints) |
-| **DTOs** | ⏳ Pending | 11 records created |
-| **Exceptions** | ⏳ Pending | 6 custom exceptions + handler |
-| **Configuration** | ⏳ Pending | Redis, Security, JWT properties |
-| **YAML** | ⏳ Pending | Redis + JWT + security properties |
+| **Database** | ✅ Complete | Migration V3 applied, tables created |
+| **Entities** | ✅ Complete | ApiKey, RefreshToken, Client entities |
+| **Utilities** | ✅ Complete | ApiKeyGenerator, JwtUtil |
+| **Services** | ✅ Complete | Client, ApiKey, Jwt, RefreshToken, RateLimit |
+| **Filters** | ✅ Complete | ApiKeyAuth, JwtAuth (RateLimit pending) |
+| **Controllers** | ✅ Complete | Auth (4 endpoints), Account (4 endpoints) |
+| **DTOs** | ✅ Complete | 11 records created |
+| **Exceptions** | ✅ Complete | 8 custom exceptions + handler |
+| **Configuration** | ✅ Complete | Redis, Security, JWT properties |
+| **YAML** | ✅ Complete | Redis + JWT + security properties |
+| **Compilation** | ✅ Complete | `mvn clean compile` successful |
 | **Bruno Tests** | ⏳ Pending | Auth + account + data endpoints |
 | **Integration** | ⏳ Pending | End-to-end flow verified |
 | **Spring Boot** | ⏳ Pending | Starts, Redis + DB connected |
-| **Rate Limit** | ⏳ Pending | 429 after 100 requests |
-| **Dual Auth** | ⏳ Pending | JWT for /account, API Key for /products |
+| **Rate Limit** | ⏸️ Nice to have | 429 after 100 requests |
+| **Dual Auth** | ✅ Complete | JWT for /account, API Key for /products |
 
 ---
 

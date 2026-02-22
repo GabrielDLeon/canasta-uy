@@ -54,7 +54,7 @@ canasta:
     jwt:
       secret: "${JWT_SECRET}"
       access-token-ttl: 900000
-      refresh-token-tl: 604800000
+      refresh-token-ttl: 604800000
 
 management:
   endpoints:
