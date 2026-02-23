@@ -12,8 +12,12 @@ post {
 
 body:json {
   {
-    "name": "my first api key"
+    "name": "{{name}}"
   }
+}
+
+vars:pre-request {
+  name: Monday Test
 }
 
 script:post-response {
