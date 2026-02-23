@@ -65,7 +65,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<MessageResponse>> logout(Authentication authentication) {
-        Client client = (Client) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
+        Client client =
+                clientService.findByUsername(email);
         refreshTokenService.revokeAllUserRefreshTokens(client.getClientId());
         return ResponseEntity.ok(
                 ApiResponse.success(new MessageResponse("Logged out successfully")));

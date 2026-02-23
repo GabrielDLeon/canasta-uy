@@ -27,7 +27,8 @@ public class AccountController {
 
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<ProfileResponse>> getProfile(Authentication authentication) {
-        Client client = (Client) authentication.getPrincipal();
+        String username = (String) authentication.getPrincipal();
+        Client client = clientService.findByUsername(username);
         int totalKeys = apiKeyService.countActiveApiKeys(client.getClientId());
 
         return ResponseEntity.ok(
@@ -42,7 +43,8 @@ public class AccountController {
     @GetMapping("/api-keys")
     public ResponseEntity<ApiResponse<ApiKeyListResponse>> listApiKeys(
             Authentication authentication) {
-        Client client = (Client) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
+        Client client = clientService.findByUsername(email);
         List<ApiKey> keys = apiKeyService.getClientApiKeys(client.getClientId());
 
         List<ApiKeyResponse> responses =
@@ -67,7 +69,8 @@ public class AccountController {
     public ResponseEntity<ApiResponse<ApiKeyResponse>> createApiKey(
             @Valid @RequestBody CreateApiKeyRequest request, Authentication authentication) {
 
-        Client client = (Client) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
+        Client client = clientService.findByUsername(email);
         ApiKey key = apiKeyService.createApiKey(client.getClientId(), request.name());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -88,7 +91,8 @@ public class AccountController {
     public ResponseEntity<ApiResponse<MessageResponse>> revokeApiKey(
             @PathVariable Long id, Authentication authentication) {
 
-        Client client = (Client) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
+        Client client = clientService.findByUsername(email);
         apiKeyService.revokeApiKey(client.getClientId(), id);
 
         return ResponseEntity.ok(

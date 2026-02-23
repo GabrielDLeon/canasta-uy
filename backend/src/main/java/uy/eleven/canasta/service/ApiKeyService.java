@@ -63,19 +63,23 @@ public class ApiKeyService {
 
     @Transactional(readOnly = true)
     public int countActiveApiKeys(Long clientId) {
-        return (int) getClientApiKeys(clientId).stream()
-                .filter(ApiKey::isActive)
-                .count();
+        return (int) getClientApiKeys(clientId).stream().filter(ApiKey::isActive).count();
     }
 
     @Transactional(readOnly = true)
     public Client validateApiKey(String keyValue) {
         String cacheKey = API_KEY_CACHE_PREFIX + keyValue;
 
-        Client cachedClient = (Client) redisTemplate.opsForValue().get(cacheKey);
-        if (cachedClient != null) {
+        String cachedClientIdStr = (String) redisTemplate.opsForValue().get(cacheKey);
+        if (cachedClientIdStr != null) {
             updateLastUsedInCache(keyValue);
-            return cachedClient;
+            Long cachedClientId = Long.parseLong(cachedClientIdStr);
+            return clientRepository
+                    .findById(cachedClientId)
+                    .orElseThrow(
+                            () ->
+                                    new InvalidApiKeyException(
+                                            "Client not found for cached API key"));
         }
 
         ApiKey apiKey =
@@ -88,7 +92,7 @@ public class ApiKeyService {
         }
 
         Client client = apiKey.getClient();
-        redisTemplate.opsForValue().set(cacheKey, client, CACHE_TTL);
+        redisTemplate.opsForValue().set(cacheKey, String.valueOf(client.getClientId()), CACHE_TTL);
         updateLastUsedInCache(keyValue);
 
         return client;

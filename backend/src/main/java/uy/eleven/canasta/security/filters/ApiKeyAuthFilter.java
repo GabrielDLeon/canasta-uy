@@ -45,7 +45,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            client,
+                            client.getEmail(),
                             apiKey,
                             Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
@@ -53,7 +53,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-            log.warn("API key validation failed: {}", e.getMessage());
+            log.warn("API key validation failed: {}", e.getMessage(), e);
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\":\"Invalid or revoked API key\"}");
