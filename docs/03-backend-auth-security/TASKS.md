@@ -1,6 +1,6 @@
 ---
-status: core_complete
-updated: 2026-02-22
+status: integration_complete
+updated: 2026-02-23
 ---
 
 # Phase 3: Backend - Authentication & Security - TASKS
@@ -11,8 +11,19 @@ This phase implements dual authentication (JWT + API Keys) for the CanastaUY API
 
 - **Architecture Overview**: See [CONTEXT.md](./CONTEXT.md)
 - **Implementation Plan**: See [PLAN.md](./PLAN.md)
-- **Sequence Diagrams**: See [DIAGRAMS.md](./DIAGRAMS.md) - Visual flow of all authentication scenarios
-- **Current Status**: Core implementation complete (Tasks 3.1-3.23). Ready for testing phase (3.24-3.28)
+- **Sequence Diagrams**: See [DIAGRAMS.md](./DIAGRAMS) - Visual flow of all authentication scenarios
+- **Current Status**: ✅ Core implementation complete (Tasks 3.1-3.28). Ready for next phase
+
+## Important Note: Redis Serialization
+
+When using `StringRedisSerializer`, you must convert values to String before saving:
+```java
+// ❌ Wrong - causes ClassCastException
+redisTemplate.opsForValue().set(key, clientId, ttl);
+
+// ✅ Correct - convert to String first
+redisTemplate.opsForValue().set(key, String.valueOf(clientId), ttl);
+```
 
 ---
 
@@ -590,7 +601,9 @@ canasta.security:
 
 ## Part G: Testing & Integration
 
-### Task 3.24: Create Bruno API tests - Registration
+### Task 3.24: Create Bruno API tests - Registration ✅
+
+**Status**: COMPLETED 2026-02-23
 
 **Description**: Create Bruno test for /auth/register endpoint.
 
@@ -600,16 +613,18 @@ canasta.security:
 - Save API key to environment variable for subsequent tests
 
 **Acceptance criteria**:
-- [ ] File created: bruno-collection/auth/01-register.bru
-- [ ] Request type: POST
-- [ ] URL: {{baseUrl}}/api/v1/auth/register
-- [ ] Request body: valid JSON with username, email, password
-- [ ] Tests: status 201, defaultApiKey present, format validation
-- [ ] API key saved to environment variable
+- [x] File created: bruno-collection/auth/01-register.bru
+- [x] Request type: POST
+- [x] URL: {{baseUrl}}/api/v1/auth/register
+- [x] Request body: valid JSON with username, email, password
+- [x] Tests: status 201, defaultApiKey present, format validation
+- [x] API key saved to environment variable
 
 ---
 
-### Task 3.25: Create Bruno API tests - Login/Refresh/Logout
+### Task 3.25: Create Bruno API tests - Login/Refresh/Logout ✅
+
+**Status**: COMPLETED 2026-02-23
 
 **Description**: Create Bruno tests for JWT authentication flow.
 
@@ -619,15 +634,17 @@ canasta.security:
 - POST /auth/logout with JWT → verify token revoked
 
 **Acceptance criteria**:
-- [ ] Files created: bruno-collection/auth/02-login.bru, 03-refresh.bru, 04-logout.bru
-- [ ] Login: saves accessToken and refreshToken to environment
-- [ ] Refresh: uses refreshToken, saves new tokens
-- [ ] Logout: uses accessToken, verifies 200 OK
-- [ ] Tests verify response structure and status codes
+- [x] Files created: bruno-collection/auth/02-login.bru, 03-refresh.bru, 04-logout.bru
+- [x] Login: saves accessToken and refreshToken to environment
+- [x] Refresh: uses refreshToken, saves new tokens
+- [x] Logout: uses accessToken, verifies 200 OK
+- [x] Tests verify response structure and status codes
 
 ---
 
-### Task 3.26: Create Bruno API tests - Account Management
+### Task 3.26: Create Bruno API tests - Account Management ✅
+
+**Status**: COMPLETED 2026-02-23
 
 **Description**: Create Bruno tests for /account endpoints.
 
@@ -638,16 +655,18 @@ canasta.security:
 - DELETE /account/api-keys/{id} with JWT
 
 **Acceptance criteria**:
-- [ ] Files created: bruno-collection/account/*.bru
-- [ ] All requests use JWT from environment ({{accessToken}})
-- [ ] Profile test: verifies clientId, username, email
-- [ ] List keys test: verifies array response with partial keys
-- [ ] Create key test: saves full key to environment
-- [ ] Delete key test: verifies 200 OK
+- [x] Files created: bruno-collection/account/*.bru
+- [x] All requests use JWT from environment ({{accessToken}})
+- [x] Profile test: verifies clientId, username, email
+- [x] List keys test: verifies array response with partial keys
+- [x] Create key test: saves full key to environment
+- [x] Delete key test: verifies 200 OK
 
 ---
 
-### Task 3.27: Update Bruno API tests - Data Endpoints
+### Task 3.27: Update Bruno API tests - Data Endpoints ✅
+
+**Status**: COMPLETED 2026-02-23
 
 **Description**: Update existing product endpoint tests to use API key authentication.
 
@@ -657,33 +676,39 @@ canasta.security:
 - GET /api/v1/products/search → Add Authorization header
 
 **Acceptance criteria**:
-- [ ] All product endpoints have Authorization header
-- [ ] Use {{apiKey}} environment variable
-- [ ] Tests pass with valid API key
-- [ ] Tests fail (401) without API key
+- [x] All product endpoints have Authorization header
+- [x] Use {{apiKey}} environment variable
+- [x] Tests pass with valid API key
+- [x] Tests fail (401) without API key
 
 ---
 
-### Task 3.28: Integration Testing
+### Task 3.28: Integration Testing ✅
+
+**Status**: COMPLETED 2026-02-23
 
 **Description**: Start Spring Boot and verify dual authentication system works end-to-end.
 
 **Manual verification checklist**:
-- [ ] Spring Boot starts without errors (mvn spring-boot:run -Dspring-boot.run.profiles=dev)
-- [ ] Redis connected (logs show connection)
-- [ ] PostgreSQL migrations applied (3 migrations total)
-- [ ] Tables exist: clients, api_keys, refresh_tokens
-- [ ] POST /auth/register returns 201 with defaultApiKey
-- [ ] POST /auth/login returns 200 with JWT tokens
-- [ ] POST /auth/refresh returns 200 with new tokens
-- [ ] GET /account/profile with JWT returns 200
-- [ ] POST /account/api-keys with JWT returns 201 with full key
-- [ ] GET /products without Authorization returns 401
-- [ ] GET /products with valid API key returns 200
-- [ ] GET /products with JWT returns 401 (wrong auth type)
-- [ ] GET /account/profile with API key returns 401 (wrong auth type)
-- [ ] POST /auth/logout revokes refresh token
-- [ ] Redis cache populated (verify with redis-cli)
+- [x] Spring Boot starts without errors (mvn spring-boot:run -Dspring-boot.run.profiles=dev)
+- [x] Redis connected (logs show connection)
+- [x] PostgreSQL migrations applied (3 migrations total)
+- [x] Tables exist: clients, api_keys, refresh_tokens
+- [x] POST /auth/register returns 201 with defaultApiKey
+- [x] POST /auth/login returns 200 with JWT tokens
+- [x] POST /auth/refresh returns 200 with new tokens
+- [x] GET /account/profile with JWT returns 200
+- [x] POST /account/api-keys with JWT returns 201 with full key
+- [x] GET /products without Authorization returns 401
+- [x] GET /products with valid API key returns 200
+- [x] GET /products with JWT returns 401 (wrong auth type)
+- [x] GET /account/profile with API key returns 401 (wrong auth type)
+- [x] POST /auth/logout revokes refresh token
+- [x] Redis cache populated (verify with redis-cli)
+
+**Bug fixes during integration**:
+- Fixed Redis `StringRedisSerializer` Long/String cast issue (see note at top of document)
+- Fixed Principal type in filters (now using email String instead of Client object)
 
 **Commands**:
 ```bash
@@ -764,9 +789,9 @@ docker exec -it canasta-postgres psql -U canasta -d canasta
 | **Configuration** | ✅ Complete | Redis, Security, JWT properties |
 | **YAML** | ✅ Complete | Redis + JWT + security properties |
 | **Compilation** | ✅ Complete | `mvn clean compile` successful |
-| **Bruno Tests** | ⏳ Pending | Auth + account + data endpoints |
-| **Integration** | ⏳ Pending | End-to-end flow verified |
-| **Spring Boot** | ⏳ Pending | Starts, Redis + DB connected |
+| **Bruno Tests** | ✅ Complete | Auth + account + data endpoints |
+| **Integration** | ✅ Complete | End-to-end flow verified 2026-02-23 |
+| **Spring Boot** | ✅ Complete | Starts, Redis + DB connected |
 | **Rate Limit** | ⏸️ Nice to have | 429 after 100 requests |
 | **Dual Auth** | ✅ Complete | JWT for /account, API Key for /products |
 
@@ -805,4 +830,4 @@ docker exec -it canasta-postgres psql -U canasta -d canasta
 
 ---
 
-**Last Updated**: 2026-02-07
+**Last Updated**: 2026-02-23
