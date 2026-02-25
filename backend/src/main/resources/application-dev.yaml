@@ -6,22 +6,18 @@ spring:
       - org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
       - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
-
   jpa:
     show-sql: false
-
 logging:
   level:
     org.flywaydb: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     uy.eleven.canasta: DEBUG
-
 canasta:
   security:
     jwt:
       secret: "${JWT_SECRET}"
-
 management:
   endpoint:
     health:

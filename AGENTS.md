@@ -8,6 +8,11 @@ This file provides guidance to AI Agent when working with code in this repositor
 
 **Important**: This is a learning project. All architectural and technology decisions should be made by the project owner. Claude should focus on boilerplate code, repetitive tasks, and execution of decisions already made.
 
+## Documentation Style Guidelines
+
+- **Do not use emojis** in documentation files (Markdown files in `docs/`)
+- Use plain text for status indicators (e.g., "Complete", "In Progress", "Pending" instead of emojis)
+
 **Current Dataset**:
 
 - 817,842 price records across 379 unique products
