@@ -6,11 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import uy.eleven.canasta.exception.ProductNotFoundException;
 import uy.eleven.canasta.model.Product;
 import uy.eleven.canasta.repository.ProductRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -26,8 +26,8 @@ public class ProductService {
         return productRepository.findAll(PageRequest.of(page, size));
     }
 
-    public Optional<Product> getProductById(Integer id) {
-        return productRepository.findById(id);
+    public Product getProductById(Integer id) {
+        return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     public List<Product> searchProductsByName(String query) {

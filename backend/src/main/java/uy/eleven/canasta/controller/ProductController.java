@@ -67,9 +67,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Product>> getProductById(@PathVariable Integer id) {
-        return productService
-                .getProductById(id)
-                .map(product -> ResponseEntity.ok(ApiResponse.success(product)))
-                .orElse(ResponseEntity.notFound().build());
+        Product product = productService.getProductById(id);
+        return ResponseEntity.ok(ApiResponse.success(product));
     }
 }

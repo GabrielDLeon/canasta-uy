@@ -93,6 +93,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFound(
+            ProductNotFoundException ex, WebRequest request) {
+        ErrorResponse error =
+                new ErrorResponse(
+                        "Product not found",
+                        ex.getMessage(),
+                        request.getDescription(false).replace("uri=", ""));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
             DataIntegrityViolationException ex, WebRequest request) {
@@ -118,6 +129,17 @@ public class GlobalExceptionHandler {
         response.put("path", request.getDescription(false).replace("uri=", ""));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, WebRequest request) {
+        ErrorResponse error =
+                new ErrorResponse(
+                        "Validation failed",
+                        ex.getMessage(),
+                        request.getDescription(false).replace("uri=", ""));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(Exception.class)
