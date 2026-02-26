@@ -1,0 +1,26 @@
+meta {
+  name: Get All Products
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/products?page=0&size=20
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+  size: 20
+}
+
+tests {
+  test("should return paginated products", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body.data.products).to.be.an('array');
+    expect(res.body.data.pagination).to.be.an('object');
+    expect(res.body.data.pagination.page).to.equal(0);
+    expect(res.body.data.pagination.size).to.equal(10);
+  });
+}

@@ -11,10 +11,11 @@
 | Phase | Status | Notes |
 |-------|--------|-------|
 | **Planning** | Complete | Scope defined, endpoints designed |
-| **Infrastructure** | Pending | Cache configuration |
-| **DTOs** | Pending | Price, Category, Analytics DTOs |
-| **Services** | Pending | Business logic + caching |
-| **Controllers** | Pending | 8 new endpoints |
+| **Infrastructure** | Complete | CacheConfig with TTLs, JSON serialization |
+| **DTOs** | Complete | Response DTOs + Request DTOs with @Valid |
+| **Services** | Partial | PriceService, CategoryService enhanced. AnalyticsService pending (user implementation) |
+| **Controllers** | Partial | PriceController (2 endpoints), CategoryController (2 endpoints). AnalyticsController pending |
+| **Repositories** | Complete | Custom queries with DTO projections |
 | **Testing** | Pending | Bruno tests |
 | **Documentation** | Pending | OpenAPI, ENDPOINTS.md |
 
@@ -28,18 +29,28 @@
 - [x] Tasks document created
 - [x] Architecture decisions finalized
 - [x] Hybrid response format defined
+- [x] CacheConfig with Redis (JacksonJsonRedisSerializer) (Task 4.1)
+- [x] DTOs Response (Price, Category, Analytics, Common) (Tasks 4.3-4.6)
+- [x] DTOs Request with @Valid (PriceSearchRequest, CategoryProductsRequest, etc.)
+- [x] PriceService enhanced with mapping methods (Task 4.7)
+- [x] CategoryService enhanced with stats calculation (Task 4.8)
+- [x] PriceController with 2 endpoints (Task 4.11)
+- [x] CategoryController with 2 endpoints (Task 4.12)
+- [x] Repository custom queries with DTO projections (Task 4.14)
+- [x] Validation via Request DTOs (Task 4.15)
 
 ### In Progress
-- [ ] Cache configuration (Task 4.1)
+- [ ] AnalyticsController - Structure created, methods pending user implementation
+- [ ] AnalyticsService - Empty structure with method signatures for user implementation
 
 ### Pending
-- [ ] DTOs creation (Tasks 4.3-4.6)
-- [ ] Services implementation (Tasks 4.7-4.10)
-- [ ] Controllers implementation (Tasks 4.11-4.13)
-- [ ] Repository queries (Task 4.14)
-- [ ] Validation (Tasks 4.15-4.16)
+- [ ] AnalyticsController full implementation (Task 4.13)
+- [ ] AnalyticsService implementation (Task 4.9 - USER IMPLEMENTATION)
+- [ ] Caching annotations on services (Task 4.10)
+- [ ] GlobalExceptionHandler updates (Task 4.16)
 - [ ] Bruno tests (Tasks 4.17-4.20)
-- [ ] Documentation (Tasks 4.21-4.22)
+- [ ] Documentation ENDPOINTS.md (Task 4.21)
+- [ ] OpenAPI annotations (Task 4.22)
 
 ---
 
@@ -98,23 +109,25 @@ None currently identified.
 
 ## Next Steps
 
-1. Create CacheConfig (Task 4.1)
-2. Create DTOs (Tasks 4.3-4.6)
-3. Implement services (Tasks 4.7-4.10)
-4. Implement controllers (Tasks 4.11-4.13)
+1. Create AnalyticsController structure with 4 endpoints (Task 4.13)
+2. Create AnalyticsService with empty method signatures for user implementation (Task 4.9)
+3. Add @Cacheable annotations to services (Task 4.10)
+4. Update GlobalExceptionHandler for new exceptions (Task 4.16)
 5. Create Bruno tests (Tasks 4.17-4.20)
 
 ---
 
 ## Success Criteria
 
-- [ ] All 8 endpoints working
+- [x] 4/8 endpoints working (PriceController + CategoryController)
+- [ ] 4/8 endpoints pending (AnalyticsController)
 - [ ] Response times <200ms (cached)
-- [ ] Date validation enforced
+- [x] Date validation enforced via @Valid Request DTOs
 - [ ] Bruno tests passing
 - [ ] Documentation complete
 - [ ] Cache reducing DB load
+- [x] Repository queries optimized with DTO projections
 
 ---
 
-**Last Updated**: 2026-02-25
+**Last Updated**: 2026-02-26

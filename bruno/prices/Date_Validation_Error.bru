@@ -1,0 +1,31 @@
+meta {
+  name: Date Validation Error
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/products/:id/prices
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 15
+}
+
+params:query {
+  from: 2024-01-01
+  to: 2025-01-01
+  granularity: daily
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+tests {
+  test("should return 400 for date range > 365 days", function() {
+    expect(res.status).to.equal(400);
+  });
+}

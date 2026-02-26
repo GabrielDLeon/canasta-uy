@@ -1,0 +1,24 @@
+meta {
+  name: Search Prices
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/prices
+  body: none
+  auth: inherit
+}
+
+params:query {
+  productIds: 15,16,17
+  from: 2024-01-01
+  to: 2024-01-31
+  granularity: daily
+  page: 0
+  size: 20
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}

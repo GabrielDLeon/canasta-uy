@@ -1,0 +1,25 @@
+meta {
+  name: Get Product Prices
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/products/:id/prices
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 15
+}
+
+params:query {
+  from: 2024-01-01
+  to: 2024-01-31
+  granularity: daily
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}

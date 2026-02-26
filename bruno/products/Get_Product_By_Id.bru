@@ -1,17 +1,17 @@
 meta {
-  name: Search Products
+  name: Get Product by ID
   type: http
-  seq: 3
+  seq: 2
 }
 
 get {
-  url: {{baseUrl}}/api/v1/products/search?query=arroz
+  url: {{baseUrl}}/api/v1/products/:id
   body: none
   auth: inherit
 }
 
-params:query {
-  query: arroz
+params:path {
+  id: 15
 }
 
 tests {
@@ -23,9 +23,10 @@ tests {
     expect(res.body.success).to.equal(true);
   });
   
-  test("should return data with search results", function() {
+  test("should return data with product", function() {
     expect(res.body.data).to.exist;
-    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.productId).to.exist;
+    expect(res.body.data.productId).to.be.a('number');
   });
   
   test("should return timestamp", function() {

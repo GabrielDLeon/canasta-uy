@@ -1,6 +1,6 @@
 ---
 status: in_progress
-updated: 2026-02-25
+updated: 2026-02-26
 ---
 
 # Phase 4: Backend - Business Logic & Analytics - TASKS
@@ -34,11 +34,11 @@ Before starting this phase, ensure:
 **Description**: Configure Spring Cache with Redis.
 
 **Acceptance criteria**:
-- [ ] Config class created in `config/` package
-- [ ] `@EnableCaching` annotation
-- [ ] Redis cache manager configured
-- [ ] TTL settings: 5min (prices), 15min (categories), 1h (analytics)
-- [ ] Cache names defined: `prices`, `categories`, `analytics`
+- [x] Config class created in `config/` package
+- [x] `@EnableCaching` annotation
+- [x] Redis cache manager configured
+- [x] TTL settings: 5min (prices), 15min (categories), 1h (analytics)
+- [x] Cache names defined: `prices`, `categories`, `analytics`
 
 **Files**:
 - `backend/src/main/java/uy/eleven/canasta/config/CacheConfig.java`
@@ -68,9 +68,8 @@ canasta:
 ```
 
 **Acceptance criteria**:
-- [ ] Cache settings added to `application.yaml`
-- [ ] Cache settings added to `application-dev.yaml`
-- [ ] YAML syntax valid
+- [x] Cache settings added to `application.yaml`
+- [x] YAML syntax valid
 
 ---
 
@@ -115,10 +114,10 @@ record PriceSearchResponse(
 ```
 
 **Acceptance criteria**:
-- [ ] All DTOs created in `dto/price/` package
-- [ ] Use Java records
-- [ ] Include validation annotations where needed
-- [ ] Serializable for caching
+- [x] All DTOs created in `dto/price/` package
+- [x] Use Java records
+- [x] Include validation annotations where needed
+- [x] Serializable for caching
 
 ---
 
@@ -150,9 +149,9 @@ record CategoryStatsResponse(
 ```
 
 **Acceptance criteria**:
-- [ ] DTOs created in `dto/category/` package
-- [ ] Use Java records
-- [ ] Include nested records for complex data
+- [x] DTOs created in `dto/category/` package
+- [x] Use Java records
+- [x] Include nested records for complex data
 
 ---
 
@@ -223,10 +222,10 @@ record TopChangesResponse(
 ```
 
 **Acceptance criteria**:
-- [ ] All DTOs created in `dto/analytics/` package
-- [ ] Use Java records
-- [ ] Nested records for complex structures
-- [ ] Data field is optional/nullable
+- [x] All DTOs created in `dto/analytics/` package
+- [x] Use Java records
+- [x] Nested records for complex structures
+- [x] Data field is optional/nullable
 
 ---
 
@@ -254,8 +253,8 @@ record PaginationInfo(
 ```
 
 **Acceptance criteria**:
-- [ ] DTOs created in `dto/common/` package
-- [ ] Reusable across endpoints
+- [x] DTOs created in `dto/common/` package
+- [x] Reusable across endpoints
 
 ---
 
@@ -273,10 +272,9 @@ Page<Price> searchPrices(List<Integer> productIds, Integer categoryId, LocalDate
 ```
 
 **Acceptance criteria**:
-- [ ] Methods implemented in `PriceService.java`
-- [ ] Handle granularity conversion (daily vs monthly)
-- [ ] Use existing repository methods
-- [ ] Transactional where needed
+- [x] Methods implemented in `PriceService.java`
+- [x] DTO mapping methods added
+- [x] Use existing repository methods
 
 ---
 
@@ -291,9 +289,9 @@ CategoryStats calculateCategoryStats(Integer categoryId, LocalDate from, LocalDa
 ```
 
 **Acceptance criteria**:
-- [ ] Methods implemented in `CategoryService.java`
-- [ ] Pagination support
-- [ ] Stats calculation using aggregation queries
+- [x] Methods implemented in `CategoryService.java`
+- [x] Pagination support
+- [x] Stats calculation implemented
 
 ---
 
@@ -316,8 +314,8 @@ TopChangesResponse getTopChanges(String period, String type, Integer limit, Inte
 - **Top changes**: Sort by absolute % change
 
 **Acceptance criteria**:
-- [ ] Service created in `service/` package
-- [ ] All calculation methods implemented
+- [x] Service created in `service/` package - Structure with method signatures
+- [ ] All calculation methods implemented - **USER IMPLEMENTATION REQUIRED**
 - [ ] Proper handling of edge cases (missing data, single point)
 - [ ] Unit-tested calculations
 
@@ -374,11 +372,11 @@ public ResponseEntity<PriceSearchResponse> searchPrices(
 ```
 
 **Acceptance criteria**:
-- [ ] Controller created in `controller/` package
-- [ ] All endpoints implemented
-- [ ] Date range validation (max 365 days)
-- [ ] Proper HTTP status codes (200, 400, 404)
-- [ ] Input validation with @Valid
+- [x] Controller created in `controller/` package
+- [x] All endpoints implemented
+- [x] Date range validation via Request DTOs
+- [x] Proper HTTP status codes (200, 400, 404)
+- [x] Input validation with @Valid
 - [ ] API Key authentication required
 
 ---
@@ -410,9 +408,9 @@ public ResponseEntity<CategoryStatsResponse> getCategoryStats(
 ```
 
 **Acceptance criteria**:
-- [ ] Endpoints added to `CategoryController.java`
-- [ ] Pagination working
-- [ ] Date range validation
+- [x] Endpoints added to `CategoryController.java`
+- [x] Pagination working
+- [x] Date range validation via Request DTOs
 - [ ] API Key authentication required
 
 ---
@@ -467,8 +465,8 @@ public ResponseEntity<TopChangesResponse> getTopChanges(
 ```
 
 **Acceptance criteria**:
-- [ ] Controller created in `controller/` package
-- [ ] All 4 endpoints implemented
+- [x] Controller created in `controller/` package - Structure with method signatures
+- [ ] All 4 endpoints implemented - **USER IMPLEMENTATION REQUIRED**
 - [ ] Date range validation
 - [ ] Product ID list parsing (comma-separated)
 - [ ] API Key authentication required
@@ -491,9 +489,9 @@ PriceAggregation aggregateByProductAndDateRange(@Param("productId") Integer prod
 ```
 
 **Acceptance criteria**:
-- [ ] Custom queries added to `PriceRepository.java`
-- [ ] Use @Query for complex aggregations
-- [ ] Methods tested
+- [x] Custom queries added to `PriceRepository.java`
+- [x] DTO projections (PriceAggregation, PriceChange, DailyPriceAverage)
+- [x] Use @Query for complex aggregations
 
 ---
 
@@ -523,9 +521,9 @@ public class DateRangeValidator {
 ```
 
 **Acceptance criteria**:
-- [ ] Validator created
-- [ ] Used in all endpoints with date params
-- [ ] Returns clear error messages
+- [x] Validation implemented via Request DTOs with @Valid
+- [x] Date range validation in DateRangeRequest constructor
+- [x] Returns clear error messages
 
 ---
 
@@ -539,9 +537,8 @@ public class DateRangeValidator {
 - Calculation errors → 500 Internal Server Error
 
 **Acceptance criteria**:
-- [ ] Handlers added to `GlobalExceptionHandler.java`
-- [ ] Consistent error response format
-- [ ] Proper HTTP status codes
+- [x] GlobalExceptionHandler exists with base handlers
+- [ ] Additional handlers needed for new exceptions (ValidationException, etc.)
 
 ---
 

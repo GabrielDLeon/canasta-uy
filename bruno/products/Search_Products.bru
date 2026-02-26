@@ -1,13 +1,19 @@
 meta {
-  name: Get All Products
+  name: Search Products
   type: http
-  seq: 1
+  seq: 3
 }
 
 get {
-  url: {{baseUrl}}/api/v1/products
+  url: {{baseUrl}}/api/v1/products/search?query=queso&page=0&size=20
   body: none
   auth: inherit
+}
+
+params:query {
+  query: queso
+  page: 0
+  size: 20
 }
 
 tests {
@@ -19,7 +25,7 @@ tests {
     expect(res.body.success).to.equal(true);
   });
   
-  test("should return data with products array", function() {
+  test("should return data with search results", function() {
     expect(res.body.data).to.exist;
     expect(res.body.data).to.be.an('array');
   });
