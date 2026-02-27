@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import uy.eleven.canasta.dto.ErrorResponse;
+import uy.eleven.canasta.dto.ApiResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,138 +17,95 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateUsernameException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateUsername(
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateUsername(
             DuplicateUsernameException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Duplicate username",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateEmail(
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateEmail(
             DuplicateEmailException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Duplicate email",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(
             InvalidCredentialsException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Invalid credentials",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(InvalidApiKeyException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidApiKey(
+    public ResponseEntity<ApiResponse<Void>> handleInvalidApiKey(
             InvalidApiKeyException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Invalid API key",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidToken(
+    public ResponseEntity<ApiResponse<Void>> handleInvalidToken(
             InvalidTokenException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Invalid token",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<ErrorResponse> handleTokenExpired(
+    public ResponseEntity<ApiResponse<Void>> handleTokenExpired(
             TokenExpiredException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Token expired",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(ClientNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleClientNotFound(
+    public ResponseEntity<ApiResponse<Void>> handleClientNotFound(
             ClientNotFoundException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Client not found",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFound(
+    public ResponseEntity<ApiResponse<Void>> handleProductNotFound(
             ProductNotFoundException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Product not found",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(
             DataIntegrityViolationException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Data integrity violation",
-                        "The operation could not be completed due to a data integrity violation",
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("Data integrity violation"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationErrors(
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(
             MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult()
                 .getFieldErrors()
                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("error", "Validation failed");
-        response.put("errors", errors);
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ApiResponse<Map<String, String>> response = new ApiResponse<>(
+                false,
+                "Validation failed",
+                errors,
+                java.time.LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(
             IllegalArgumentException ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Validation failed",
-                        ex.getMessage(),
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
-        ErrorResponse error =
-                new ErrorResponse(
-                        "Internal server error",
-                        "An unexpected error has occurred",
-                        request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Internal server error"));
     }
 }

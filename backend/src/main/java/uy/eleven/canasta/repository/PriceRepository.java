@@ -1,14 +1,10 @@
 package uy.eleven.canasta.repository;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import uy.eleven.canasta.dto.projection.DailyPriceAverage;
-import uy.eleven.canasta.dto.projection.PriceAggregation;
-import uy.eleven.canasta.dto.projection.PriceChange;
 import uy.eleven.canasta.model.Price;
 import uy.eleven.canasta.model.PriceId;
 
@@ -41,7 +37,8 @@ public interface PriceRepository extends JpaRepository<Price, PriceId> {
     //         "SELECT new uy.eleven.canasta.dto.projection.PriceAggregation("
     //                 + " AVG(p.priceAverage), MIN(p.priceAverage), MAX(p.priceAverage),"
     //                 + " AVG(p.priceMedian), MIN(p.priceMinimum), MAX(p.priceMaximum))"
-    //                 + " FROM Price p WHERE p.id.productId = :productId AND p.id.date BETWEEN :from"
+    //                 + " FROM Price p WHERE p.id.productId = :productId AND p.id.date BETWEEN
+    // :from"
     //                 + " AND :to")
     // PriceAggregation aggregateByProductAndDateRange(
     //         @Param("productId") Integer productId,
@@ -74,7 +71,8 @@ public interface PriceRepository extends JpaRepository<Price, PriceId> {
     // TODO: Fix JPQL projection
     // @Query(
     //         "SELECT new uy.eleven.canasta.dto.projection.DailyPriceAverage( AVG(p.priceAverage),"
-    //             + " p.id.date) FROM Price p WHERE p.id.productId = :productId AND p.id.date BETWEEN"
+    //             + " p.id.date) FROM Price p WHERE p.id.productId = :productId AND p.id.date
+    // BETWEEN"
     //             + " :from AND :to GROUP BY p.id.date ORDER BY p.id.date")
     // List<DailyPriceAverage> findDailyAveragesByProductAndDateRange(
     //         @Param("productId") Integer productId,

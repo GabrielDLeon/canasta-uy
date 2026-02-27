@@ -1,5 +1,10 @@
 package uy.eleven.canasta.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
@@ -21,13 +26,29 @@ import uy.eleven.canasta.service.CategoryService;
 @RestController
 @RequestMapping("/api/v1/categories")
 @AllArgsConstructor
+@Tag(name = "Categories", description = "Operaciones para consultar categorías y estadísticas")
 public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @Operation(
+            summary = "Obtener productos de una categoría",
+            description = "Obtiene la lista de productos pertenecientes a una categoría específica")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Productos obtenidos exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "404",
+                description = "Categoría no encontrada",
+                content = @Content)
+    })
     @GetMapping("/{id}/products")
     public ResponseEntity<ApiResponse<CategoryProductsResponse>> getCategoryProducts(
-            @PathVariable Integer id, @Valid @ModelAttribute CategoryProductsRequest request) {
+            @Parameter(description = "ID de la categoría", example = "1", required = true)
+            @PathVariable Integer id, 
+            @Valid @ModelAttribute CategoryProductsRequest request) {
 
         CategoryProductsResponse response =
                 categoryService.getCategoryProductsResponse(
@@ -60,9 +81,24 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success(responseWithPagination));
     }
 
+    @Operation(
+            summary = "Obtener estadísticas de una categoría",
+            description = "Obtiene estadísticas de precios para todos los productos de una categoría en un rango de fechas")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Estadísticas obtenidas exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "404",
+                description = "Categoría no encontrada",
+                content = @Content)
+    })
     @GetMapping("/{id}/stats")
     public ResponseEntity<ApiResponse<CategoryStatsResponse>> getCategoryStats(
-            @PathVariable Integer id, @Valid @ModelAttribute CategoryStatsRequest request) {
+            @Parameter(description = "ID de la categoría", example = "1", required = true)
+            @PathVariable Integer id, 
+            @Valid @ModelAttribute CategoryStatsRequest request) {
 
         CategoryStatsResponse response =
                 categoryService.calculateCategoryStats(

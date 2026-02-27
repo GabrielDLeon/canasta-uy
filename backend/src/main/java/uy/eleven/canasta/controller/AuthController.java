@@ -1,5 +1,10 @@
 package uy.eleven.canasta.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -17,12 +22,31 @@ import uy.eleven.canasta.service.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Operaciones de autenticación y gestión de sesiones")
 public class AuthController {
 
     private final ClientService clientService;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
+    @Operation(
+            summary = "Registrar nuevo usuario",
+            description = "Crea una nueva cuenta de usuario con email y contraseña")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "201",
+                description = "Usuario registrado exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "400",
+                description = "Datos de registro inválidos",
+                content = @Content),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "409",
+                description = "Email o username ya existe",
+                content = @Content)
+    })
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(
             @Valid @RequestBody RegisterRequest request) {
@@ -34,6 +58,20 @@ public class AuthController {
                                 "User registered successfully"));
     }
 
+    @Operation(
+            summary = "Iniciar sesión",
+            description = "Autentica un usuario y devuelve tokens de acceso y refresh")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Login exitoso",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "401",
+                description = "Credenciales inválidas",
+                content = @Content)
+    })
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request) {
@@ -49,6 +87,20 @@ public class AuthController {
                         "Login successful"));
     }
 
+    @Operation(
+            summary = "Refrescar token",
+            description = "Obtiene un nuevo access token usando un refresh token válido")
+    @SecurityRequirements
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Token refrescado exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "401",
+                description = "Refresh token inválido o expirado",
+                content = @Content)
+    })
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<RefreshResponse>> refresh(
             @Valid @RequestBody RefreshRequest request) {
@@ -63,6 +115,15 @@ public class AuthController {
                 ApiResponse.success(new RefreshResponse(newAccessToken, pair.refreshToken())));
     }
 
+    @Operation(
+            summary = "Cerrar sesión",
+            description = "Revoca todos los tokens de refresh del usuario actual")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Sesión cerrada exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<MessageResponse>> logout(Authentication authentication) {
         String email = (String) authentication.getPrincipal();

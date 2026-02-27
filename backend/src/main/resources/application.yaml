@@ -69,3 +69,16 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+
+# Springdoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /api/docs
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    displayRequestDuration: true
+    persistAuthorization: true

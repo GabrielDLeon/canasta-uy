@@ -25,7 +25,6 @@ import uy.eleven.canasta.service.ClientService;
 import uy.eleven.canasta.service.JwtService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Slf4j
@@ -56,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
 
             ApiResponse<Void> errorResponse =
-                    new ApiResponse<>(null, false, "JWT token required", LocalDateTime.now());
+                    ApiResponse.error("JWT token required");
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
@@ -91,7 +90,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
 
             ApiResponse<Void> errorResponse =
-                    new ApiResponse<>(null, false, "Invalid or expired token", LocalDateTime.now());
+                    ApiResponse.error("Invalid or expired token");
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
