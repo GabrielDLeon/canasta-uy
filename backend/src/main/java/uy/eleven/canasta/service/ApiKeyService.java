@@ -6,6 +6,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uy.eleven.canasta.dto.ApiKeyCreateResponse;
+import uy.eleven.canasta.dto.ApiKeyListItem;
 import uy.eleven.canasta.exception.ClientNotFoundException;
 import uy.eleven.canasta.exception.InvalidApiKeyException;
 import uy.eleven.canasta.model.ApiKey;
@@ -132,5 +134,32 @@ public class ApiKeyService {
             return keyValue;
         }
         return keyValue.substring(0, 10) + "..." + keyValue.substring(keyValue.length() - 4);
+    }
+
+    public List<ApiKeyListItem> getClientApiKeyListItems(Long clientId) {
+        Client client =
+                clientRepository
+                        .findById(clientId)
+                        .orElseThrow(() -> new ClientNotFoundException(clientId));
+
+        return apiKeyRepository.findByClient(client).stream()
+                .map(
+                        key ->
+                                new ApiKeyListItem(
+                                        key.getName(),
+                                        maskApiKey(key.getKeyValue()),
+                                        key.isActive(),
+                                        key.getCreatedAt()))
+                .toList();
+    }
+
+    public ApiKeyCreateResponse createApiKeyResponse(Long clientId, String name) {
+        ApiKey apiKey = createApiKey(clientId, name);
+        return new ApiKeyCreateResponse(
+                apiKey.getName(),
+                apiKey.getKeyValue(),
+                null,
+                apiKey.isActive(),
+                apiKey.getCreatedAt());
     }
 }

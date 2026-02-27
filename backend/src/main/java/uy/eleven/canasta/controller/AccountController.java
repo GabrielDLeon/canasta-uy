@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import uy.eleven.canasta.dto.*;
-import uy.eleven.canasta.model.ApiKey;
+import uy.eleven.canasta.dto.ApiKeyCreateResponse;
+import uy.eleven.canasta.dto.ApiKeyListItem;
+import uy.eleven.canasta.dto.ApiResponse;
+import uy.eleven.canasta.dto.CreateApiKeyRequest;
+import uy.eleven.canasta.dto.ProfileResponse;
 import uy.eleven.canasta.model.Client;
 import uy.eleven.canasta.service.ApiKeyService;
 import uy.eleven.canasta.service.ClientService;
@@ -65,33 +69,20 @@ public class AccountController {
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @GetMapping("/api-keys")
-    public ResponseEntity<ApiResponse<ApiKeyListResponse>> listApiKeys(
+    public ResponseEntity<ApiResponse<List<ApiKeyListItem>>> listApiKeys(
             Authentication authentication) {
         String email = (String) authentication.getPrincipal();
         Client client = clientService.findByUsername(email);
-        List<ApiKey> keys = apiKeyService.getClientApiKeys(client.getClientId());
+        List<ApiKeyListItem> keys = apiKeyService.getClientApiKeyListItems(client.getClientId());
 
-        List<ApiKeyResponse> responses =
-                keys.stream()
-                        .map(
-                                key -> {
-                                    String keyPrefix = apiKeyService.maskApiKey(key.getKeyValue());
-                                    return new ApiKeyResponse(
-                                            key.getId(),
-                                            key.getName(),
-                                            null,
-                                            keyPrefix,
-                                            key.isActive(),
-                                            key.getCreatedAt());
-                                })
-                        .toList();
-
-        return ResponseEntity.ok(ApiResponse.success(new ApiKeyListResponse(responses)));
+        return ResponseEntity.ok(ApiResponse.success(keys));
     }
 
     @Operation(
             summary = "Crear nueva API key",
-            description = "Crea una nueva API key para el usuario autenticado. La clave solo se muestra una vez.")
+            description =
+                    "Crea una nueva API key para el usuario autenticado. La clave solo se muestra"
+                        + " una vez.")
     @io.swagger.v3.oas.annotations.responses.ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "201",
@@ -99,25 +90,20 @@ public class AccountController {
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping("/api-keys")
-    public ResponseEntity<ApiResponse<ApiKeyResponse>> createApiKey(
+    public ResponseEntity<ApiResponse<ApiKeyCreateResponse>> createApiKey(
             @Valid @RequestBody CreateApiKeyRequest request, Authentication authentication) {
 
         String email = (String) authentication.getPrincipal();
         Client client = clientService.findByUsername(email);
-        ApiKey key = apiKeyService.createApiKey(client.getClientId(), request.name());
+        ApiKeyCreateResponse response =
+                apiKeyService.createApiKeyResponse(client.getClientId(), request.name());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         ApiResponse.success(
-                                new ApiKeyResponse(
-                                        key.getId(),
-                                        key.getName(),
-                                        key.getKeyValue(),
-                                        null,
-                                        key.isActive(),
-                                        key.getCreatedAt()),
+                                response,
                                 "API key created successfully. Save this key - it won't be shown"
-                                        + " again."));
+                                    + " again."));
     }
 
     @Operation(
@@ -134,15 +120,16 @@ public class AccountController {
                 content = @Content)
     })
     @DeleteMapping("/api-keys/{id}")
-    public ResponseEntity<ApiResponse<MessageResponse>> revokeApiKey(
+    public ResponseEntity<ApiResponse<Void>> revokeApiKey(
             @Parameter(description = "ID de la API key", example = "1", required = true)
-            @PathVariable Long id, Authentication authentication) {
+                    @PathVariable
+                    Long id,
+            Authentication authentication) {
 
         String email = (String) authentication.getPrincipal();
         Client client = clientService.findByUsername(email);
         apiKeyService.revokeApiKey(client.getClientId(), id);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(new MessageResponse("API key revoked successfully")));
+        return ResponseEntity.ok(ApiResponse.success(null, "API key revoked successfully"));
     }
 }

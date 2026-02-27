@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.AllArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -30,7 +31,8 @@ public class ProductController {
 
     @Operation(
             summary = "Listar todos los productos",
-            description = "Obtiene una lista paginada de todos los productos disponibles en el catálogo")
+            description =
+                    "Obtiene una lista paginada de todos los productos disponibles en el catálogo")
     @io.swagger.v3.oas.annotations.responses.ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "200",
@@ -40,9 +42,11 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<ApiResponse<ProductListResponse>> getAllProducts(
             @Parameter(description = "Número de página (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
+                    @RequestParam(defaultValue = "0")
+                    int page,
             @Parameter(description = "Cantidad de elementos por página", example = "20")
-            @RequestParam(defaultValue = "20") int size) {
+                    @RequestParam(defaultValue = "20")
+                    int size) {
 
         Page<Product> productPage = productService.getAllProductsPaginated(page, size);
 
@@ -72,11 +76,14 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<ProductListResponse>> searchProductsByName(
             @Parameter(description = "Término de búsqueda", example = "Arroz", required = true)
-            @RequestParam String query,
+                    @RequestParam
+                    String query,
             @Parameter(description = "Número de página (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
+                    @RequestParam(defaultValue = "0")
+                    int page,
             @Parameter(description = "Cantidad de elementos por página", example = "20")
-            @RequestParam(defaultValue = "20") int size) {
+                    @RequestParam(defaultValue = "20")
+                    int size) {
 
         Page<Product> productPage = productService.searchProductsByNamePaginated(query, page, size);
 
@@ -110,7 +117,8 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Product>> getProductById(
             @Parameter(description = "ID del producto", example = "15", required = true)
-            @PathVariable Integer id) {
+                    @PathVariable
+                    Integer id) {
         Product product = productService.getProductById(id);
         return ResponseEntity.ok(ApiResponse.success(product));
     }
