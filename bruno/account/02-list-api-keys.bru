@@ -21,16 +21,18 @@ tests {
   
   test("should return data with apiKeys array", function() {
     expect(res.body.data).to.exist;
-    expect(res.body.data.apiKeys).to.exist;
-    expect(res.body.data.apiKeys).to.be.an('array');
+    expect(res.body.data).to.be.an('array');
   });
   
-  test("each key in data should have required fields", function() {
-    if (res.body.data.apiKeys && res.body.data.apiKeys.length > 0) {
-      const key = res.body.data.apiKeys[0];
-      expect(key.id).to.exist;
+  test("each key should have required fields (without id)", function() {
+    if (res.body.data && res.body.data.length > 0) {
+      const key = res.body.data[0];
       expect(key.name).to.exist;
+      expect(key.keyPrefix).to.exist;
       expect(key.isActive).to.be.a('boolean');
+      expect(key.createdAt).to.exist;
+      expect(key.id).to.not.exist;
+      expect(key.keyValue).to.not.exist;
     }
   });
   

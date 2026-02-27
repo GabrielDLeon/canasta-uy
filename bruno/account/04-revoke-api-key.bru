@@ -19,10 +19,8 @@ tests {
     expect(res.body.success).to.equal(true);
   });
   
-  test("should return data with message", function() {
-    expect(res.body.data).to.exist;
-    expect(res.body.data.message).to.exist;
-    expect(res.body.data.message).to.be.a('string');
+  test("should return data as null", function() {
+    expect(res.body.data).to.be.null;
   });
   
   test("should return message", function() {

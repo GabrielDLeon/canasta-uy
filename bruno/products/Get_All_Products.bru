@@ -21,6 +21,6 @@ tests {
     expect(res.body.data.products).to.be.an('array');
     expect(res.body.data.pagination).to.be.an('object');
     expect(res.body.data.pagination.page).to.equal(0);
-    expect(res.body.data.pagination.size).to.equal(10);
+    expect(res.body.data.pagination.size).to.equal(20);
   });
 }

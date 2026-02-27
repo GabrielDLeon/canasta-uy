@@ -34,3 +34,107 @@ tests {
     expect(res.body.timestamp).to.be.a('string');
   });
 }
+
+example {
+  name: Product found
+  
+  request: {
+    url: {{baseUrl}}/api/v1/products/:id
+    method: GET
+    mode: none
+    params:path: {
+      id: 15
+    }
+  }
+  
+  response: {
+    headers: {
+      x-content-type-options: nosniff
+      x-xss-protection: 0
+      cache-control: no-cache, no-store, max-age=0, must-revalidate
+      pragma: no-cache
+      expires: 0
+      x-frame-options: DENY
+      content-type: application/json
+      transfer-encoding: chunked
+      date: Thu, 26 Feb 2026 21:51:32 GMT
+      keep-alive: timeout=60
+      connection: keep-alive
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "data": {
+            "productId": 15,
+            "name": "Arroz blanco Blue Patna Bolsa 1 kg.",
+            "specification": "Bolsa 1 kg.",
+            "brand": "Blue Patna",
+            "createdAt": "2026-02-22T15:12:54.041457",
+            "updatedAt": "2026-02-22T15:12:54.041457",
+            "category": {
+              "categoryId": 14,
+              "name": "Arroz blanco",
+              "createdAt": "2026-02-22T15:12:53.780856",
+              "hibernateLazyInitializer": {}
+            }
+          },
+          "success": true,
+          "timestamp": "2026-02-26T18:51:32.699609045"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Product not found
+  
+  request: {
+    url: {{baseUrl}}/api/v1/products/:id
+    method: GET
+    mode: none
+    params:path: {
+      id: 999
+    }
+  }
+  
+  response: {
+    headers: {
+      x-content-type-options: nosniff
+      x-xss-protection: 0
+      cache-control: no-cache, no-store, max-age=0, must-revalidate
+      pragma: no-cache
+      expires: 0
+      x-frame-options: DENY
+      content-type: application/json
+      transfer-encoding: chunked
+      date: Thu, 26 Feb 2026 22:00:27 GMT
+      keep-alive: timeout=60
+      connection: keep-alive
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Product not found with id: 999",
+          "data": null,
+          "timestamp": "2026-02-26T19:00:27.951391035"
+        }
+      '''
+    }
+  }
+}

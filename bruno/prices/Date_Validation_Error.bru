@@ -1,7 +1,7 @@
 meta {
   name: Date Validation Error
   type: http
-  seq: 3
+  seq: 2
 }
 
 get {
@@ -10,18 +10,14 @@ get {
   auth: inherit
 }
 
-params:path {
-  id: 15
-}
-
 params:query {
   from: 2024-01-01
   to: 2025-01-01
   granularity: daily
 }
 
-headers {
-  X-API-Key: {{apiKey}}
+params:path {
+  id: 15
 }
 
 tests {

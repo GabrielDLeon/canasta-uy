@@ -10,16 +10,12 @@ get {
   auth: inherit
 }
 
-params:path {
-  id: 15
-}
-
 params:query {
   from: 2024-01-01
   to: 2024-01-31
   granularity: daily
 }
 
-headers {
-  X-API-Key: {{apiKey}}
+params:path {
+  id: 15
 }

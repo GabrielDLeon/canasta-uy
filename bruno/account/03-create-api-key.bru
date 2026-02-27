@@ -17,7 +17,7 @@ body:json {
 }
 
 vars:pre-request {
-  name: Monday Test
+  name: Friday 27/02
 }
 
 script:post-response {
@@ -36,12 +36,6 @@ tests {
   
   test("should return success true", function() {
     expect(res.body.success).to.equal(true);
-  });
-  
-  test("should return data with id", function() {
-    expect(res.body.data).to.exist;
-    expect(res.body.data.id).to.exist;
-    expect(res.body.data.id).to.be.a('number');
   });
   
   test("should return data with name", function() {

@@ -1,5 +1,7 @@
 # CanastaUY
 
+![CanastaUY](public/canastauy-thumbnail.webp)
+
 API REST para consulta y análisis histórico de precios de productos al consumidor en Uruguay. El proyecto recopila datos desde 2016 hasta 2025, procesándolos mediante técnicas de detección de outliers para garantizar la calidad de la información.
 
 El objetivo es proporcionar una fuente de datos confiable para análisis de tendencias de precios, comparativas entre productos, y métricas de inflación por categoría. La API permite acceder a más de 774 mil registros de precios diarios mediante endpoints REST documentados con OpenAPI.
