@@ -64,11 +64,6 @@ public class AnalyticsController {
                     boolean includeData) {
 
         TrendResponse response = analyticsService.calculateTrend(productId, from, to, includeData);
-
-        if (response == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -106,11 +101,6 @@ public class AnalyticsController {
 
         InflationResponse response =
                 analyticsService.calculateInflation(categoryId, from, to, includeData);
-
-        if (response == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

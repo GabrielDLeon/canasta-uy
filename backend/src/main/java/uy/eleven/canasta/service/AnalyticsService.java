@@ -10,6 +10,8 @@ import uy.eleven.canasta.dto.analytics.InflationResponse;
 import uy.eleven.canasta.dto.analytics.TopChangesResponse;
 import uy.eleven.canasta.dto.analytics.TrendResponse;
 import uy.eleven.canasta.dto.common.DateRange;
+import uy.eleven.canasta.exception.ProductNotFoundException;
+import uy.eleven.canasta.exception.CategoryNotFoundException;
 import uy.eleven.canasta.model.Category;
 import uy.eleven.canasta.model.Price;
 import uy.eleven.canasta.model.Product;
@@ -44,16 +46,15 @@ public class AnalyticsService {
 
     @Cacheable(
             value = "analytics",
-            key = "'trend:' + #productId + ':' + #from + ':' + #to + ':' + #includeData")
+            key = "'trend:' + #productId + ':' + #from + ':' + #to + ':' + #includeData",
+            unless = "#result == null")
     public TrendResponse calculateTrend(
             Integer productId, LocalDate from, LocalDate to, boolean includeData) {
 
-        Optional<Product> productOpt = productRepository.findById(productId);
-        if (productOpt.isEmpty()) {
-            return null;
-        }
-
-        Product product = productOpt.get();
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new ProductNotFoundException(productId));
 
         LocalDate effectiveFrom =
                 from != null ? from : LocalDate.now().minusDays(DEFAULT_DATE_RANGE_DAYS);
@@ -189,16 +190,15 @@ public class AnalyticsService {
 
     @Cacheable(
             value = "analytics",
-            key = "'inflation:' + #categoryId + ':' + #from + ':' + #to + ':' + #includeData")
+            key = "'inflation:' + #categoryId + ':' + #from + ':' + #to + ':' + #includeData",
+            unless = "#result == null")
     public InflationResponse calculateInflation(
             Integer categoryId, LocalDate from, LocalDate to, boolean includeData) {
 
-        Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-        if (categoryOpt.isEmpty()) {
-            return null;
-        }
-
-        Category category = categoryOpt.get();
+        Category category =
+                categoryRepository
+                        .findById(categoryId)
+                        .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
         LocalDate effectiveFrom =
                 from != null ? from : LocalDate.now().minusDays(DEFAULT_DATE_RANGE_DAYS);
