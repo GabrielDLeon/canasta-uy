@@ -239,7 +239,7 @@ Scripts principales:
 - **Metodología**: Outliers removidos mediante IQR (5.27%)
 - **Calidad**: 99.97%
 
-Esquema de datos:
+**Esquema de datos:**
 
 ```
 prices: product_id, date, price_min, price_max, price_avg, price_median,
@@ -248,6 +248,7 @@ prices: product_id, date, price_min, price_max, price_avg, price_median,
 products: product_id, category_id, brand, specification, name
 
 categories: category_id, name, description
+```
 
 ---
 
@@ -272,4 +273,3 @@ Este gráfico resume los productos con mayores variaciones de precio en el perí
 ![Rice Seasonality Analysis](outputs/rice_seasonality_analysis.png)
 
 Este análisis muestra la estacionalidad del arroz con múltiples vistas (promedios mensuales, heatmap y distribución), facilitando la lectura de patrones temporales y su consistencia a lo largo de los años.
-```
