@@ -1,0 +1,17 @@
+meta {
+  name: Compare
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/compare?productIds=1,2,3&from=2024-01-01&to=2024-12-31
+  body: none
+  auth: inherit
+}
+
+params:query {
+  productIds: 1,2,3
+  from: 2024-01-01
+  to: 2024-12-31
+}

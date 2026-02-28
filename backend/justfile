@@ -22,6 +22,9 @@ infra-down:
 infra-logs:
     docker compose logs -f postgres redis pgadmin
 
+cache-clear:
+    docker compose exec redis redis-cli FLUSHALL
+
 dev:
     export $(grep -v '^#' .env | xargs) && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 

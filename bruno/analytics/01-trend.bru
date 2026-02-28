@@ -1,0 +1,17 @@
+meta {
+  name: Trend
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/trend/1?from=2024-01-01&to=2024-12-31&includeData=false
+  body: none
+  auth: inherit
+}
+
+params:query {
+  from: 2024-01-01
+  to: 2024-12-31
+  includeData: false
+}

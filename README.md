@@ -114,6 +114,7 @@ Todos los comandos se ejecutan desde el directorio `backend/`:
 | `just import-data` | Importar datos CSV a PostgreSQL                |
 | `just setup`       | Crear archivo .env desde template              |
 | `just clean`       | Limpiar contenedores, volúmenes y build        |
+| `just cache-clear` | Limpiar cache de Redis                         |
 
 ---
 

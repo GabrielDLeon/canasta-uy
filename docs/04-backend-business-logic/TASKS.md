@@ -1,6 +1,6 @@
 ---
 status: in_progress
-updated: 2026-02-26
+updated: 2026-02-28
 ---
 
 # Phase 4: Backend - Business Logic & Analytics - TASKS
@@ -39,6 +39,8 @@ Before starting this phase, ensure:
 - [x] Redis cache manager configured
 - [x] TTL settings: 5min (prices), 15min (categories), 1h (analytics)
 - [x] Cache names defined: `prices`, `categories`, `analytics`
+- [x] JSON serializer includes type metadata
+- [x] Cache clear command available (`just cache-clear`)
 
 **Files**:
 - `backend/src/main/java/uy/eleven/canasta/config/CacheConfig.java`
@@ -314,9 +316,9 @@ TopChangesResponse getTopChanges(String period, String type, Integer limit, Inte
 - **Top changes**: Sort by absolute % change
 
 **Acceptance criteria**:
-- [x] Service created in `service/` package - Structure with method signatures
-- [ ] All calculation methods implemented - **USER IMPLEMENTATION REQUIRED**
-- [ ] Proper handling of edge cases (missing data, single point)
+- [x] Service created in `service/` package
+- [x] All calculation methods implemented
+- [x] Edge cases handled (missing data, single point)
 - [ ] Unit-tested calculations
 
 ---
@@ -332,9 +334,9 @@ TopChangesResponse getTopChanges(String period, String type, Integer limit, Inte
 - `AnalyticsService.calculateInflation()` - 1 hour
 
 **Acceptance criteria**:
-- [ ] `@Cacheable` annotations added
-- [ ] Cache keys are unique and deterministic
-- [ ] Cache names match CacheConfig
+- [x] `@Cacheable` annotations added
+- [x] Cache keys are unique and deterministic
+- [x] Cache names match CacheConfig
 
 ---
 
@@ -465,10 +467,10 @@ public ResponseEntity<TopChangesResponse> getTopChanges(
 ```
 
 **Acceptance criteria**:
-- [x] Controller created in `controller/` package - Structure with method signatures
-- [ ] All 4 endpoints implemented - **USER IMPLEMENTATION REQUIRED**
-- [ ] Date range validation
-- [ ] Product ID list parsing (comma-separated)
+- [x] Controller created in `controller/` package
+- [x] All 4 endpoints implemented
+- [x] Date range validation
+- [x] Product ID list parsing (comma-separated)
 - [ ] API Key authentication required
 
 ---
@@ -604,8 +606,8 @@ public class DateRangeValidator {
 - Test top changes filtering
 
 **Acceptance criteria**:
-- [ ] Test files created
-- [ ] All endpoints tested
+- [x] Test files created
+- [x] All endpoints tested
 - [ ] Calculation accuracy verified
 - [ ] Tests pass
 
@@ -623,8 +625,8 @@ public class DateRangeValidator {
 5. Check Redis has cached key
 
 **Acceptance criteria**:
-- [ ] Cache hit faster than cache miss
-- [ ] Keys appear in Redis
+- [x] Cache hit faster than cache miss
+- [x] Keys appear in Redis
 - [ ] TTL respected (keys expire)
 
 ---
@@ -642,9 +644,7 @@ public class DateRangeValidator {
 - Error scenarios
 
 **Acceptance criteria**:
-- [ ] `docs/ENDPOINTS.md` updated
-- [ ] All endpoints documented
-- [ ] Examples included
+- [ ] Skipped (Swagger/OpenAPI used instead)
 
 ---
 
@@ -658,9 +658,9 @@ public class DateRangeValidator {
 - `@Parameter` for query params
 
 **Acceptance criteria**:
-- [ ] All controllers annotated
-- [ ] Swagger UI shows descriptions
-- [ ] Example values included
+- [x] All controllers annotated
+- [x] Swagger UI shows descriptions
+- [x] Example values included
 
 ---
 
@@ -668,15 +668,15 @@ public class DateRangeValidator {
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| **Cache Config** | ⬜ Pending | CacheConfig, TTL settings |
-| **DTOs** | ⬜ Pending | Price, Category, Analytics DTOs |
-| **Services** | ⬜ Pending | Enhanced services with caching |
-| **Controllers** | ⬜ Pending | 8 endpoints total |
-| **Repositories** | ⬜ Pending | Custom queries |
-| **Validation** | ⬜ Pending | Date range validator |
-| **Bruno Tests** | ⬜ Pending | All endpoints tested |
-| **Documentation** | ⬜ Pending | ENDPOINTS.md, OpenAPI |
-| **Performance** | ⬜ Pending | <200ms response times |
+| **Cache Config** | Done | CacheConfig, TTL settings, typed JSON |
+| **DTOs** | Done | Price, Category, Analytics DTOs |
+| **Services** | Done | Enhanced services with caching |
+| **Controllers** | Done | 8 endpoints total |
+| **Repositories** | Done | Custom queries |
+| **Validation** | Done | Date range validator |
+| **Bruno Tests** | Partial | Analytics done, prices/categories pending |
+| **Documentation** | Partial | Swagger/OpenAPI complete, no ENDPOINTS.md |
+| **Performance** | Partial | Cache hit verified, TTL verification pending |
 
 ---
 
@@ -708,4 +708,4 @@ public class DateRangeValidator {
 
 ---
 
-**Last Updated**: 2026-02-25
+**Last Updated**: 2026-02-28

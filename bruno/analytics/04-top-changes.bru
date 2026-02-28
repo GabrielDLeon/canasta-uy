@@ -1,0 +1,17 @@
+meta {
+  name: Top Changes
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/analytics/top-changes?period=30d&type=all&limit=10
+  body: none
+  auth: inherit
+}
+
+params:query {
+  period: 30d
+  type: all
+  limit: 10
+}
