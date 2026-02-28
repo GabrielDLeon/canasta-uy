@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Procesa precios_2025.csv completo y genera prices_aggregated_2025.csv
-Versión optimizada usando pandas groupby
+Process precios_2025.csv and generate prices_aggregated_2025.csv.
+Optimized version using pandas groupby.
 """
 
 import pandas as pd
@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Nombres de las columnas basados en los metadatos
+# Column names based on source metadata
 COLUMN_NAMES = [
     "ID_PrecioDiario",
     "Declaracion",
@@ -32,7 +32,7 @@ COLUMN_NAMES = [
 
 
 def process_year_2025():
-    """Procesa todo el año 2025 y genera archivo agregado por día y producto."""
+    """Process year 2025 and generate daily product aggregates."""
 
     base_dir = Path(__file__).parent.parent
     input_file = base_dir / "data" / "raw" / "precios_2025.csv"
@@ -41,7 +41,7 @@ def process_year_2025():
     chunk_size = 1000000  # 1M filas por chunk (más grande = más eficiente)
 
     logger.info("=" * 80)
-    logger.info("PROCESANDO AÑO 2025 - AGREGACIÓN POR PRODUCTO Y FECHA")
+    logger.info("PROCESSING YEAR 2025 - AGGREGATION BY PRODUCT AND DATE")
     logger.info("=" * 80)
     logger.info(f"Archivo entrada: {input_file}")
     logger.info(f"Archivo salida: {output_file}")
@@ -63,7 +63,7 @@ def process_year_2025():
         ):
             chunk_count += 1
 
-            # Convertir tipos de datos
+            # Convert data types
             chunk["Precio"] = pd.to_numeric(chunk["Precio"], errors="coerce")
             chunk["Oferta"] = pd.to_numeric(chunk["Oferta"], errors="coerce").fillna(0)
             chunk["Establecimiento"] = pd.to_numeric(
@@ -73,19 +73,19 @@ def process_year_2025():
                 chunk["Presentacion_Producto"], errors="coerce"
             )
 
-            # Eliminar filas con datos inválidos
+            # Drop rows with invalid data
             chunk = chunk.dropna(subset=["Precio", "Presentacion_Producto", "Fecha"])
 
             total_rows += len(chunk)
 
-            # Eliminar duplicados por Establecimiento + Producto + Fecha (mantener el último)
+            # Remove duplicates by establishment + product + date (keep last)
             chunk = chunk.sort_values("Declaracion")
             chunk = chunk.drop_duplicates(
                 subset=["Establecimiento", "Presentacion_Producto", "Fecha"],
                 keep="last",
             )
 
-            # Agregar por Fecha y Producto usando groupby (MUY eficiente)
+            # Aggregate by date and product using groupby (highly efficient)
             aggregated = (
                 chunk.groupby(["Fecha", "Presentacion_Producto"])
                 .agg(
@@ -101,20 +101,20 @@ def process_year_2025():
                 .reset_index()
             )
 
-            # Calcular offer_percentage
+            # Calculate offer_percentage
             aggregated["offer_percentage"] = (
                 aggregated["offer_count"] / aggregated["total_records"] * 100
             ).round(2)
 
-            # Renombrar columnas
+            # Rename columns
             aggregated = aggregated.rename(
                 columns={"Fecha": "date", "Presentacion_Producto": "product_id"}
             )
 
-            # Eliminar columna temporal
+            # Drop temporary column
             aggregated = aggregated.drop("total_records", axis=1)
 
-            # Redondear valores
+            # Round values
             aggregated["price_min"] = aggregated["price_min"].round(2)
             aggregated["price_max"] = aggregated["price_max"].round(2)
             aggregated["price_avg"] = aggregated["price_avg"].round(2)
@@ -126,47 +126,47 @@ def process_year_2025():
 
             if chunk_count % 5 == 0:
                 logger.info(
-                    f"  Chunks procesados: {chunk_count} | Filas: {total_rows:,} | Registros agregados: {len(aggregated):,}"
+                    f"  Chunks processed: {chunk_count} | Rows: {total_rows:,} | Aggregated records: {len(aggregated):,}"
                 )
 
         logger.info(
-            f"✓ Procesamiento de chunks completado: {chunk_count} chunks, {total_rows:,} filas"
+            f"✓ Chunk processing completed: {chunk_count} chunks, {total_rows:,} rows"
         )
 
         # Combinar todos los resultados
-        logger.info("\nCombinando resultados de todos los chunks...")
+        logger.info("\nCombining results from all chunks...")
         df_combined = pd.concat(all_aggregated, ignore_index=True)
 
-        logger.info(f"  Registros antes de deduplicar: {len(df_combined):,}")
+        logger.info(f"  Records before deduplication: {len(df_combined):,}")
 
-        # Si un mismo (fecha, producto) aparece en múltiples chunks, combinarlos
-        # (puede pasar si los chunks se cortan en medio de un día)
+        # If a (date, product) appears across chunks, combine them
+        # (can happen if chunks split a day)
         df_final = (
             df_combined.groupby(["date", "product_id"])
             .agg(
                 price_min=("price_min", "min"),
                 price_max=("price_max", "max"),
-                price_avg=("price_avg", "mean"),  # Promedio de promedios
-                price_median=("price_median", "median"),  # Mediana de medianas
-                price_std=("price_std", "mean"),  # Promedio de stds
-                store_count=("store_count", "sum"),  # Sumar establecimientos
-                offer_count=("offer_count", "sum"),  # Sumar ofertas
+                price_avg=("price_avg", "mean"),  # Mean of means
+                price_median=("price_median", "median"),  # Median of medians
+                price_std=("price_std", "mean"),  # Mean of stds
+                store_count=("store_count", "sum"),  # Sum of stores
+                offer_count=("offer_count", "sum"),  # Sum of offers
                 offer_percentage=(
                     "offer_percentage",
                     "mean",
-                ),  # Promedio de porcentajes
+                ),  # Mean of percentages
             )
             .reset_index()
         )
 
-        # Recalcular offer_percentage correctamente
-        # Nota: esto es aproximado, idealmente deberíamos sumar los conteos originales
+        # Recompute offer_percentage
+        # Note: approximate; ideally sum original counts
         df_final["offer_percentage"] = df_final["offer_percentage"].round(2)
 
-        # Ordenar y reordenar columnas para que coincidan con el formato estándar
+        # Sort and reorder columns to match standard format
         df_final = df_final.sort_values(["product_id", "date"]).reset_index(drop=True)
 
-        # Reordenar columnas: product_id primero (como los demás archivos anuales)
+        # Reorder columns: product_id first (like other yearly files)
         column_order = [
             "product_id",
             "date",
@@ -181,26 +181,22 @@ def process_year_2025():
         ]
         df_final = df_final[column_order]
 
-        logger.info(f"  Registros finales: {len(df_final):,}")
+        logger.info(f"  Final records: {len(df_final):,}")
 
-        # Guardar resultado
-        logger.info(f"\nGuardando resultado: {output_file}")
+        # Save result
+        logger.info(f"\nSaving result: {output_file}")
         df_final.to_csv(output_file, index=False)
 
-        # Mostrar estadísticas
+        # Show statistics
         logger.info("\n" + "=" * 80)
-        logger.info("RESUMEN")
+        logger.info("SUMMARY")
         logger.info("=" * 80)
-        logger.info(f"Total registros generados: {len(df_final):,}")
-        logger.info(f"Productos únicos: {df_final['product_id'].nunique():,}")
-        logger.info(
-            f"Rango de fechas: {df_final['date'].min()} a {df_final['date'].max()}"
-        )
-        logger.info(
-            f"Tamaño archivo: {output_file.stat().st_size / (1024 * 1024):.2f} MB"
-        )
+        logger.info(f"Total records generated: {len(df_final):,}")
+        logger.info(f"Unique products: {df_final['product_id'].nunique():,}")
+        logger.info(f"Date range: {df_final['date'].min()} to {df_final['date'].max()}")
+        logger.info(f"File size: {output_file.stat().st_size / (1024 * 1024):.2f} MB")
 
-        logger.info("\nEstadísticas de precios:")
+        logger.info("\nPrice statistics:")
         logger.info(
             f"  - price_min: ${df_final['price_min'].min():.2f} - ${df_final['price_min'].max():.2f}"
         )
@@ -214,15 +210,15 @@ def process_year_2025():
             f"  - Establecimientos: {df_final['store_count'].min()} - {df_final['store_count'].max()}"
         )
 
-        logger.info("\n✓ Procesamiento completado exitosamente")
+        logger.info("\n✓ Processing completed successfully")
 
         return df_final
 
     except FileNotFoundError:
-        logger.error(f"Error: No se encontró el archivo {input_file}")
+        logger.error(f"Error: File not found {input_file}")
         raise
     except Exception as e:
-        logger.error(f"Error durante el procesamiento: {e}")
+        logger.error(f"Error during processing: {e}")
         import traceback
 
         traceback.print_exc()

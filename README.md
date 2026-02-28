@@ -10,8 +10,8 @@ El objetivo es proporcionar una fuente de datos confiable para análisis de tend
 
 **Datos disponibles:**
 
-- **774,716 registros** de precios diarios
-- **306 productos** en **134 categorías**
+- **793,334 registros** de precios diarios
+- **379 productos** en **193 categorías**
 - **10 años** de datos históricos (2016-2025)
 - Dataset limpio con detección de outliers mediante método IQR (Interquartile Range)
 
@@ -36,12 +36,9 @@ El objetivo es proporcionar una fuente de datos confiable para análisis de tend
 ```
 canasta-uy/
 ├── backend/              # Spring Boot API
-│   ├── src/main/java/    # Código fuente
-│   ├── src/main/resources/
-│   │   └── db/migration/ # Flyway migrations
-│   ├── docker-compose.yml
-│   └── justfile          # Comandos de desarrollo
-├── data/processed/       # Datasets (CSV)
+│   ├── src/              # Código fuente
+│   ├── justfile          # Comandos de desarrollo
+│   └── docker-compose.yml
 ├── scripts/              # Pipeline de datos Python
 ├── docs/                 # Documentación completa
 └── bruno/                # Colección de API tests
@@ -59,7 +56,7 @@ canasta-uy/
 
 ---
 
-## Inicio Rápido
+## Preparación
 
 ### 1. Clonar y configurar
 
@@ -195,7 +192,7 @@ GET  /api/v1/analytics/compare               # Comparar productos
 GET  /api/v1/analytics/top-changes           # Mayores variaciones
 ```
 
-Ver documentación completa en `docs/ENDPOINTS.md`.
+Ver documentación completa en Swagger/OpenAPI.
 
 ---
 
@@ -208,16 +205,16 @@ Ubicados en `scripts/`. Requieren `uv` instalado.
 uv sync
 
 # Ejecutar script
-uv run python scripts/detect_outliers_v4_improved.py
+    uv run python scripts/processing/detect_outliers_v4_improved.py
 ```
 
 Scripts principales:
 
-| Script                                 | Descripción               |
-| -------------------------------------- | ------------------------- |
-| `detect_outliers_v4_improved.py`       | Crear dataset V4 (IQR)    |
-| `visualize_rice_price_evolution_v4.py` | Generar gráficos          |
-| `product_descriptive_statistics_v4.py` | Estadísticas descriptivas |
+| Script                                               | Descripción               |
+| ---------------------------------------------------- | ------------------------- |
+| `processing/detect_outliers_v4_improved.py`          | Crear dataset V4 (IQR)    |
+| `visualization/visualize_rice_price_evolution_v4.py` | Generar gráficos          |
+| `product_descriptive_statistics_v4.py`               | Estadísticas descriptivas |
 
 ---
 
@@ -238,7 +235,7 @@ Scripts principales:
 **Versión recomendada: V4**
 
 - **Archivo**: `data/processed/prices_aggregated_all_years_v4.csv`
-- **Registros**: 774,716
+- **Registros**: 793,334
 - **Metodología**: Outliers removidos mediante IQR (5.27%)
 - **Calidad**: 99.97%
 
@@ -251,4 +248,28 @@ prices: product_id, date, price_min, price_max, price_avg, price_median,
 products: product_id, category_id, brand, specification, name
 
 categories: category_id, name, description
+
+---
+
+## Licencia y uso de datos
+
+Los datos provienen del Catálogo Nacional de Datos Abiertos de Uruguay. Su uso está sujeto a la licencia y condiciones publicadas por el proveedor. Este repositorio no redistribuye la fuente original, sino una versión procesada para análisis. Para uso público o comercial, revisar la licencia oficial del dataset y realizar la atribución correspondiente.
+
+---
+
+## Portfolio Highlights
+
+- Dataset histórico limpio (V4) con detección de outliers por IQR y trazabilidad documentada.
+- API con endpoints analíticos listos para dashboards: tendencias, inflación por categoría y comparativas.
+- Pipeline reproducible con scripts de limpieza, análisis y visualización en `scripts/`.
+
+### Gráficos seleccionados
+
+![Top Price Changes](outputs/top_price_changes.png)
+
+Este gráfico resume los productos con mayores variaciones de precio en el período completo, permitiendo identificar rápidamente los cambios más significativos y su magnitud relativa.
+
+![Rice Seasonality Analysis](outputs/rice_seasonality_analysis.png)
+
+Este análisis muestra la estacionalidad del arroz con múltiples vistas (promedios mensuales, heatmap y distribución), facilitando la lectura de patrones temporales y su consistencia a lo largo de los años.
 ```

@@ -94,7 +94,7 @@ Set up complete backend infrastructure: Spring Boot, PostgreSQL, Redis, Flyway m
 - `backend/src/main/resources/db/migration/V2__create_indexes.sql` - Indexes
 
 ### Scripts
-- `scripts/prepare_db_import.py` - CSV transformation
+- `scripts/processing/prepare_db_import.py` - CSV transformation
 - `data/processed/db_import/categories.csv`
 - `data/processed/db_import/products_db.csv`
 - `data/processed/db_import/prices_db.csv`

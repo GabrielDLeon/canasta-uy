@@ -41,7 +41,7 @@ uv sync
 Run scripts:
 
 ```bash
-uv run python scripts/script_name.py
+uv run python scripts/processing/script_name.py
 ```
 
 **IDE Configuration**:
@@ -142,15 +142,15 @@ open-price-uy/
 uv sync
 
 # Run pipeline to regenerate all data versions
-uv run python scripts/consolidate_all_years.py
-uv run python scripts/detect_price_outliers.py       # V2
-uv run python scripts/create_clean_dataset_v3.py     # V3
-uv run python scripts/detect_outliers_v4_improved.py # V4
+uv run python scripts/processing/consolidate_all_years.py
+uv run python scripts/processing/detect_price_outliers.py       # V2
+uv run python scripts/processing/create_clean_dataset_v3.py     # V3
+uv run python scripts/processing/detect_outliers_v4_improved.py # V4
 
 # Generate analysis & visualizations (uses V4)
 uv run python scripts/product_descriptive_statistics_v4.py
-uv run python scripts/visualize_rice_price_evolution_v4.py
-uv run python scripts/visualize_rice_price_distribution.py
+uv run python scripts/visualization/visualize_rice_price_evolution_v4.py
+uv run python scripts/deprecated/visualize_rice_price_distribution.py
 
 # Run main entry point
 uv run python main.py

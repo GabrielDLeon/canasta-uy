@@ -348,13 +348,13 @@ To regenerate the entire pipeline from V1:
 
 ```bash
 # 1. Generate V2 (add structure and detect with 3x method)
-uv run python scripts/detect_price_outliers.py
+uv run python scripts/processing/detect_price_outliers.py
 
 # 2. Generate V3 (remove v2 outliers conservatively)
-uv run python scripts/create_clean_dataset_v3.py
+uv run python scripts/processing/create_clean_dataset_v3.py
 
 # 3. Generate V4 (improved IQR detection)
-uv run python scripts/detect_outliers_v4_improved.py
+uv run python scripts/processing/detect_outliers_v4_improved.py
 
 # 4. Generate statistics for quality verification
 uv run python scripts/product_descriptive_statistics_v4.py
@@ -366,10 +366,10 @@ Create professional charts with clean data:
 
 ```bash
 # Rice price evolution using V4
-uv run python scripts/visualize_rice_price_evolution_v4.py
+uv run python scripts/visualization/visualize_rice_price_evolution_v4.py
 
-# Rice price distribution by brand
-uv run python scripts/visualize_rice_price_distribution.py
+# Rice price distribution by brand (deprecated)
+uv run python scripts/deprecated/visualize_rice_price_distribution.py
 
 # Product statistics dashboard
 uv run python scripts/product_descriptive_statistics_v4.py
@@ -478,4 +478,3 @@ The **V4 dataset** represents the best balance of data quality and retention:
  **Reproducible** (documented scripts, clear methodology)
 
 For any new analysis, visualization, or backend integration, **use V4**.
-

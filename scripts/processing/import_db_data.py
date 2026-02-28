@@ -1,17 +1,17 @@
 """
 import_db_data.py
 
-Importa los CSVs preparados a PostgreSQL usando COPY (rapido para grandes volumenes).
+Imports prepared CSVs into PostgreSQL using COPY (fast for large volumes).
 
 Input:
 - data/processed/db_import/categories.csv
 - data/processed/db_import/products_db.csv
 - data/processed/db_import/prices_db.csv
 
-Uso:
+Usage:
     uv run python scripts/import_db_data.py
 
-Requiere: psycopg2-binary
+Requires: psycopg2-binary
     uv add psycopg2-binary
 """
 
@@ -33,13 +33,13 @@ DB_CONFIG = {
 
 
 def get_connection():
-    """Crea conexion a PostgreSQL."""
+    """Create a PostgreSQL connection."""
     return psycopg2.connect(**DB_CONFIG)
 
 
 def import_categories(cursor):
-    """Importa categorias desde CSV."""
-    print("\n[1/3] Importando categorias...")
+    """Import categories from CSV."""
+    print("\n[1/3] Importing categories...")
 
     csv_path = DB_IMPORT_DIR / "categories.csv"
 
@@ -55,12 +55,12 @@ def import_categories(cursor):
 
     cursor.execute("SELECT COUNT(*) FROM categories")
     count = cursor.fetchone()[0]
-    print(f"      Importadas {count} categorias")
+    print(f"      Imported {count} categories")
 
 
 def import_products(cursor):
-    """Importa productos desde CSV."""
-    print("\n[2/3] Importando productos...")
+    """Import products from CSV."""
+    print("\n[2/3] Importing products...")
 
     csv_path = DB_IMPORT_DIR / "products_db.csv"
 
@@ -76,16 +76,16 @@ def import_products(cursor):
 
     cursor.execute("SELECT COUNT(*) FROM products")
     count = cursor.fetchone()[0]
-    print(f"      Importados {count} productos")
+    print(f"      Imported {count} products")
 
 
 def import_prices(cursor):
-    """Importa precios en batches para no saturar memoria."""
-    print("\n[3/3] Importando precios...")
+    """Import prices using COPY for large volumes."""
+    print("\n[3/3] Importing prices...")
 
     csv_path = DB_IMPORT_DIR / "prices_db.csv"
 
-    # COPY es mucho mas rapido que INSERT para grandes volumenes
+    # COPY is much faster than INSERT for large volumes
     with open(csv_path, "r") as f:
         next(f)  # Skip header
         cursor.copy_expert(
@@ -101,13 +101,13 @@ def import_prices(cursor):
 
     cursor.execute("SELECT COUNT(*) FROM prices")
     count = cursor.fetchone()[0]
-    print(f"      Importados {count:,} registros de precios")
+    print(f"      Imported {count:,} price records")
 
 
 def verify_imports(cursor):
-    """Verifica que los imports sean correctos."""
+    """Verify that imports are correct."""
     print("\n" + "=" * 60)
-    print("VERIFICACION")
+    print("VERIFICATION")
     print("=" * 60)
 
     cursor.execute("SELECT COUNT(*) FROM categories")
@@ -122,12 +122,12 @@ def verify_imports(cursor):
     cursor.execute("SELECT MIN(date), MAX(date) FROM prices")
     date_range = cursor.fetchone()
 
-    print(f"Categorias:  {categories:>8}")
-    print(f"Productos:   {products:>8}")
-    print(f"Precios:     {prices:>8,}")
-    print(f"Rango fechas: {date_range[0]} a {date_range[1]}")
+    print(f"Categories:  {categories:>8}")
+    print(f"Products:    {products:>8}")
+    print(f"Prices:      {prices:>8,}")
+    print(f"Date range: {date_range[0]} to {date_range[1]}")
 
-    # Verificar integridad referencial
+    # Verify referential integrity
     cursor.execute("""
         SELECT COUNT(*) FROM prices p
         WHERE NOT EXISTS (SELECT 1 FROM products pr WHERE pr.product_id = p.product_id)
@@ -135,9 +135,9 @@ def verify_imports(cursor):
     orphan_prices = cursor.fetchone()[0]
 
     if orphan_prices > 0:
-        print(f"\nADVERTENCIA: {orphan_prices:,} precios sin producto asociado")
+        print(f"\nWARNING: {orphan_prices:,} prices without a matching product")
     else:
-        print("\nIntegridad referencial: OK")
+        print("\nReferential integrity: OK")
 
 
 def main():
@@ -145,7 +145,7 @@ def main():
     print("IMPORT DB DATA - PostgreSQL")
     print("=" * 60)
     print(
-        f"\nConectando a: {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
+        f"\nConnecting to: {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
     )
 
     conn = None
@@ -153,29 +153,29 @@ def main():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Truncar tablas antes de importar (limpio)
-        print("\nLimpiando tablas existentes...")
+        # Truncate tables before importing (clean)
+        print("\nTruncating existing tables...")
         cursor.execute("TRUNCATE TABLE prices, products, categories CASCADE")
 
-        # Importar en orden (respetar FKs)
+        # Import in order (respect FKs)
         import_categories(cursor)
         import_products(cursor)
         import_prices(cursor)
 
-        # Verificar
+        # Verify
         verify_imports(cursor)
 
         # Commit
         conn.commit()
-        print("\nImport completado exitosamente!")
+        print("\nImport completed successfully!")
 
     except psycopg2.Error as e:
-        print(f"\nError de PostgreSQL: {e}")
+        print(f"\nPostgreSQL error: {e}")
         if conn:
             conn.rollback()
         raise
     except Exception as e:
-        print(f"\nError inesperado: {e}")
+        print(f"\nUnexpected error: {e}")
         if conn:
             conn.rollback()
         raise

@@ -16,7 +16,7 @@ Docker + PostgreSQL + Flyway + imported data (774,716 records)
 ### Phase 2: Domain & Persistence (COMPLETED)
 Domain layer (JPA entities) and persistence (repositories)
 
-**Status**: ✅ Complete - All entities and repositories implemented
+**Status**: Complete - All entities and repositories implemented
 
 **See**: `02-backend-domain-persistence/`
 
@@ -25,21 +25,21 @@ Domain layer (JPA entities) and persistence (repositories)
 ### Phase 3: Security & Auth (COMPLETED)
 JWT authentication and API Key authorization with Redis caching
 
-**Status**: ✅ Complete - Dual authentication working (JWT + API Keys)
+**Status**: Complete - Dual authentication working (JWT + API Keys)
 
 **See**: `03-backend-auth-security/`
 
 ---
 
-### Phase 4: Business Logic & Analytics (IN PROGRESS)
+### Phase 4: Business Logic & Analytics (COMPLETED)
 Complete API with prices, categories, and analytics
 
 **Tasks**:
-- [ ] Prices endpoints (/products/{id}/prices, /prices)
-- [ ] Categories endpoints (/categories/{id}/products, /categories/{id}/stats)
-- [ ] Analytics endpoints (trend, inflation, compare, top-changes)
-- [ ] Redis caching for performance
-- [ ] Bruno API tests
+- [x] Prices endpoints (/products/{id}/prices, /prices)
+- [x] Categories endpoints (/categories/{id}/products, /categories/{id}/stats)
+- [x] Analytics endpoints (trend, inflation, compare, top-changes)
+- [x] Redis caching for performance
+- [ ] Bruno API tests for prices and categories (optional)
 
 **Main endpoints**:
 ```
@@ -103,12 +103,12 @@ uy.eleven.canasta/
 
 | Phase | Status | Location |
 |-------|--------|----------|
-| Phase 1 | ✅ Complete | `01-backend-infrastructure/` |
-| Phase 2 | ✅ Complete | `02-backend-domain-persistence/` |
-| Phase 3 | ✅ Complete | `03-backend-auth-security/` |
-| Phase 4 | 🔄 In Progress | `04-backend-business-logic/` |
-| Phase 5 | ⏳ Optional | (Future) |
+| Phase 1 | Complete | `01-backend-infrastructure/` |
+| Phase 2 | Complete | `02-backend-domain-persistence/` |
+| Phase 3 | Complete | `03-backend-auth-security/` |
+| Phase 4 | Complete (Core) | `04-backend-business-logic/` |
+| Phase 5 | Optional | (Future) |
 
 ---
 
-**Last Updated**: 2026-02-25
+**Last Updated**: 2026-02-28
