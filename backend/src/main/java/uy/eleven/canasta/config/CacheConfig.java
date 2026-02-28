@@ -8,8 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -29,31 +31,47 @@ public class CacheConfig {
     private long analyticsTtl;
 
     @Bean
-    public RedisCacheConfiguration defaultCacheConfiguration() {
+    public ObjectMapper cacheObjectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
+    public GenericJacksonJsonRedisSerializer genericJacksonJsonRedisSerializer(
+            ObjectMapper cacheObjectMapper) {
+        return GenericJacksonJsonRedisSerializer.builder()
+                .enableUnsafeDefaultTyping()
+                .typePropertyName("@class")
+                .build();
+    }
+
+    @Bean
+    public RedisCacheConfiguration defaultCacheConfiguration(
+            GenericJacksonJsonRedisSerializer serializer) {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(60))
                 .disableCachingNullValues()
                 .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new JacksonJsonRedisSerializer<>(Object.class)));
+                        RedisSerializationContext.SerializationPair.fromSerializer(serializer));
     }
 
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    public CacheManager cacheManager(
+            RedisConnectionFactory connectionFactory,
+            RedisCacheConfiguration defaultCacheConfiguration) {
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
         cacheConfigs.put(
-                "prices", defaultCacheConfiguration().entryTtl(Duration.ofMillis(pricesTtl)));
+                "prices", defaultCacheConfiguration.entryTtl(Duration.ofMillis(pricesTtl)));
 
         cacheConfigs.put(
-                "categories",
-                defaultCacheConfiguration().entryTtl(Duration.ofMillis(categoriesTtl)));
+                "categories", defaultCacheConfiguration.entryTtl(Duration.ofMillis(categoriesTtl)));
 
         cacheConfigs.put(
-                "analytics", defaultCacheConfiguration().entryTtl(Duration.ofMillis(analyticsTtl)));
+                "analytics",
+                defaultCacheConfiguration.entryTtl(Duration.ofMillis(analyticsTtl)));
 
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(defaultCacheConfiguration())
+                .cacheDefaults(defaultCacheConfiguration)
                 .withInitialCacheConfigurations(cacheConfigs)
                 .build();
     }

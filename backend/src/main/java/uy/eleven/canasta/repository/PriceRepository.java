@@ -68,14 +68,19 @@ public interface PriceRepository extends JpaRepository<Price, PriceId> {
             @Param("from") LocalDate from,
             @Param("to") LocalDate to);
 
-    // TODO: Fix JPQL projection
-    // @Query(
-    //         "SELECT new uy.eleven.canasta.dto.projection.DailyPriceAverage( AVG(p.priceAverage),"
-    //             + " p.id.date) FROM Price p WHERE p.id.productId = :productId AND p.id.date
-    // BETWEEN"
-    //             + " :from AND :to GROUP BY p.id.date ORDER BY p.id.date")
-    // List<DailyPriceAverage> findDailyAveragesByProductAndDateRange(
-    //         @Param("productId") Integer productId,
-    //         @Param("from") LocalDate from,
-    //         @Param("to") LocalDate to);
+    @Query(
+            "SELECT MIN(p.priceAverage) FROM Price p WHERE p.id.productId = :productId AND"
+                    + " p.id.date BETWEEN :from AND :to")
+    BigDecimal calculateMinPriceForProduct(
+            @Param("productId") Integer productId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
+
+    @Query(
+            "SELECT MAX(p.priceAverage) FROM Price p WHERE p.id.productId = :productId AND"
+                    + " p.id.date BETWEEN :from AND :to")
+    BigDecimal calculateMaxPriceForProduct(
+            @Param("productId") Integer productId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
 }
