@@ -1,7 +1,5 @@
 package uy.eleven.canasta.config;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,11 +13,15 @@ import uy.eleven.canasta.security.filters.JwtAuthFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final ApiKeyAuthFilter apiKeyAuthFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, ApiKeyAuthFilter apiKeyAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.apiKeyAuthFilter = apiKeyAuthFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -35,7 +37,11 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers("/api/v1/account/**")
                                         .authenticated()
-                                        .requestMatchers("/api/v1/products/**", "/api/v1/prices/**")
+                                        .requestMatchers(
+                                                "/api/v1/products/**",
+                                                "/api/v1/prices/**",
+                                                "/api/v1/categories/**",
+                                                "/api/v1/analytics/**")
                                         .authenticated()
                                         .anyRequest()
                                         .permitAll())

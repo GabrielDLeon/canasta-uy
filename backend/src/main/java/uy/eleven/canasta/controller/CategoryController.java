@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-import lombok.AllArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +18,36 @@ import uy.eleven.canasta.dto.category.CategoryProductsResponse;
 import uy.eleven.canasta.dto.category.CategoryStatsRequest;
 import uy.eleven.canasta.dto.category.CategoryStatsResponse;
 import uy.eleven.canasta.dto.common.PaginationInfo;
+import uy.eleven.canasta.model.Category;
 import uy.eleven.canasta.model.Product;
 import uy.eleven.canasta.service.CategoryService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/categories")
-@AllArgsConstructor
 @Tag(name = "Categories", description = "Operaciones para consultar categorías y estadísticas")
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    @Operation(
+            summary = "Listar categorías",
+            description = "Obtiene todas las categorías disponibles ordenadas alfabéticamente")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Categorías obtenidas exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
+        return ResponseEntity.ok(ApiResponse.success(categoryService.getAllCategories()));
+    }
 
     @Operation(
             summary = "Obtener productos de una categoría",

@@ -77,7 +77,7 @@ public class OpenApiConfig {
         return new SecurityScheme()
                 .type(SecurityScheme.Type.APIKEY)
                 .in(SecurityScheme.In.HEADER)
-                .name("X-API-Key")
+                .name("Api-Key")
                 .description("API Key para autenticación de clientes. Genera una API key en tu cuenta.");
     }
 
