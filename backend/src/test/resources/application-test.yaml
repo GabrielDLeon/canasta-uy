@@ -1,0 +1,20 @@
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  cache:
+    type: redis
+
+canasta:
+  security:
+    jwt:
+      secret: "dGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdA=="
+      access-token-ttl: 900000
+      refresh-token-ttl: 604800000
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN

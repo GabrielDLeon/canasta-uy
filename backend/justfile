@@ -31,9 +31,14 @@ dev:
 build:
     ./mvnw clean package -DskipTests
 
-test: infra-up
+unit:
     ./mvnw test
-    just infra-down
+
+it:
+    ./mvnw verify
+
+test:
+    just unit
 
 docker-build:
     docker build -t canastauy-backend:latest .

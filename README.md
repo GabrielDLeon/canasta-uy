@@ -102,11 +102,16 @@ Todos los comandos se ejecutan desde el directorio `backend/`:
 | `just infra-logs`  | Ver logs de servicios                          |
 | `just dev`         | Ejecutar Spring Boot en modo dev               |
 | `just build`       | Compilar proyecto                              |
-| `just test`        | Ejecutar tests (levanta infra automáticamente) |
+| `just unit`        | Ejecutar tests unitarios (`mvn test`)          |
+| `just it`          | Ejecutar suite completa (`mvn verify`)         |
+| `just test`        | Alias de `just unit`                           |
 | `just import-data` | Importar datos CSV a PostgreSQL                |
 | `just setup`       | Crear archivo .env desde template              |
 | `just clean`       | Limpiar contenedores, volúmenes y build        |
 | `just cache-clear` | Limpiar cache de Redis                         |
+
+Los tests de integración usan Testcontainers (PostgreSQL y Redis) y se ejecutan con `*IT` durante `mvn verify`.
+Si Docker no está disponible, esos tests se omiten automáticamente.
 
 ---
 
