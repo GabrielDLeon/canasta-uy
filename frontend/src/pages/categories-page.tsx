@@ -5,7 +5,6 @@ import { Search } from 'lucide-react'
 
 import { ApiKeyBanner } from '@/components/api-key-banner'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Item, ItemContent, ItemTitle, ItemActions } from '@/components/ui/item'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -49,39 +48,32 @@ export function CategoriesPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Listado de categorias</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {categories.isPending ? <p>Cargando categorias...</p> : null}
-          {categories.isError ? (
-            <p className="text-sm text-destructive">{(categories.error as Error).message}</p>
-          ) : null}
-          {categories.data ? (
-            <ul className="grid gap-2 md:grid-cols-2">
-              {filtered.map((category) => (
-                <li key={category.categoryId}>
-                  <Item variant="outline">
-                    <ItemContent>
-                      <ItemTitle>{category.name}</ItemTitle>
-                    </ItemContent>
-                    <ItemActions>
-                      <Button asChild variant="secondary" size="sm">
-                        <Link to={`/app/categories/${category.categoryId}`}>Ver</Link>
-                      </Button>
-                    </ItemActions>
-                  </Item>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+      {categories.isPending ? <p>Cargando categorias...</p> : null}
+      {categories.isError ? (
+        <p className="text-sm text-destructive">{(categories.error as Error).message}</p>
+      ) : null}
+      {categories.data ? (
+        <ul className="grid gap-2 md:grid-cols-2">
+          {filtered.map((category) => (
+            <li key={category.categoryId}>
+              <Item variant="outline">
+                <ItemContent>
+                  <ItemTitle>{category.name}</ItemTitle>
+                </ItemContent>
+                <ItemActions>
+                  <Button asChild variant="secondary" size="sm">
+                    <Link to={`/app/categories/${category.categoryId}`}>Ver</Link>
+                  </Button>
+                </ItemActions>
+              </Item>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
-          {categories.data && filtered.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No hay categorias que coincidan con la busqueda.</p>
-          ) : null}
-        </CardContent>
-      </Card>
+      {categories.data && filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No hay categorias que coincidan con la busqueda.</p>
+      ) : null}
     </section>
   )
 }

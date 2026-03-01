@@ -8,12 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { api } from '@/lib/api'
-import { setApiKeyValue } from '@/lib/storage'
+import { getApiKeyValue, setApiKeyValue } from '@/lib/storage'
 
 export function AccountKeysPage() {
   const queryClient = useQueryClient()
   const [newKeyName, setNewKeyName] = useState('Frontend key')
   const [newKeyValue, setNewKeyValue] = useState('')
+  const [activeApiKey, setActiveApiKey] = useState(getApiKeyValue())
   const [open, setOpen] = useState(false)
 
   const apiKeys = useQuery({
@@ -26,6 +27,7 @@ export function AccountKeysPage() {
     onSuccess: async (data) => {
       setNewKeyValue(data.keyValue)
       setApiKeyValue(data.keyValue)
+      setActiveApiKey(data.keyValue)
       setOpen(false)
       setNewKeyName('Frontend key')
       await queryClient.invalidateQueries({ queryKey: ['api-keys'] })
@@ -36,6 +38,17 @@ export function AccountKeysPage() {
   const onCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     await createMutation.mutateAsync()
+  }
+
+  const onSaveActiveApiKey = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setApiKeyValue(activeApiKey)
+    setActiveApiKey(getApiKeyValue())
+  }
+
+  const onClearActiveApiKey = () => {
+    setApiKeyValue('')
+    setActiveApiKey('')
   }
 
   return (
@@ -75,6 +88,28 @@ export function AccountKeysPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>API key activa en frontend</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSaveActiveApiKey} className="flex flex-wrap items-center gap-2">
+            <Input
+              value={activeApiKey}
+              onChange={(event) => setActiveApiKey(event.target.value)}
+              placeholder="Pega aqui la API key activa"
+              className="min-w-60 flex-1"
+            />
+            <Button type="submit" variant="secondary" size="sm">
+              Guardar
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={onClearActiveApiKey}>
+              Limpiar
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

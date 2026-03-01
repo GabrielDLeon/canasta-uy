@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
@@ -187,8 +187,8 @@ export function ComparePage() {
           </p>
           <Combobox
             items={availableCompareResults}
-            itemToStringValue={(product) => (product as Product).name}
-            onValueChange={(value) => {
+            itemToStringValue={(product: unknown) => (product as Product).name}
+            onValueChange={(value: unknown) => {
               const selected = value as Product | null;
               if (!selected) {
                 return;
@@ -199,7 +199,9 @@ export function ComparePage() {
           >
             <ComboboxInput
               value={compareSearchInput}
-              onChange={(event) => setCompareSearchInput(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setCompareSearchInput(event.target.value)
+              }
               placeholder="Buscar producto por nombre"
               showClear
             >
@@ -208,7 +210,7 @@ export function ComparePage() {
             <ComboboxContent>
               <ComboboxEmpty>No se encontraron productos.</ComboboxEmpty>
               <ComboboxList>
-                {(product) => (
+                {(product: unknown) => (
                   <ComboboxItem
                     key={(product as Product).productId}
                     value={product as Product}

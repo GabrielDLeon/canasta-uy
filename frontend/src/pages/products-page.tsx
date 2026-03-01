@@ -4,7 +4,6 @@ import { Search } from "lucide-react";
 
 import { ApiKeyBanner } from "@/components/api-key-banner";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ProductItem } from "@/components/product-item";
 import { api } from "@/lib/api";
@@ -35,28 +34,21 @@ export function ProductsPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Resultados</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {products.isPending ? <p>Cargando productos...</p> : null}
-          {products.isError ? (
-            <p className="text-sm text-destructive">
-              {(products.error as Error).message}
-            </p>
-          ) : null}
-          {products.data ? (
-            <ul className="space-y-2">
-              {products.data.products.map((product) => (
-                <li key={product.productId}>
-                  <ProductItem product={product} />
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </CardContent>
-      </Card>
+      {products.isPending ? <p>Cargando productos...</p> : null}
+      {products.isError ? (
+        <p className="text-sm text-destructive">
+          {(products.error as Error).message}
+        </p>
+      ) : null}
+      {products.data ? (
+        <ul className="space-y-2">
+          {products.data.products.map((product) => (
+            <li key={product.productId}>
+              <ProductItem product={product} />
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </section>
   );
 }

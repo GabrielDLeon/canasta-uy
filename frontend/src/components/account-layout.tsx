@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { CircleUserRound, LogOut, UserRound } from 'lucide-react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { CircleUserRound, KeyRound, LogOut, ShieldUser, UserRound } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -11,24 +10,34 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Footer } from '@/components/footer'
-import { Input } from '@/components/ui/input'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 import { api } from '@/lib/api'
-import { getApiKeyValue, getAuthState, setApiKeyValue, setAuthState } from '@/lib/storage'
+import { getAuthState, setAuthState } from '@/lib/storage'
 
 const accountItems = [
-  { to: '/account/profile', label: 'Perfil' },
-  { to: '/account/keys', label: 'API Keys' },
+  { to: '/account/profile', label: 'Perfil', icon: ShieldUser },
+  { to: '/account/keys', label: 'API Keys', icon: KeyRound },
 ]
 
 export function AccountLayout() {
+  const location = useLocation()
   const navigate = useNavigate()
-  const [apiKey, setApiKey] = useState(getApiKeyValue())
   const isLogged = Boolean(getAuthState()?.accessToken)
-
-  const saveApiKey = () => {
-    setApiKeyValue(apiKey)
-    navigate(0)
-  }
 
   const clearSession = async () => {
     try {
@@ -43,85 +52,86 @@ export function AccountLayout() {
     }
   }
 
+  const isItemActive = (to: string) => location.pathname.startsWith(to)
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/60">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-3 px-4 py-3">
-          <Link to="/app" className="mr-2 text-lg font-semibold">
-            CanastaUY Frontend
-          </Link>
-          <div className="flex flex-1 flex-wrap items-center gap-2">
-            <Input
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Api-Key activa"
-              className="w-full min-w-60 max-w-md"
-            />
-            <Button onClick={saveApiKey} size="sm" variant="secondary">
-              Guardar API key
-            </Button>
+    <SidebarProvider>
+      <Sidebar variant="inset" collapsible="icon">
+        <SidebarHeader>
+          <div className="flex items-center gap-2 px-2 py-1">
+            <div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
+              <ShieldUser className="size-4" />
+            </div>
+            <div className="grid flex-1 text-sm leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="truncate font-semibold">Cuenta</span>
+              <span className="truncate text-xs text-sidebar-foreground/70">CanastaUY</span>
+            </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" aria-label="Abrir menu de cuenta">
-                <CircleUserRound className="size-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => navigate('/account/profile')}>
-                <UserRound className="size-4" />
-                Cuenta
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onSelect={clearSession}>
-                <LogOut className="size-4" />
-                Cerrar sesion
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+        </SidebarHeader>
+        <SidebarSeparator />
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Configuracion</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {accountItems.map((item) => (
+                  <SidebarMenuItem key={item.to}>
+                    <SidebarMenuButton asChild isActive={isItemActive(item.to)} tooltip={item.label}>
+                      <Link to={item.to}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Volver a consultas">
+                    <Link to="/app">
+                      <UserRound />
+                      <span>Volver a consultas</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
 
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[220px_1fr]">
-        <aside className="space-y-2">
-          <p className="mb-2 px-3 text-xs font-semibold uppercase text-muted-foreground">
-            Cuenta
-          </p>
-          {accountItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm transition ${
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-          <NavLink
-            to="/app"
-            className={({ isActive }) =>
-              `mt-4 block rounded-md px-3 py-2 text-sm transition ${
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              }`
-            }
-          >
-            Volver a consultas
-          </NavLink>
-        </aside>
+      <SidebarInset>
+        <header className="sticky top-0 z-20 border-b bg-card/80 backdrop-blur">
+          <div className="flex h-14 items-center justify-between px-4 md:px-6">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <h1 className="text-sm font-semibold md:text-base">Cuenta</h1>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Abrir menu de cuenta">
+                  <CircleUserRound className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => navigate('/account/profile')}>
+                  <UserRound className="size-4" />
+                  Cuenta
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onSelect={clearSession}>
+                  <LogOut className="size-4" />
+                  Cerrar sesion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
 
-        <main>
+        <div className="flex-1 p-4 md:p-6">
           <Outlet />
-        </main>
-      </div>
-
-      <Footer />
-    </div>
+        </div>
+        <Footer />
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
