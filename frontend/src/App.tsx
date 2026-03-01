@@ -9,6 +9,7 @@ import { AccountProfilePage } from '@/pages/account-profile-page'
 import { AnalyticsPage } from '@/pages/analytics-page'
 import { CategoriesPage } from '@/pages/categories-page'
 import { CategoryDetailPage } from '@/pages/category-detail-page'
+import { ComparePage } from '@/pages/compare-page'
 import { DashboardPage } from '@/pages/dashboard-page'
 import { LandingPage } from '@/pages/landing-page'
 import { LoginPage } from '@/pages/login-page'
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="categories/:id" element={<CategoryDetailPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="compare" element={<ComparePage />} />
       </Route>
 
       <Route

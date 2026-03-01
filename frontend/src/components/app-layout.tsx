@@ -19,6 +19,7 @@ const items = [
   { to: '/app', label: 'Dashboard' },
   { to: '/app/products', label: 'Productos' },
   { to: '/app/categories', label: 'Categorias' },
+  { to: '/app/compare', label: 'Comparar productos' },
   { to: '/app/analytics', label: 'Analytics' },
 ]
 

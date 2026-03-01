@@ -326,17 +326,23 @@ public class AnalyticsService {
                 includeData ? monthlyData : null);
     }
 
-    @Cacheable(
-            value = "analytics",
-            key = "'compare:' + #productIds.hashCode() + ':' + #from + ':' + #to")
     public ComparisonResponse compareProducts(
             List<Integer> productIds, LocalDate from, LocalDate to) {
-
         LocalDate effectiveFrom =
                 from != null ? from : LocalDate.now().minusDays(DEFAULT_DATE_RANGE_DAYS);
         LocalDate effectiveTo = to != null ? to : LocalDate.now();
+        return compareProducts(productIds, effectiveFrom, effectiveTo, false);
+    }
 
-        priceService.validateDateRange(effectiveFrom, effectiveTo);
+    @Cacheable(
+            value = "analytics",
+            key =
+                    "'compare:' + #productIds.hashCode() + ':' + #from + ':' + #to + ':'"
+                            + " + #includeData")
+    public ComparisonResponse compareProducts(
+            List<Integer> productIds, LocalDate from, LocalDate to, boolean includeData) {
+
+        priceService.validateDateRange(from, to);
 
         List<ComparisonResponse.ProductComparison> productComparisons = new ArrayList<>();
 
@@ -347,9 +353,7 @@ public class AnalyticsService {
             }
 
             Product product = productOpt.get();
-            List<Price> prices =
-                    priceRepository.findByIdProductIdAndIdDateBetween(
-                            productId, effectiveFrom, effectiveTo);
+            List<Price> prices = priceRepository.findByIdProductIdAndIdDateBetween(productId, from, to);
 
             if (prices.isEmpty()) {
                 continue;
@@ -386,6 +390,17 @@ public class AnalyticsService {
                                     .divide(firstPrice.getPriceAverage(), 2, RoundingMode.HALF_UP)
                             : BigDecimal.ZERO;
 
+            List<ComparisonResponse.PricePoint> priceData =
+                    includeData
+                            ? prices.stream()
+                                    .map(
+                                            price ->
+                                                    new ComparisonResponse.PricePoint(
+                                                            price.getId().getDate(),
+                                                            price.getPriceAverage()))
+                                    .toList()
+                            : null;
+
             productComparisons.add(
                     new ComparisonResponse.ProductComparison(
                             productId,
@@ -397,12 +412,12 @@ public class AnalyticsService {
                             minPrice,
                             maxPrice,
                             variationPercentage,
-                            prices.size()));
+                            prices.size(),
+                            priceData));
         }
 
         if (productComparisons.isEmpty()) {
-            return new ComparisonResponse(
-                    new DateRange(effectiveFrom, effectiveTo), List.of(), null);
+            return new ComparisonResponse(new DateRange(from, to), List.of(), null);
         }
 
         ComparisonResponse.ProductComparison mostExpensive =
@@ -445,8 +460,7 @@ public class AnalyticsService {
                         cheapest != null ? cheapest.productName() : "",
                         mostVolatile != null ? mostVolatile.productName() : "");
 
-        return new ComparisonResponse(
-                new DateRange(effectiveFrom, effectiveTo), productComparisons, stats);
+        return new ComparisonResponse(new DateRange(from, to), productComparisons, stats);
     }
 
     @Cacheable(

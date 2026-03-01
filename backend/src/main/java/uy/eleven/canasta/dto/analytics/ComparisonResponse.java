@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import uy.eleven.canasta.dto.common.DateRange;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
@@ -19,7 +20,10 @@ public record ComparisonResponse(
             BigDecimal minPrice,
             BigDecimal maxPrice,
             BigDecimal variationPercentage,
-            Integer dataPoints) {}
+            Integer dataPoints,
+            List<PricePoint> data) {}
+
+    public record PricePoint(LocalDate date, BigDecimal priceAvg) {}
 
     public record ComparisonStats(
             BigDecimal priceDifference,

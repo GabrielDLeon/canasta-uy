@@ -147,6 +147,10 @@ export type ComparisonResponse = {
     maxPrice: number
     variationPercentage: number
     dataPoints: number
+    data?: Array<{
+      date: string
+      priceAvg: number
+    }> | null
   }>
   comparison: {
     priceDifference: number

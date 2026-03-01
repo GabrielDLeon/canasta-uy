@@ -221,9 +221,9 @@ export const api = {
       },
     ),
 
-  compareProducts: (productIds: string, from?: string, to?: string) =>
+  compareProducts: (productIds: string, from?: string, to?: string, includeData = false) =>
     request<ComparisonResponse>(
-      `/analytics/compare${searchParams({ productIds, from, to })}`,
+      `/analytics/compare${searchParams({ productIds, from, to, includeData })}`,
       {
         auth: 'api-key',
       },

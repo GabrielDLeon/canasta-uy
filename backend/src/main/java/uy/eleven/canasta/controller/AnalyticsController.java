@@ -130,7 +130,10 @@ public class AnalyticsController {
                     LocalDate from,
             @Parameter(description = "Fecha fin (YYYY-MM-DD)", example = "2024-12-31")
                     @RequestParam(required = false)
-                    LocalDate to) {
+                    LocalDate to,
+            @Parameter(description = "Incluir serie diaria de precios (date + priceAvg)")
+                    @RequestParam(defaultValue = "false")
+                    boolean includeData) {
 
         List<Integer> ids =
                 Arrays.stream(productIds.split(","))
@@ -143,7 +146,11 @@ public class AnalyticsController {
                     .body(ApiResponse.error("Se requieren entre 2 y 5 productos para comparar"));
         }
 
-        ComparisonResponse response = analyticsService.compareProducts(ids, from, to);
+        LocalDate effectiveFrom = from != null ? from : LocalDate.now().minusDays(365);
+        LocalDate effectiveTo = to != null ? to : LocalDate.now();
+
+        ComparisonResponse response =
+                analyticsService.compareProducts(ids, effectiveFrom, effectiveTo, includeData);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

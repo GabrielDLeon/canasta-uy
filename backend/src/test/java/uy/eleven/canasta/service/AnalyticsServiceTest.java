@@ -1,6 +1,7 @@
 package uy.eleven.canasta.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -132,6 +133,49 @@ class AnalyticsServiceTest {
 
         assertEquals(0, response.products().size());
         assertNull(response.comparison());
+    }
+
+    @Test
+    void compareProductsIncludesDailyDataWhenIncludeDataIsTrue() {
+        LocalDate from = LocalDate.of(2025, 1, 1);
+        LocalDate to = LocalDate.of(2025, 1, 3);
+        Category category = TestDataFactory.category(1, "Aceites");
+        Product product = TestDataFactory.product(1, "Aceite A", category);
+        List<Price> prices =
+                new ArrayList<>(
+                        List.of(
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.of(2025, 1, 2),
+                                        new BigDecimal("90"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100")),
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.of(2025, 1, 1),
+                                        new BigDecimal("80"),
+                                        new BigDecimal("90"),
+                                        new BigDecimal("90"),
+                                        new BigDecimal("90")),
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.of(2025, 1, 3),
+                                        new BigDecimal("95"),
+                                        new BigDecimal("110"),
+                                        new BigDecimal("110"),
+                                        new BigDecimal("110"))));
+
+        when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        when(priceRepository.findByIdProductIdAndIdDateBetween(1, from, to)).thenReturn(prices);
+
+        ComparisonResponse response = analyticsService.compareProducts(List.of(1), from, to, true);
+
+        assertEquals(1, response.products().size());
+        assertNotNull(response.products().get(0).data());
+        assertEquals(3, response.products().get(0).data().size());
+        assertEquals(LocalDate.of(2025, 1, 1), response.products().get(0).data().get(0).date());
+        assertEquals(new BigDecimal("90"), response.products().get(0).data().get(0).priceAvg());
     }
 
     @Test
