@@ -2,7 +2,7 @@ import type {
   ApiKeyCreateResponse,
   ApiKeyListItem,
   ApiResponse,
-  Category,
+  CategoryListResponse,
   CategoryProductsResponse,
   CategoryStatsResponse,
   ComparisonResponse,
@@ -187,7 +187,15 @@ export const api = {
       },
     ),
 
-  getCategories: () => request<Category[]>('/categories', { auth: 'api-key' }),
+  getCategories: (page = 0, size = 20) =>
+    request<CategoryListResponse>(`/categories${searchParams({ page, size })}`, {
+      auth: 'api-key',
+    }),
+
+  searchCategories: (query: string, page = 0, size = 20) =>
+    request<CategoryListResponse>(`/categories/search${searchParams({ query, page, size })}`, {
+      auth: 'api-key',
+    }),
 
   getCategoryProducts: (categoryId: number, page = 0, size = 20) =>
     request<CategoryProductsResponse>(

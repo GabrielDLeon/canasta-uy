@@ -3,7 +3,9 @@ package uy.eleven.canasta.service;
 import lombok.AllArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import uy.eleven.canasta.dto.category.CategoryProductsResponse;
@@ -30,6 +32,15 @@ public class CategoryService {
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAllByOrderByNameAsc();
+    }
+
+    public Page<Category> getAllCategoriesPaginated(int page, int size) {
+        return categoryRepository.findAll(PageRequest.of(page, size, Sort.by("name").ascending()));
+    }
+
+    public Page<Category> searchCategoriesByNamePaginated(String query, int page, int size) {
+        return categoryRepository.findByNameContainingIgnoreCase(
+                query, PageRequest.of(page, size, Sort.by("name").ascending()));
     }
 
     public Optional<Category> getCategoryByName(String name) {

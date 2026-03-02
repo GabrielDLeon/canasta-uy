@@ -25,6 +25,11 @@ export type Category = {
   createdAt?: string
 }
 
+export type CategoryListResponse = {
+  categories: Category[]
+  pagination: PaginationInfo
+}
+
 export type Product = {
   productId: number
   name: string

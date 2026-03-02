@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import uy.eleven.canasta.dto.ApiResponse;
 import uy.eleven.canasta.dto.category.CategoryProductsRequest;
 import uy.eleven.canasta.dto.category.CategoryProductsResponse;
+import uy.eleven.canasta.dto.category.CategoryListResponse;
 import uy.eleven.canasta.dto.category.CategoryStatsRequest;
 import uy.eleven.canasta.dto.category.CategoryStatsResponse;
 import uy.eleven.canasta.dto.common.PaginationInfo;
@@ -37,7 +38,7 @@ public class CategoryController {
 
     @Operation(
             summary = "Listar categorías",
-            description = "Obtiene todas las categorías disponibles ordenadas alfabéticamente")
+            description = "Obtiene una lista paginada de categorías ordenadas alfabéticamente")
     @io.swagger.v3.oas.annotations.responses.ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "200",
@@ -45,8 +46,67 @@ public class CategoryController {
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
-        return ResponseEntity.ok(ApiResponse.success(categoryService.getAllCategories()));
+    public ResponseEntity<ApiResponse<CategoryListResponse>> getAllCategories(
+            @Parameter(description = "Número de página (0-based)", example = "0")
+                    @RequestParam(defaultValue = "0")
+                    int page,
+            @Parameter(description = "Cantidad de elementos por página", example = "20")
+                    @RequestParam(defaultValue = "20")
+                    int size) {
+
+        Page<Category> categoryPage = categoryService.getAllCategoriesPaginated(page, size);
+
+        PaginationInfo pagination =
+                new PaginationInfo(
+                        categoryPage.getNumber(),
+                        categoryPage.getSize(),
+                        categoryPage.getTotalElements(),
+                        categoryPage.getTotalPages(),
+                        categoryPage.hasNext(),
+                        categoryPage.hasPrevious());
+
+        CategoryListResponse response =
+                new CategoryListResponse(categoryPage.getContent(), pagination);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(
+            summary = "Buscar categorías por nombre",
+            description = "Busca categorías por nombre y devuelve resultados paginados")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Búsqueda completada exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<CategoryListResponse>> searchCategoriesByName(
+            @Parameter(description = "Término de búsqueda", example = "Bebidas", required = true)
+                    @RequestParam
+                    String query,
+            @Parameter(description = "Número de página (0-based)", example = "0")
+                    @RequestParam(defaultValue = "0")
+                    int page,
+            @Parameter(description = "Cantidad de elementos por página", example = "20")
+                    @RequestParam(defaultValue = "20")
+                    int size) {
+
+        Page<Category> categoryPage = categoryService.searchCategoriesByNamePaginated(query, page, size);
+
+        PaginationInfo pagination =
+                new PaginationInfo(
+                        categoryPage.getNumber(),
+                        categoryPage.getSize(),
+                        categoryPage.getTotalElements(),
+                        categoryPage.getTotalPages(),
+                        categoryPage.hasNext(),
+                        categoryPage.hasPrevious());
+
+        CategoryListResponse response =
+                new CategoryListResponse(categoryPage.getContent(), pagination);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @Operation(
