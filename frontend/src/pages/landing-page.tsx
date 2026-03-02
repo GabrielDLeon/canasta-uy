@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { getAuthState } from '@/lib/storage'
 
 export function LandingPage() {
@@ -10,6 +11,9 @@ export function LandingPage() {
   return (
     <main className="min-h-screen bg-muted/20 px-4 py-14">
       <section className="mx-auto w-full max-w-4xl space-y-10">
+        <div className="flex justify-end">
+          <ThemeToggle />
+        </div>
         <div className="space-y-3 text-center">
           <p className="text-sm font-medium uppercase tracking-wide text-primary">CanastaUY</p>
           <h1 className="text-4xl font-semibold tracking-tight">Visualizador de precios en Uruguay</h1>

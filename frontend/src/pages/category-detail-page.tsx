@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
 
 import { ApiKeyBanner } from '@/components/api-key-banner'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ProductItem } from '@/components/product-item'
@@ -29,6 +31,14 @@ export function CategoryDetailPage() {
   return (
     <section className="space-y-4">
       <ApiKeyBanner />
+      <div className="flex items-center gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/app/categories">
+            <ArrowLeft className="size-4" />
+            Volver a categorias
+          </Link>
+        </Button>
+      </div>
       <h1 className="text-2xl font-semibold">Categoria #{categoryId}</h1>
 
       <Card>

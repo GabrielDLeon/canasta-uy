@@ -19,11 +19,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Footer } from '@/components/footer'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { useCompareProducts } from '@/hooks/use-compare-products'
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarMenuBadge,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
@@ -50,6 +53,7 @@ export function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const isLogged = Boolean(getAuthState()?.accessToken)
+  const { count: compareCount } = useCompareProducts()
 
   const clearSession = async () => {
     try {
@@ -100,6 +104,9 @@ export function AppLayout() {
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
+                    {item.to === '/app/compare' && compareCount > 0 ? (
+                      <SidebarMenuBadge>{compareCount}</SidebarMenuBadge>
+                    ) : null}
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -116,24 +123,27 @@ export function AppLayout() {
               <SidebarTrigger className="-ml-1" />
               <h1 className="text-sm font-semibold md:text-base">CanastaUY Frontend</h1>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Abrir menu de cuenta">
-                  <CircleUserRound className="size-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => navigate('/account/profile')}>
-                  <UserRound className="size-4" />
-                  Cuenta
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onSelect={clearSession}>
-                  <LogOut className="size-4" />
-                  Cerrar sesion
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Abrir menu de cuenta">
+                    <CircleUserRound className="size-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => navigate('/account/profile')}>
+                    <UserRound className="size-4" />
+                    Cuenta
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onSelect={clearSession}>
+                    <LogOut className="size-4" />
+                    Cerrar sesion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </header>
 

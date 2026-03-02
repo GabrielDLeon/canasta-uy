@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { ColorType, LineSeries, createChart } from 'lightweight-charts'
+import { AreaSeries, ColorType, createChart } from 'lightweight-charts'
+import { useTheme } from 'next-themes'
 
 type ChartPoint = {
   time: string
@@ -18,10 +19,26 @@ type PriceChartProps = {
   series?: ChartSeries[]
 }
 
+function hexToRgba(color: string, alpha: number): string {
+  const hex = color.replace('#', '')
+
+  if (hex.length !== 6) {
+    return color
+  }
+
+  const normalized = Number.parseInt(hex, 16)
+  const red = (normalized >> 16) & 255
+  const green = (normalized >> 8) & 255
+  const blue = normalized & 255
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
+}
+
 export function PriceChart({ title, points = [], series }: PriceChartProps) {
+  const { resolvedTheme } = useTheme()
   const rootRef = useRef<HTMLDivElement | null>(null)
   const resolvedSeries =
-    series && series.length > 0 ? series : [{ name: title, color: '#d97706', points }]
+    series && series.length > 0 ? series : [{ name: title, color: '#9c5a24', points }]
   const hasData = resolvedSeries.some((item) => item.points.length > 0)
 
   useEffect(() => {
@@ -29,21 +46,32 @@ export function PriceChart({ title, points = [], series }: PriceChartProps) {
       return
     }
 
+    const rootStyles = getComputedStyle(document.documentElement)
+    const getVar = (name: string, fallback: string) => {
+      const value = rootStyles.getPropertyValue(name).trim()
+      return value || fallback
+    }
+
+    const chartBackground = getVar('--card', resolvedTheme === 'dark' ? '#2a2118' : '#fffaf0')
+    const chartText = getVar('--muted-foreground', resolvedTheme === 'dark' ? '#c5b08c' : '#6d5b45')
+    const chartBorder = getVar('--border', resolvedTheme === 'dark' ? '#4d3a2a' : '#d9c9a5')
+    const chartGrid = getVar('--muted', resolvedTheme === 'dark' ? '#2f241a' : '#f3e9d3')
+
     const chart = createChart(rootRef.current, {
       height: 300,
       layout: {
-        background: { type: ColorType.Solid, color: 'white' },
-        textColor: '#555',
+        background: { type: ColorType.Solid, color: chartBackground },
+        textColor: chartText,
       },
       rightPriceScale: {
-        borderColor: '#ddd',
+        borderColor: chartBorder,
       },
       timeScale: {
-        borderColor: '#ddd',
+        borderColor: chartBorder,
       },
       grid: {
-        vertLines: { color: '#f1f1f1' },
-        horzLines: { color: '#f1f1f1' },
+        vertLines: { color: chartGrid },
+        horzLines: { color: chartGrid },
       },
     })
 
@@ -52,8 +80,13 @@ export function PriceChart({ title, points = [], series }: PriceChartProps) {
         return
       }
 
-      const line = chart.addSeries(LineSeries, {
-        color: item.color,
+      const topColor = hexToRgba(item.color, resolvedTheme === 'dark' ? 0.36 : 0.28)
+      const bottomColor = hexToRgba(item.color, resolvedTheme === 'dark' ? 0.06 : 0.04)
+
+      const line = chart.addSeries(AreaSeries, {
+        lineColor: item.color,
+        topColor,
+        bottomColor,
         lineWidth: 2,
       })
       line.setData(item.points)
@@ -76,7 +109,7 @@ export function PriceChart({ title, points = [], series }: PriceChartProps) {
       observer.disconnect()
       chart.remove()
     }
-  }, [hasData, resolvedSeries])
+  }, [hasData, resolvedSeries, resolvedTheme])
 
   return (
     <section className="rounded-lg border bg-card p-4">

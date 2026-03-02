@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
+import { toast } from "sonner";
 
 import { ApiKeyBanner } from "@/components/api-key-banner";
 import { PriceChart } from "@/components/price-chart";
@@ -16,18 +17,17 @@ import {
 } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCompareProducts } from "@/hooks/use-compare-products";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { api } from "@/lib/api";
 import type { Product } from "@/types/api";
 
-type CompareRangePreset = "30d" | "90d" | "1y";
-
 const COMPARE_SERIES_COLORS = [
-  "#d97706",
-  "#0ea5e9",
-  "#22c55e",
-  "#ef4444",
-  "#a855f7",
+  "#9c5a24",
+  "#3c6e71",
+  "#708238",
+  "#b34f45",
+  "#6e4f8a",
 ];
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -41,26 +41,19 @@ function toUtcTime(date: string): number {
   return Date.UTC(year, month - 1, day);
 }
 
-function getPresetDays(preset: CompareRangePreset): number {
-  if (preset === "30d") {
-    return 30;
-  }
-  if (preset === "90d") {
-    return 90;
-  }
-  return 365;
-}
-
 export function ComparePage() {
+  const { products: selectedCompareProducts, addProduct, removeProduct } =
+    useCompareProducts();
   const [compareSearchInput, setCompareSearchInput] = useState("");
+  const [isCompareComboboxOpen, setIsCompareComboboxOpen] = useState(false);
   const compareSearch = useDebouncedValue(compareSearchInput.trim(), 400);
-  const [selectedCompareProducts, setSelectedCompareProducts] = useState<
-    Product[]
-  >([]);
   const [compareIds, setCompareIds] = useState("");
-  const [compareRangePreset, setCompareRangePreset] =
-    useState<CompareRangePreset>("1y");
   const [compareFormError, setCompareFormError] = useState("");
+
+  useEffect(() => {
+    setCompareIds("");
+    setCompareFormError("");
+  }, [selectedCompareProducts]);
 
   const compare = useQuery({
     queryKey: ["analytics-compare", compareIds, "with-data"],
@@ -104,8 +97,7 @@ export function ComparePage() {
       return compareSeriesBase;
     }
 
-    const days = getPresetDays(compareRangePreset);
-    const minTimestamp = maxTimestamp - days * DAY_IN_MS;
+    const minTimestamp = maxTimestamp - 365 * DAY_IN_MS;
 
     return compareSeriesBase
       .map((item) => ({
@@ -120,7 +112,7 @@ export function ComparePage() {
         }),
       }))
       .filter((item) => item.points.length > 0);
-  }, [compareRangePreset, compareSeriesBase]);
+  }, [compareSeriesBase]);
 
   const onCompareSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -139,25 +131,15 @@ export function ComparePage() {
   };
 
   const onAddCompareProduct = (product: Product) => {
-    setSelectedCompareProducts((current) => {
-      if (
-        current.some((item) => item.productId === product.productId) ||
-        current.length >= 5
-      ) {
-        return current;
-      }
-      return [...current, product];
-    });
-    setCompareIds("");
-    setCompareFormError("");
+    const result = addProduct(product);
+
+    if (result === "limit") {
+      toast.error("Solo puedes comparar hasta 5 productos.");
+    }
   };
 
   const onRemoveCompareProduct = (productId: number) => {
-    setSelectedCompareProducts((current) =>
-      current.filter((item) => item.productId !== productId),
-    );
-    setCompareIds("");
-    setCompareFormError("");
+    removeProduct(productId);
   };
 
   const availableCompareResults = useMemo(
@@ -186,6 +168,14 @@ export function ComparePage() {
             evolucion de precio.
           </p>
           <Combobox
+            open={isCompareComboboxOpen}
+            onOpenChange={(open, eventDetails) => {
+              if (!open && eventDetails.reason === "item-press") {
+                return;
+              }
+
+              setIsCompareComboboxOpen(open);
+            }}
             items={availableCompareResults}
             itemToStringValue={(product: unknown) => (product as Product).name}
             onValueChange={(value: unknown) => {
@@ -194,14 +184,15 @@ export function ComparePage() {
                 return;
               }
               onAddCompareProduct(selected);
-              setCompareSearchInput("");
+              setIsCompareComboboxOpen(true);
             }}
           >
             <ComboboxInput
               value={compareSearchInput}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setCompareSearchInput(event.target.value)
-              }
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                setCompareSearchInput(event.target.value);
+                setIsCompareComboboxOpen(true);
+              }}
               placeholder="Buscar producto por nombre"
               showClear
             >
@@ -246,7 +237,11 @@ export function ComparePage() {
                 {selectedCompareProducts.map((product) => (
                   <li key={product.productId} className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
-                      <ProductItem product={product} showActions={false} />
+                      <ProductItem
+                        product={product}
+                        showActions={false}
+                        showCompareAction={false}
+                      />
                     </div>
                     <Button
                       type="button"
@@ -269,29 +264,6 @@ export function ComparePage() {
           {compareFormError ? (
             <p className="mt-2 text-sm text-destructive">{compareFormError}</p>
           ) : null}
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant={compareRangePreset === "30d" ? "default" : "outline"}
-              onClick={() => setCompareRangePreset("30d")}
-            >
-              30d
-            </Button>
-            <Button
-              type="button"
-              variant={compareRangePreset === "90d" ? "default" : "outline"}
-              onClick={() => setCompareRangePreset("90d")}
-            >
-              90d
-            </Button>
-            <Button
-              type="button"
-              variant={compareRangePreset === "1y" ? "default" : "outline"}
-              onClick={() => setCompareRangePreset("1y")}
-            >
-              1y
-            </Button>
-          </div>
         </CardContent>
       </Card>
 

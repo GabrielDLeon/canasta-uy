@@ -1,17 +1,22 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
+import { ArrowLeft, Scale } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 
 import { ApiKeyBanner } from '@/components/api-key-banner'
 import { PriceChart } from '@/components/price-chart'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCompareProducts } from '@/hooks/use-compare-products'
 import { api } from '@/lib/api'
 
 export function ProductDetailPage() {
   const params = useParams()
   const productId = Number(params.id)
+  const { addProduct } = useCompareProducts()
 
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
@@ -38,9 +43,53 @@ export function ProductDetailPage() {
     [prices.data],
   )
 
+  const onAddToCompare = () => {
+    if (!product.data) {
+      return
+    }
+
+    const result = addProduct(product.data)
+
+    if (result === 'added') {
+      toast.success('Producto agregado a comparacion.')
+      return
+    }
+
+    if (result === 'duplicate') {
+      toast('Este producto ya esta en comparacion.')
+      return
+    }
+
+    if (result === 'limit') {
+      toast.error('Solo puedes comparar hasta 5 productos.')
+      return
+    }
+
+    toast.error('No se pudo agregar el producto a comparacion.')
+  }
+
   return (
     <section className="space-y-4">
       <ApiKeyBanner />
+      <div className="flex flex-wrap items-center gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/app/products">
+            <ArrowLeft className="size-4" />
+            Volver a productos
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onAddToCompare}
+          disabled={product.isPending || !product.data}
+        >
+          <Scale className="size-4" />
+          Agregar a comparacion
+        </Button>
+      </div>
+
       <h1 className="text-2xl font-semibold">Detalle de producto</h1>
 
       <Card>
