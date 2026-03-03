@@ -7,6 +7,7 @@ import { PriceChart } from "@/components/price-chart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 
@@ -79,18 +80,22 @@ export function AnalyticsPage() {
                 promedio.
               </p>
               <form onSubmit={onTrendSubmit} className="flex flex-wrap gap-2">
+                <div className="space-y-2">
+                  <Label htmlFor="trend-product-id">ID de producto</Label>
                 <Input
+                  id="trend-product-id"
                   value={trendProductInput}
                   onChange={(event) => setTrendProductInput(event.target.value)}
                   placeholder="Ejemplo: 15"
                   className="max-w-xs"
                 />
+                </div>
                 <Button type="submit">Consultar trend</Button>
               </form>
             </CardContent>
           </Card>
           {trend.isError ? (
-            <p className="text-sm text-destructive">
+            <p role="alert" className="text-sm text-destructive">
               {(trend.error as Error).message}
             </p>
           ) : null}
@@ -114,7 +119,10 @@ export function AnalyticsPage() {
                 onSubmit={onInflationSubmit}
                 className="flex flex-wrap gap-2"
               >
+                <div className="space-y-2">
+                  <Label htmlFor="inflation-category-id">ID de categoria</Label>
                 <Input
+                  id="inflation-category-id"
                   value={inflationCategoryInput}
                   onChange={(event) =>
                     setInflationCategoryInput(event.target.value)
@@ -122,12 +130,13 @@ export function AnalyticsPage() {
                   placeholder="Ejemplo: 1"
                   className="max-w-xs"
                 />
+                </div>
                 <Button type="submit">Consultar inflation</Button>
               </form>
             </CardContent>
           </Card>
           {inflation.isError ? (
-            <p className="text-sm text-destructive">
+            <p role="alert" className="text-sm text-destructive">
               {(inflation.error as Error).message}
             </p>
           ) : null}

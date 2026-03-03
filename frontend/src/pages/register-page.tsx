@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { api } from '@/lib/api'
 
 export function RegisterPage() {
@@ -41,14 +42,21 @@ export function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="register-email">Email</Label>
             <Input
+              id="register-email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="email@dominio.com"
               required
             />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="register-password">Contrasena</Label>
             <Input
+              id="register-password"
               type="password"
               minLength={8}
               value={password}
@@ -56,7 +64,12 @@ export function RegisterPage() {
               placeholder="Minimo 8 caracteres"
               required
             />
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
+            </div>
+            {error ? (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            ) : null}
             <Button disabled={loading} className="w-full" type="submit">
               {loading ? 'Creando cuenta...' : 'Registrarme'}
             </Button>

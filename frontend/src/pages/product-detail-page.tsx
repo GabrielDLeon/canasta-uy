@@ -9,6 +9,7 @@ import { PriceChart } from '@/components/price-chart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCompareProducts } from '@/hooks/use-compare-products'
 import { api } from '@/lib/api'
@@ -109,11 +110,19 @@ export function ProductDetailPage() {
         <CardHeader>
           <CardTitle>Filtros de precios</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-wrap items-center gap-2">
-          <Input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
-          <Input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+        <CardContent className="flex flex-wrap items-end gap-3">
+          <div className="space-y-2">
+            <Label htmlFor="prices-from">Desde</Label>
+            <Input id="prices-from" type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="prices-to">Hasta</Label>
+            <Input id="prices-to" type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="prices-granularity">Granularidad</Label>
           <Select value={granularity} onValueChange={(value) => setGranularity(value as typeof granularity)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger id="prices-granularity" className="w-[180px]">
               <SelectValue placeholder="Granularidad" />
             </SelectTrigger>
             <SelectContent>
@@ -122,6 +131,7 @@ export function ProductDetailPage() {
               <SelectItem value="monthly">Mensual</SelectItem>
             </SelectContent>
           </Select>
+          </div>
         </CardContent>
       </Card>
 

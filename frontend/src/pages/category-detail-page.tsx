@@ -7,6 +7,7 @@ import { ApiKeyBanner } from '@/components/api-key-banner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ProductItem } from '@/components/product-item'
 import { api } from '@/lib/api'
 
@@ -45,9 +46,15 @@ export function CategoryDetailPage() {
         <CardHeader>
           <CardTitle>Filtro de fechas para estadisticas</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
-          <Input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+        <CardContent className="flex flex-wrap items-end gap-3">
+          <div className="space-y-2">
+            <Label htmlFor="stats-from">Desde</Label>
+            <Input id="stats-from" type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="stats-to">Hasta</Label>
+            <Input id="stats-to" type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+          </div>
         </CardContent>
       </Card>
 
