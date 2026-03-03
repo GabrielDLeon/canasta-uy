@@ -1,4 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   BarChart3,
   CircleUserRound,
@@ -39,7 +40,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { api } from '@/lib/api'
-import { getAuthState, setAuthState } from '@/lib/storage'
+import { setApiKeyValue } from '@/lib/storage'
 
 const items = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard },
@@ -52,18 +53,17 @@ const items = [
 export function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const isLogged = Boolean(getAuthState()?.accessToken)
+  const queryClient = useQueryClient()
   const { count: compareCount } = useCompareProducts()
 
   const clearSession = async () => {
     try {
-      if (isLogged) {
-        await api.logout()
-      }
+      await api.logout()
     } catch {
       // no-op
     } finally {
-      setAuthState(null)
+      queryClient.removeQueries({ queryKey: ['profile'] })
+      setApiKeyValue('')
       navigate('/auth/login')
     }
   }

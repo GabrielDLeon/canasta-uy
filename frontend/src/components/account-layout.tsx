@@ -1,4 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { CircleUserRound, KeyRound, LogOut, ShieldUser, UserRound } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -28,7 +29,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { api } from '@/lib/api'
-import { getAuthState, setAuthState } from '@/lib/storage'
+import { setApiKeyValue } from '@/lib/storage'
 
 const accountItems = [
   { to: '/account/profile', label: 'Perfil', icon: ShieldUser },
@@ -38,17 +39,16 @@ const accountItems = [
 export function AccountLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const isLogged = Boolean(getAuthState()?.accessToken)
+  const queryClient = useQueryClient()
 
   const clearSession = async () => {
     try {
-      if (isLogged) {
-        await api.logout()
-      }
+      await api.logout()
     } catch {
       // no-op
     } finally {
-      setAuthState(null)
+      queryClient.removeQueries({ queryKey: ['profile'] })
+      setApiKeyValue('')
       navigate('/auth/login')
     }
   }
