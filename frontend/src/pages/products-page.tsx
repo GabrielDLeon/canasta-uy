@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
@@ -23,10 +23,6 @@ export function ProductsPage() {
   const [page, setPage] = useState(0);
   const search = useDebouncedValue(query.trim(), 500);
 
-  useEffect(() => {
-    setPage(0);
-  }, [search]);
-
   const products = useQuery({
     queryKey: ["products", search, page],
     queryFn: () =>
@@ -45,7 +41,10 @@ export function ProductsPage() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(0);
+            }}
             placeholder="Buscar por nombre"
             className="pl-9"
           />

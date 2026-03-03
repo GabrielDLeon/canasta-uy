@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
@@ -49,11 +49,6 @@ export function ComparePage() {
   const compareSearch = useDebouncedValue(compareSearchInput.trim(), 400);
   const [compareIds, setCompareIds] = useState("");
   const [compareFormError, setCompareFormError] = useState("");
-
-  useEffect(() => {
-    setCompareIds("");
-    setCompareFormError("");
-  }, [selectedCompareProducts]);
 
   const compare = useQuery({
     queryKey: ["analytics-compare", compareIds, "with-data"],
@@ -132,6 +127,8 @@ export function ComparePage() {
 
   const onAddCompareProduct = (product: Product) => {
     const result = addProduct(product);
+    setCompareIds("");
+    setCompareFormError("");
 
     if (result === "limit") {
       toast.error("Solo puedes comparar hasta 5 productos.");
@@ -140,6 +137,8 @@ export function ComparePage() {
 
   const onRemoveCompareProduct = (productId: number) => {
     removeProduct(productId);
+    setCompareIds("");
+    setCompareFormError("");
   };
 
   const availableCompareResults = useMemo(

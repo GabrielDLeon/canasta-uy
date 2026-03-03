@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { AreaSeries, ColorType, createChart } from 'lightweight-charts'
 import { useTheme } from 'next-themes'
 
@@ -37,8 +37,10 @@ function hexToRgba(color: string, alpha: number): string {
 export function PriceChart({ title, points = [], series }: PriceChartProps) {
   const { resolvedTheme } = useTheme()
   const rootRef = useRef<HTMLDivElement | null>(null)
-  const resolvedSeries =
-    series && series.length > 0 ? series : [{ name: title, color: '#9c5a24', points }]
+  const resolvedSeries = useMemo(
+    () => (series && series.length > 0 ? series : [{ name: title, color: '#9c5a24', points }]),
+    [points, series, title],
+  )
   const hasData = resolvedSeries.some((item) => item.points.length > 0)
 
   useEffect(() => {

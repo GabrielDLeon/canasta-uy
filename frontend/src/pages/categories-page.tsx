@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
@@ -15,10 +15,6 @@ export function CategoriesPage() {
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(0)
   const debouncedQuery = useDebouncedValue(query.trim().toLowerCase(), 500)
-
-  useEffect(() => {
-    setPage(0)
-  }, [debouncedQuery])
 
   const categories = useQuery({
     queryKey: ['categories', debouncedQuery, page],
@@ -39,7 +35,10 @@ export function CategoriesPage() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setPage(0)
+            }}
             placeholder="Buscar categoria por nombre"
             className="pl-9"
           />
