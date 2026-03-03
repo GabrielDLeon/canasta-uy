@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -37,19 +38,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final String AUTH_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String ACCESS_COOKIE_NAME = "canasta_access_token";
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader(AUTH_HEADER);
+        String jwt = extractJwtToken(request);
         String path = request.getRequestURI();
 
         log.debug("JwtAuthFilter processing request to: {}", path);
-        log.debug("Authorization header: {}", authHeader);
+        log.debug("JWT present in request: {}", jwt != null);
 
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+        if (jwt == null || jwt.isBlank()) {
             log.warn("JWT required but not provided for path: {}", path);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -64,8 +66,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.getWriter().write(mapper.writeValueAsString(errorResponse));
             return;
         }
-
-        String jwt = authHeader.substring(BEARER_PREFIX.length());
 
         try {
             Claims claims = jwtService.validateAndGetClaims(jwt);
@@ -108,5 +108,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         boolean shouldFilter =
                 path.startsWith("/api/v1/account") || path.equals("/api/v1/auth/logout");
         return !shouldFilter;
+    }
+
+    private String extractJwtToken(HttpServletRequest request) {
+        String authHeader = request.getHeader(AUTH_HEADER);
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            return authHeader.substring(BEARER_PREFIX.length());
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (ACCESS_COOKIE_NAME.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 }
