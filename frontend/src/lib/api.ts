@@ -17,9 +17,9 @@ import type {
   TopChangesResponse,
   TrendResponse,
 } from '@/types/api'
-import { getApiKeyValue, getAuthState, setAuthState } from '@/lib/storage'
+import { getApiKeyValue } from '@/lib/storage'
 
-type AuthMode = 'none' | 'jwt' | 'api-key'
+type AuthMode = 'none' | 'session' | 'api-key'
 
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'DELETE'
@@ -40,15 +40,6 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
     'Content-Type': 'application/json',
   }
 
-  if (authMode === 'jwt') {
-    const auth = getAuthState()
-    if (!auth?.accessToken) {
-      throw new Error('No hay token JWT activo. Inicia sesion primero.')
-    }
-
-    headers.Authorization = `Bearer ${auth.accessToken}`
-  }
-
   if (authMode === 'api-key') {
     const apiKey = getApiKeyValue()
     if (!apiKey) {
@@ -61,10 +52,11 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
   const response = await fetch(`${API_BASE}${path}`, {
     method: options.method ?? 'GET',
     headers,
+    credentials: 'include',
     body: options.body ? JSON.stringify(options.body) : undefined,
   })
 
-  if (response.status === 401 && authMode === 'jwt') {
+  if (response.status === 401 && authMode === 'session') {
     const refreshed = await tryRefreshToken()
     if (refreshed) {
       return performRequest(path, options)
@@ -81,18 +73,13 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
 }
 
 async function tryRefreshToken(): Promise<boolean> {
-  const auth = getAuthState()
-  if (!auth?.refreshToken) {
-    return false
-  }
-
   try {
     const response = await fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ refreshToken: auth.refreshToken }),
     })
 
     if (!response.ok) {
@@ -104,10 +91,6 @@ async function tryRefreshToken(): Promise<boolean> {
       return false
     }
 
-    setAuthState({
-      accessToken: parsed.data.accessToken,
-      refreshToken: parsed.data.refreshToken,
-    })
     return true
   } catch {
     return false
@@ -138,21 +121,21 @@ export const api = {
   login: (email: string, password: string) =>
     request<LoginResponse>('/auth/login', { method: 'POST', body: { email, password } }),
 
-  logout: () => request('/auth/logout', { method: 'POST', auth: 'jwt' }),
+  logout: () => request('/auth/logout', { method: 'POST', auth: 'session' }),
 
-  getProfile: () => request<ProfileResponse>('/account/profile', { auth: 'jwt' }),
+  getProfile: () => request<ProfileResponse>('/account/profile', { auth: 'session' }),
 
-  listApiKeys: () => request<ApiKeyListItem[]>('/account/api-keys', { auth: 'jwt' }),
+  listApiKeys: () => request<ApiKeyListItem[]>('/account/api-keys', { auth: 'session' }),
 
   createApiKey: (name: string) =>
     request<ApiKeyCreateResponse>('/account/api-keys', {
       method: 'POST',
-      auth: 'jwt',
+      auth: 'session',
       body: { name },
     }),
 
   revokeApiKey: (id: number) =>
-    request<void>(`/account/api-keys/${id}`, { method: 'DELETE', auth: 'jwt' }),
+    request<void>(`/account/api-keys/${id}`, { method: 'DELETE', auth: 'session' }),
 
   getProducts: (page = 0, size = 20) =>
     request<ProductListResponse>(`/products${searchParams({ page, size })}`, {

@@ -1,9 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 import { AccountLayout } from '@/components/account-layout'
 import { AppLayout } from '@/components/app-layout'
-import { getAuthState } from '@/lib/storage'
+import { api } from '@/lib/api'
 import { AccountKeysPage } from '@/pages/account-keys-page'
 import { AccountProfilePage } from '@/pages/account-profile-page'
 import { AnalyticsPage } from '@/pages/analytics-page'
@@ -18,8 +19,17 @@ import { ProductsPage } from '@/pages/products-page'
 import { RegisterPage } from '@/pages/register-page'
 
 function RequireAuth({ children }: { children: ReactNode }) {
-  const hasAuth = Boolean(getAuthState()?.accessToken)
-  if (!hasAuth) {
+  const profile = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => api.getProfile(),
+    retry: false,
+  })
+
+  if (profile.isPending) {
+    return <p className="p-4 text-sm text-muted-foreground">Verificando sesion...</p>
+  }
+
+  if (profile.isError) {
     return <Navigate to="/auth/login" replace />
   }
 

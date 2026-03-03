@@ -7,8 +7,8 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { api } from '@/lib/api'
-import { setAuthState } from '@/lib/storage'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -22,8 +22,7 @@ export function LoginPage() {
     setInvalidCredentials(false)
     setLoading(true)
     try {
-      const data = await api.login(email, password)
-      setAuthState({ accessToken: data.accessToken, refreshToken: data.refreshToken })
+      await api.login(email, password)
       navigate('/app')
     } catch (e) {
       const message = e instanceof Error ? e.message : ''
@@ -54,7 +53,10 @@ export function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
             <Input
+              id="email"
               type="email"
               value={email}
               onChange={(event) => {
@@ -65,7 +67,11 @@ export function LoginPage() {
               aria-invalid={invalidCredentials}
               required
             />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Contrasena</Label>
             <Input
+              id="password"
               type="password"
               value={password}
               onChange={(event) => {
@@ -76,6 +82,12 @@ export function LoginPage() {
               aria-invalid={invalidCredentials}
               required
             />
+            </div>
+            {invalidCredentials ? (
+              <p role="alert" className="text-sm text-destructive">
+                Credenciales invalidas. Verifica email y contrasena.
+              </p>
+            ) : null}
             <Button disabled={loading} className="w-full" type="submit">
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>

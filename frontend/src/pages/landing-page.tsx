@@ -3,11 +3,8 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { getAuthState } from '@/lib/storage'
 
 export function LandingPage() {
-  const isLogged = Boolean(getAuthState()?.accessToken)
-
   return (
     <main className="min-h-screen bg-muted/20 px-4 py-14">
       <section className="mx-auto w-full max-w-4xl space-y-10">
@@ -24,9 +21,7 @@ export function LandingPage() {
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Button asChild size="lg">
-            <Link to={isLogged ? '/app' : '/auth/login'}>
-              {isLogged ? 'Entrar a la app' : 'Iniciar sesion'}
-            </Link>
+            <Link to="/auth/login">Iniciar sesion</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
             <Link to="/auth/register">Crear cuenta</Link>
