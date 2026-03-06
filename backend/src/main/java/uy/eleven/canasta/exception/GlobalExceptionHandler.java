@@ -10,6 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import uy.eleven.canasta.dto.ApiResponse;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,7 +92,7 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Map<String, String>> response =
                 new ApiResponse<>(
-                        false, "Validation failed", errors, java.time.LocalDateTime.now());
+                        false, "Validation failed", errors, LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -203,9 +205,9 @@ class AnalyticsServiceTest {
                                         new BigDecimal("80"))));
         when(productRepository.findAll()).thenReturn(List.of(product));
         when(priceRepository.findByIdProductIdAndIdDateBetween(
-                        org.mockito.ArgumentMatchers.eq(1),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                        eq(1),
+                        any(LocalDate.class),
+                        any(LocalDate.class)))
                 .thenReturn(prices);
 
         TopChangesResponse response = analyticsService.getTopChanges("30d", "decrease", 10, null);
@@ -257,18 +259,18 @@ class AnalyticsServiceTest {
 
         when(productRepository.findAll()).thenReturn(List.of(productA, productB));
         when(priceRepository.findByIdProductIdAndIdDateBetween(
-                        org.mockito.ArgumentMatchers.eq(1),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                        eq(1),
+                        any(LocalDate.class),
+                        any(LocalDate.class)))
                 .thenReturn(pricesA);
         when(priceRepository.findByIdProductIdAndIdDateBetween(
-                        org.mockito.ArgumentMatchers.eq(2),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                        eq(2),
+                        any(LocalDate.class),
+                        any(LocalDate.class)))
                 .thenReturn(pricesB);
         when(priceRepository.findByIdDateBetween(
-                        org.mockito.ArgumentMatchers.any(LocalDate.class),
-                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                        any(LocalDate.class),
+                        any(LocalDate.class)))
                 .thenReturn(
                         List.of(
                                 TestDataFactory.price(
@@ -342,7 +344,9 @@ class AnalyticsServiceTest {
                                         new BigDecimal("110"),
                                         new BigDecimal("110")))));
 
-        TrendResponse response = analyticsService.calculateTrend(1, expectedFrom, LocalDate.of(2026, 3, 5), false);
+        TrendResponse response =
+                analyticsService.calculateTrend(
+                        1, expectedFrom, LocalDate.of(2026, 3, 5), false);
 
         assertEquals(expectedTo, response.period().to());
         assertEquals("increasing", response.summary().trend());

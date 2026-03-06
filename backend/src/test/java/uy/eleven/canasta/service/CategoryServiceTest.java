@@ -19,6 +19,7 @@ import uy.eleven.canasta.repository.CategoryRepository;
 import uy.eleven.canasta.repository.ProductRepository;
 import uy.eleven.canasta.testsupport.TestDataFactory;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ class CategoryServiceTest {
                 categoryService.calculateCategoryStats(
                         1, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 2, 1));
 
-        assertEquals(0, response.stats().avgPrice().compareTo(java.math.BigDecimal.ZERO));
+        assertEquals(0, response.stats().avgPrice().compareTo(BigDecimal.ZERO));
         assertEquals(1, response.productCount());
     }
 }

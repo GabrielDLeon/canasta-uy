@@ -3,6 +3,7 @@ package uy.eleven.canasta.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +52,7 @@ class JwtServiceTest {
 
     @Test
     void validateAndGetClaimsReturnsClaimsWhenValid() {
-        Claims claims = org.mockito.Mockito.mock(Claims.class);
+        Claims claims = mock(Claims.class);
         when(jwtUtil.isTokenValid("valid")).thenReturn(true);
         when(jwtUtil.extractClaim(any(), any())).thenReturn(claims);
 
@@ -63,7 +64,7 @@ class JwtServiceTest {
     @Test
     void extractorsValidateThenDelegate() {
         when(jwtUtil.isTokenValid("valid")).thenReturn(true);
-        when(jwtUtil.extractClaim(any(), any())).thenReturn(org.mockito.Mockito.mock(Claims.class));
+        when(jwtUtil.extractClaim(any(), any())).thenReturn(mock(Claims.class));
         when(jwtUtil.extractClientId("valid")).thenReturn(11L);
         when(jwtUtil.extractUsername("valid")).thenReturn("user@test.com");
 
