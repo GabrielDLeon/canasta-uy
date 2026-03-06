@@ -36,12 +36,44 @@ function RequireAuth({ children }: { children: ReactNode }) {
   return children
 }
 
+function RequireGuest({ children }: { children: ReactNode }) {
+  const profile = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => api.getProfile(),
+    retry: false,
+  })
+
+  if (profile.isPending) {
+    return <p className="p-4 text-sm text-muted-foreground">Verificando sesion...</p>
+  }
+
+  if (profile.isSuccess) {
+    return <Navigate to="/app" replace />
+  }
+
+  return children
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/auth/login" element={<LoginPage />} />
-      <Route path="/auth/register" element={<RegisterPage />} />
+      <Route
+        path="/auth/login"
+        element={
+          <RequireGuest>
+            <LoginPage />
+          </RequireGuest>
+        }
+      />
+      <Route
+        path="/auth/register"
+        element={
+          <RequireGuest>
+            <RegisterPage />
+          </RequireGuest>
+        }
+      />
 
       <Route
         path="/app"
