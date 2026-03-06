@@ -83,4 +83,7 @@ public interface PriceRepository extends JpaRepository<Price, PriceId> {
             @Param("productId") Integer productId,
             @Param("from") LocalDate from,
             @Param("to") LocalDate to);
+
+    @Query("SELECT MAX(p.id.date) FROM Price p")
+    LocalDate findLatestDate();
 }

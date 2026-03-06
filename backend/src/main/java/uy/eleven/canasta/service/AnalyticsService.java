@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import uy.eleven.canasta.dto.analytics.ComparisonResponse;
+import uy.eleven.canasta.dto.analytics.DashboardResponse;
 import uy.eleven.canasta.dto.analytics.InflationResponse;
 import uy.eleven.canasta.dto.analytics.TopChangesResponse;
 import uy.eleven.canasta.dto.analytics.TrendResponse;
@@ -56,9 +57,10 @@ public class AnalyticsService {
                         .findById(productId)
                         .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        LocalDate effectiveFrom =
-                from != null ? from : LocalDate.now().minusDays(DEFAULT_DATE_RANGE_DAYS);
-        LocalDate effectiveTo = to != null ? to : LocalDate.now();
+        DateRange effectiveDateRange =
+                resolveEffectiveDateRange(from, to, DEFAULT_DATE_RANGE_DAYS);
+        LocalDate effectiveFrom = effectiveDateRange.from();
+        LocalDate effectiveTo = effectiveDateRange.to();
 
         priceService.validateDateRange(effectiveFrom, effectiveTo);
 
@@ -200,9 +202,10 @@ public class AnalyticsService {
                         .findById(categoryId)
                         .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-        LocalDate effectiveFrom =
-                from != null ? from : LocalDate.now().minusDays(DEFAULT_DATE_RANGE_DAYS);
-        LocalDate effectiveTo = to != null ? to : LocalDate.now();
+        DateRange effectiveDateRange =
+                resolveEffectiveDateRange(from, to, DEFAULT_DATE_RANGE_DAYS);
+        LocalDate effectiveFrom = effectiveDateRange.from();
+        LocalDate effectiveTo = effectiveDateRange.to();
 
         priceService.validateDateRange(effectiveFrom, effectiveTo);
 
@@ -328,9 +331,10 @@ public class AnalyticsService {
 
     public ComparisonResponse compareProducts(
             List<Integer> productIds, LocalDate from, LocalDate to) {
-        LocalDate effectiveFrom =
-                from != null ? from : LocalDate.now().minusDays(DEFAULT_DATE_RANGE_DAYS);
-        LocalDate effectiveTo = to != null ? to : LocalDate.now();
+        DateRange effectiveDateRange =
+                resolveEffectiveDateRange(from, to, DEFAULT_DATE_RANGE_DAYS);
+        LocalDate effectiveFrom = effectiveDateRange.from();
+        LocalDate effectiveTo = effectiveDateRange.to();
         return compareProducts(productIds, effectiveFrom, effectiveTo, false);
     }
 
@@ -342,7 +346,11 @@ public class AnalyticsService {
     public ComparisonResponse compareProducts(
             List<Integer> productIds, LocalDate from, LocalDate to, boolean includeData) {
 
-        priceService.validateDateRange(from, to);
+        DateRange effectiveDateRange = resolveEffectiveDateRange(from, to, DEFAULT_DATE_RANGE_DAYS);
+        LocalDate effectiveFrom = effectiveDateRange.from();
+        LocalDate effectiveTo = effectiveDateRange.to();
+
+        priceService.validateDateRange(effectiveFrom, effectiveTo);
 
         List<ComparisonResponse.ProductComparison> productComparisons = new ArrayList<>();
 
@@ -353,7 +361,9 @@ public class AnalyticsService {
             }
 
             Product product = productOpt.get();
-            List<Price> prices = priceRepository.findByIdProductIdAndIdDateBetween(productId, from, to);
+            List<Price> prices =
+                    priceRepository.findByIdProductIdAndIdDateBetween(
+                            productId, effectiveFrom, effectiveTo);
 
             if (prices.isEmpty()) {
                 continue;
@@ -417,7 +427,7 @@ public class AnalyticsService {
         }
 
         if (productComparisons.isEmpty()) {
-            return new ComparisonResponse(new DateRange(from, to), List.of(), null);
+            return new ComparisonResponse(effectiveDateRange, List.of(), null);
         }
 
         ComparisonResponse.ProductComparison mostExpensive =
@@ -460,7 +470,7 @@ public class AnalyticsService {
                         cheapest != null ? cheapest.productName() : "",
                         mostVolatile != null ? mostVolatile.productName() : "");
 
-        return new ComparisonResponse(new DateRange(from, to), productComparisons, stats);
+        return new ComparisonResponse(effectiveDateRange, productComparisons, stats);
     }
 
     @Cacheable(
@@ -469,10 +479,312 @@ public class AnalyticsService {
     public TopChangesResponse getTopChanges(
             String period, String type, Integer limit, Integer categoryId) {
 
-        LocalDate effectiveTo = LocalDate.now();
-        LocalDate effectiveFrom;
+        LocalDate effectiveTo = resolveLatestAvailableDate();
+        DateRange dateRange = resolveDateRangeByPeriod(period, effectiveTo);
+        LocalDate effectiveFrom = dateRange.from();
+        String normalizedType = type == null ? "all" : type.toLowerCase();
 
-        switch (period.toLowerCase()) {
+        List<ProductChangeMetric> changes = buildProductChanges(effectiveFrom, effectiveTo, categoryId);
+
+        List<ProductChangeMetric> filtered =
+                changes.stream()
+                        .filter(
+                                change -> {
+                                    if ("increase".equals(normalizedType)) {
+                                        return change.changePercentage().compareTo(BigDecimal.ZERO) > 0;
+                                    }
+                                    if ("decrease".equals(normalizedType)) {
+                                        return change.changePercentage().compareTo(BigDecimal.ZERO) < 0;
+                                    }
+                                    return true;
+                                })
+                        .toList();
+
+        List<ProductChangeMetric> sorted =
+                filtered.stream()
+                        .sorted(
+                                (a, b) ->
+                                        b.changePercentage()
+                                                .abs()
+                                                .compareTo(a.changePercentage().abs()))
+                        .toList();
+
+        int resultLimit = Math.min(limit, sorted.size());
+        List<TopChangesResponse.PriceChange> topChanges =
+                sorted.stream()
+                        .limit(resultLimit)
+                        .map(
+                                change ->
+                                        new TopChangesResponse.PriceChange(
+                                                change.productId(),
+                                                change.productName(),
+                                                change.category(),
+                                                change.priceBefore(),
+                                                change.priceAfter(),
+                                                change.changePercentage(),
+                                                change.changeAbsolute(),
+                                                change.changeDirection()))
+                        .toList();
+
+        return new TopChangesResponse(normalizePeriod(period), dateRange, topChanges);
+    }
+
+    @Cacheable(value = "analytics", key = "'dashboard:' + #period + ':' + #limit")
+    public DashboardResponse getDashboardSummary(String period, Integer limit) {
+        LocalDate effectiveTo = resolveLatestAvailableDate();
+        DateRange dateRange = resolveDateRangeByPeriod(period, effectiveTo);
+        LocalDate effectiveFrom = dateRange.from();
+        int effectiveLimit = Math.max(1, Math.min(limit, 20));
+
+        List<ProductChangeMetric> productChanges = buildProductChanges(effectiveFrom, effectiveTo, null);
+
+        List<DashboardResponse.ProductChange> topIncreases =
+                productChanges.stream()
+                        .filter(change -> change.changePercentage().compareTo(BigDecimal.ZERO) > 0)
+                        .sorted(
+                                (a, b) ->
+                                        b.changePercentage().compareTo(a.changePercentage()))
+                        .limit(effectiveLimit)
+                        .map(this::toDashboardProductChange)
+                        .toList();
+
+        List<DashboardResponse.ProductChange> topDecreases =
+                productChanges.stream()
+                        .filter(change -> change.changePercentage().compareTo(BigDecimal.ZERO) < 0)
+                        .sorted(Comparator.comparing(ProductChangeMetric::changePercentage))
+                        .limit(effectiveLimit)
+                        .map(this::toDashboardProductChange)
+                        .toList();
+
+        List<DashboardResponse.CategoryChange> categoryChanges =
+                buildCategoryChanges(productChanges, effectiveLimit);
+        DashboardResponse.MarketSnapshot marketSnapshot =
+                buildMarketSnapshot(effectiveFrom, effectiveTo);
+        DashboardResponse.VolatilitySummary volatility =
+                buildVolatilitySummary(effectiveFrom, effectiveTo, effectiveLimit);
+
+        return new DashboardResponse(
+                normalizePeriod(period),
+                dateRange,
+                marketSnapshot,
+                topIncreases,
+                topDecreases,
+                categoryChanges,
+                volatility);
+    }
+
+    private DashboardResponse.MarketSnapshot buildMarketSnapshot(LocalDate from, LocalDate to) {
+        List<Price> currentPeriodPrices = priceRepository.findByIdDateBetween(from, to);
+        BigDecimal currentAverage = calculateAverage(currentPeriodPrices);
+
+        long periodDays = ChronoUnit.DAYS.between(from, to) + 1;
+        LocalDate previousTo = from.minusDays(1);
+        LocalDate previousFrom = previousTo.minusDays(periodDays - 1);
+
+        List<Price> previousPeriodPrices = priceRepository.findByIdDateBetween(previousFrom, previousTo);
+        BigDecimal previousAverage = calculateAverage(previousPeriodPrices);
+
+        BigDecimal changeAbsolute = currentAverage.subtract(previousAverage);
+        BigDecimal changePercentage =
+                previousAverage.compareTo(BigDecimal.ZERO) == 0
+                        ? BigDecimal.ZERO
+                        : changeAbsolute
+                                .multiply(BigDecimal.valueOf(100))
+                                .divide(previousAverage, 2, RoundingMode.HALF_UP);
+
+        return new DashboardResponse.MarketSnapshot(
+                currentAverage, previousAverage, changePercentage, changeAbsolute);
+    }
+
+    private List<DashboardResponse.CategoryChange> buildCategoryChanges(
+            List<ProductChangeMetric> productChanges, int limit) {
+        Map<String, List<ProductChangeMetric>> byCategory =
+                productChanges.stream().collect(Collectors.groupingBy(ProductChangeMetric::category));
+
+        return byCategory.entrySet().stream()
+                .map(
+                        entry -> {
+                            List<ProductChangeMetric> categoryItems = entry.getValue();
+                            BigDecimal avgChangePercentage =
+                                    categoryItems.stream()
+                                            .map(ProductChangeMetric::changePercentage)
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                            .divide(
+                                                    BigDecimal.valueOf(categoryItems.size()),
+                                                    2,
+                                                    RoundingMode.HALF_UP);
+
+                            BigDecimal avgChangeAbsolute =
+                                    categoryItems.stream()
+                                            .map(ProductChangeMetric::changeAbsolute)
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                            .divide(
+                                                    BigDecimal.valueOf(categoryItems.size()),
+                                                    2,
+                                                    RoundingMode.HALF_UP);
+
+                            return new DashboardResponse.CategoryChange(
+                                    entry.getKey(),
+                                    avgChangePercentage,
+                                    avgChangeAbsolute,
+                                    categoryItems.size());
+                        })
+                .sorted(
+                        (a, b) ->
+                                b.avgChangePercentage()
+                                        .abs()
+                                        .compareTo(a.avgChangePercentage().abs()))
+                .limit(limit)
+                .toList();
+    }
+
+    private DashboardResponse.VolatilitySummary buildVolatilitySummary(
+            LocalDate from, LocalDate to, int limit) {
+        List<Product> products = productRepository.findAll();
+        List<DashboardResponse.VolatilityItem> items = new ArrayList<>();
+
+        for (Product product : products) {
+            List<Price> prices =
+                    priceRepository.findByIdProductIdAndIdDateBetween(
+                            product.getProductId(), from, to);
+            if (prices.size() < 2) {
+                continue;
+            }
+
+            double mean =
+                    prices.stream()
+                            .mapToDouble(price -> price.getPriceAverage().doubleValue())
+                            .average()
+                            .orElse(0.0);
+            if (mean == 0.0) {
+                continue;
+            }
+
+            double variance =
+                    prices.stream()
+                            .mapToDouble(price -> Math.pow(price.getPriceAverage().doubleValue() - mean, 2))
+                            .average()
+                            .orElse(0.0);
+            double stdDev = Math.sqrt(variance);
+            BigDecimal coefficientOfVariation =
+                    BigDecimal.valueOf((stdDev / mean) * 100).setScale(2, RoundingMode.HALF_UP);
+
+            items.add(
+                    new DashboardResponse.VolatilityItem(
+                            product.getProductId(),
+                            product.getName(),
+                            product.getCategory() != null
+                                    ? product.getCategory().getName()
+                                    : "Unknown",
+                            coefficientOfVariation));
+        }
+
+        List<DashboardResponse.VolatilityItem> mostVolatile =
+                items.stream()
+                        .sorted(
+                                (a, b) ->
+                                        b.coefficientOfVariation()
+                                                .compareTo(a.coefficientOfVariation()))
+                        .limit(limit)
+                        .toList();
+        List<DashboardResponse.VolatilityItem> mostStable =
+                items.stream()
+                        .sorted(Comparator.comparing(DashboardResponse.VolatilityItem::coefficientOfVariation))
+                        .limit(limit)
+                        .toList();
+
+        return new DashboardResponse.VolatilitySummary(mostVolatile, mostStable);
+    }
+
+    private List<ProductChangeMetric> buildProductChanges(
+            LocalDate from, LocalDate to, Integer categoryId) {
+        List<Product> products;
+        if (categoryId != null) {
+            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+            if (categoryOpt.isEmpty()) {
+                return List.of();
+            }
+            products = productRepository.findByCategory(categoryOpt.get());
+        } else {
+            products = productRepository.findAll();
+        }
+
+        List<ProductChangeMetric> changes = new ArrayList<>();
+
+        for (Product product : products) {
+            List<Price> prices =
+                    priceRepository.findByIdProductIdAndIdDateBetween(
+                            product.getProductId(), from, to);
+
+            if (prices.size() < 2) {
+                continue;
+            }
+
+            prices.sort(Comparator.comparing(p -> p.getId().getDate()));
+
+            Price firstPrice = prices.get(0);
+            Price lastPrice = prices.get(prices.size() - 1);
+            BigDecimal priceBefore = firstPrice.getPriceAverage();
+            BigDecimal priceAfter = lastPrice.getPriceAverage();
+
+            BigDecimal changeAbsolute = priceAfter.subtract(priceBefore);
+            BigDecimal changePercentage =
+                    priceBefore.compareTo(BigDecimal.ZERO) == 0
+                            ? BigDecimal.ZERO
+                            : changeAbsolute
+                                    .multiply(BigDecimal.valueOf(100))
+                                    .divide(priceBefore, 2, RoundingMode.HALF_UP);
+
+            String changeDirection =
+                    changePercentage.compareTo(BigDecimal.ZERO) > 0
+                            ? "increase"
+                            : changePercentage.compareTo(BigDecimal.ZERO) < 0
+                                    ? "decrease"
+                                    : "stable";
+
+            changes.add(
+                    new ProductChangeMetric(
+                            product.getProductId(),
+                            product.getName(),
+                            product.getCategory() != null
+                                    ? product.getCategory().getName()
+                                    : "Unknown",
+                            priceBefore,
+                            priceAfter,
+                            changePercentage,
+                            changeAbsolute,
+                            changeDirection));
+        }
+
+        return changes;
+    }
+
+    private DashboardResponse.ProductChange toDashboardProductChange(ProductChangeMetric change) {
+        return new DashboardResponse.ProductChange(
+                change.productId(),
+                change.productName(),
+                change.category(),
+                change.priceBefore(),
+                change.priceAfter(),
+                change.changePercentage(),
+                change.changeAbsolute(),
+                change.changeDirection());
+    }
+
+    private BigDecimal calculateAverage(List<Price> prices) {
+        if (prices.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return prices.stream()
+                .map(Price::getPriceAverage)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(prices.size()), 2, RoundingMode.HALF_UP);
+    }
+
+    private DateRange resolveDateRangeByPeriod(String period, LocalDate effectiveTo) {
+        String normalizedPeriod = normalizePeriod(period);
+        LocalDate effectiveFrom;
+        switch (normalizedPeriod) {
             case "7d":
                 effectiveFrom = effectiveTo.minusDays(7);
                 break;
@@ -487,84 +799,57 @@ public class AnalyticsService {
                 effectiveFrom = effectiveTo.minusDays(30);
                 break;
         }
-
-        List<Product> products;
-        if (categoryId != null) {
-            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-            if (categoryOpt.isEmpty()) {
-                return new TopChangesResponse(
-                        period, new DateRange(effectiveFrom, effectiveTo), List.of());
-            }
-            products = productRepository.findByCategory(categoryOpt.get());
-        } else {
-            products = productRepository.findAll();
-        }
-
-        List<TopChangesResponse.PriceChange> changes = new ArrayList<>();
-
-        for (Product product : products) {
-            List<Price> prices =
-                    priceRepository.findByIdProductIdAndIdDateBetween(
-                            product.getProductId(), effectiveFrom, effectiveTo);
-
-            if (prices.size() < 2) {
-                continue;
-            }
-
-            prices.sort(Comparator.comparing(p -> p.getId().getDate()));
-
-            Price firstPrice = prices.get(0);
-            Price lastPrice = prices.get(prices.size() - 1);
-
-            BigDecimal priceBefore = firstPrice.getPriceAverage();
-            BigDecimal priceAfter = lastPrice.getPriceAverage();
-
-            BigDecimal changeAbsolute = priceAfter.subtract(priceBefore);
-            BigDecimal changePercentage =
-                    priceBefore.compareTo(BigDecimal.ZERO) != 0
-                            ? changeAbsolute
-                                    .multiply(BigDecimal.valueOf(100))
-                                    .divide(priceBefore, 2, RoundingMode.HALF_UP)
-                            : BigDecimal.ZERO;
-
-            String changeDirection =
-                    changePercentage.compareTo(BigDecimal.ZERO) > 0
-                            ? "increase"
-                            : changePercentage.compareTo(BigDecimal.ZERO) < 0
-                                    ? "decrease"
-                                    : "stable";
-
-            if (!"all".equalsIgnoreCase(type)) {
-                if ("increase".equalsIgnoreCase(type)
-                        && changePercentage.compareTo(BigDecimal.ZERO) <= 0) {
-                    continue;
-                }
-                if ("decrease".equalsIgnoreCase(type)
-                        && changePercentage.compareTo(BigDecimal.ZERO) >= 0) {
-                    continue;
-                }
-            }
-
-            changes.add(
-                    new TopChangesResponse.PriceChange(
-                            product.getProductId(),
-                            product.getName(),
-                            product.getCategory() != null
-                                    ? product.getCategory().getName()
-                                    : "Unknown",
-                            priceBefore,
-                            priceAfter,
-                            changePercentage,
-                            changeAbsolute,
-                            changeDirection));
-        }
-
-        changes.sort((a, b) -> b.changePercentage().abs().compareTo(a.changePercentage().abs()));
-
-        int resultLimit = Math.min(limit, changes.size());
-        List<TopChangesResponse.PriceChange> topChanges = changes.subList(0, resultLimit);
-
-        return new TopChangesResponse(
-                period, new DateRange(effectiveFrom, effectiveTo), topChanges);
+        return new DateRange(effectiveFrom, effectiveTo);
     }
+
+    private DateRange resolveEffectiveDateRange(LocalDate from, LocalDate to, int defaultDays) {
+        LocalDate latestAvailableDate = resolveLatestAvailableDate();
+        if (from != null && from.isAfter(latestAvailableDate)) {
+            throw new IllegalArgumentException(
+                    "Requested date range is after the latest available data date: "
+                            + latestAvailableDate);
+        }
+
+        LocalDate effectiveTo = to != null ? to : latestAvailableDate;
+
+        if (effectiveTo.isAfter(latestAvailableDate)) {
+            effectiveTo = latestAvailableDate;
+        }
+
+        LocalDate effectiveFrom = from != null ? from : effectiveTo.minusDays(defaultDays);
+        if (effectiveFrom.isAfter(effectiveTo)) {
+            effectiveFrom = effectiveTo.minusDays(defaultDays);
+        }
+
+        return new DateRange(effectiveFrom, effectiveTo);
+    }
+
+    private LocalDate resolveLatestAvailableDate() {
+        LocalDate latestDate = priceRepository.findLatestDate();
+        return latestDate != null ? latestDate : LocalDate.now();
+    }
+
+    private String normalizePeriod(String period) {
+        if (period == null) {
+            return "30d";
+        }
+        String normalized = period.toLowerCase();
+        if ("7d".equals(normalized)
+                || "30d".equals(normalized)
+                || "90d".equals(normalized)
+                || "1y".equals(normalized)) {
+            return normalized;
+        }
+        return "30d";
+    }
+
+    private record ProductChangeMetric(
+            Integer productId,
+            String productName,
+            String category,
+            BigDecimal priceBefore,
+            BigDecimal priceAfter,
+            BigDecimal changePercentage,
+            BigDecimal changeAbsolute,
+            String changeDirection) {}
 }

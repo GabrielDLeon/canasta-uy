@@ -1,6 +1,8 @@
 package uy.eleven.canasta.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -67,12 +69,21 @@ public class CacheConfig {
                 "categories", defaultCacheConfiguration.entryTtl(Duration.ofMillis(categoriesTtl)));
 
         cacheConfigs.put(
-                "analytics",
-                defaultCacheConfiguration.entryTtl(Duration.ofMillis(analyticsTtl)));
+                "analytics", defaultCacheConfiguration.entryTtl(Duration.ofMillis(analyticsTtl)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultCacheConfiguration)
                 .withInitialCacheConfigurations(cacheConfigs)
                 .build();
+    }
+
+    @Bean
+    public ApplicationRunner clearAnalyticsCacheOnStartup(CacheManager cacheManager) {
+        return args -> {
+            Cache analyticsCache = cacheManager.getCache("analytics");
+            if (analyticsCache != null) {
+                analyticsCache.clear();
+            }
+        };
     }
 }

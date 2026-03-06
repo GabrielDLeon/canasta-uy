@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uy.eleven.canasta.dto.analytics.ComparisonResponse;
+import uy.eleven.canasta.dto.analytics.DashboardResponse;
 import uy.eleven.canasta.dto.analytics.InflationResponse;
 import uy.eleven.canasta.dto.analytics.TopChangesResponse;
 import uy.eleven.canasta.dto.analytics.TrendResponse;
@@ -210,5 +212,160 @@ class AnalyticsServiceTest {
 
         assertEquals(1, response.changes().size());
         assertEquals("decrease", response.changes().get(0).changeDirection());
+    }
+
+    @Test
+    void getDashboardSummaryReturnsSnapshotAndRankings() {
+        Category category = TestDataFactory.category(1, "Arroz");
+        Product productA = TestDataFactory.product(1, "Producto A", category);
+        Product productB = TestDataFactory.product(2, "Producto B", category);
+
+        List<Price> pricesA =
+                new ArrayList<>(
+                        List.of(
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.now().minusDays(30),
+                                        new BigDecimal("95"),
+                                        new BigDecimal("105"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100")),
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.now().minusDays(1),
+                                        new BigDecimal("115"),
+                                        new BigDecimal("125"),
+                                        new BigDecimal("120"),
+                                        new BigDecimal("120"))));
+        List<Price> pricesB =
+                new ArrayList<>(
+                        List.of(
+                                TestDataFactory.price(
+                                        2,
+                                        LocalDate.now().minusDays(30),
+                                        new BigDecimal("95"),
+                                        new BigDecimal("105"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100")),
+                                TestDataFactory.price(
+                                        2,
+                                        LocalDate.now().minusDays(1),
+                                        new BigDecimal("75"),
+                                        new BigDecimal("85"),
+                                        new BigDecimal("80"),
+                                        new BigDecimal("80"))));
+
+        when(productRepository.findAll()).thenReturn(List.of(productA, productB));
+        when(priceRepository.findByIdProductIdAndIdDateBetween(
+                        org.mockito.ArgumentMatchers.eq(1),
+                        org.mockito.ArgumentMatchers.any(LocalDate.class),
+                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                .thenReturn(pricesA);
+        when(priceRepository.findByIdProductIdAndIdDateBetween(
+                        org.mockito.ArgumentMatchers.eq(2),
+                        org.mockito.ArgumentMatchers.any(LocalDate.class),
+                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                .thenReturn(pricesB);
+        when(priceRepository.findByIdDateBetween(
+                        org.mockito.ArgumentMatchers.any(LocalDate.class),
+                        org.mockito.ArgumentMatchers.any(LocalDate.class)))
+                .thenReturn(
+                        List.of(
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.now().minusDays(1),
+                                        new BigDecimal("125"),
+                                        new BigDecimal("135"),
+                                        new BigDecimal("130"),
+                                        new BigDecimal("130")),
+                                TestDataFactory.price(
+                                        2,
+                                        LocalDate.now().minusDays(1),
+                                        new BigDecimal("85"),
+                                        new BigDecimal("95"),
+                                        new BigDecimal("90"),
+                                        new BigDecimal("90"))),
+                        List.of(
+                                TestDataFactory.price(
+                                        1,
+                                        LocalDate.now().minusDays(60),
+                                        new BigDecimal("95"),
+                                        new BigDecimal("105"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100")),
+                                TestDataFactory.price(
+                                        2,
+                                        LocalDate.now().minusDays(60),
+                                        new BigDecimal("95"),
+                                        new BigDecimal("105"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100"))));
+
+        DashboardResponse response = analyticsService.getDashboardSummary("30d", 5);
+
+        assertEquals("30d", response.period());
+        assertEquals(new BigDecimal("110.00"), response.marketSnapshot().avgPriceCurrent());
+        assertEquals(new BigDecimal("100.00"), response.marketSnapshot().avgPricePrevious());
+        assertEquals(1, response.topIncreases().size());
+        assertEquals(1, response.topDecreases().size());
+        assertEquals("Producto A", response.topIncreases().get(0).productName());
+        assertEquals("Producto B", response.topDecreases().get(0).productName());
+        assertTrue(response.volatility().mostVolatile().size() > 0);
+        assertTrue(response.volatility().mostStable().size() > 0);
+    }
+
+    @Test
+    void calculateTrendClampsFutureToDateToLatestAvailableDate() {
+        Product product = TestDataFactory.product(1, "Arroz", TestDataFactory.category(1, "cat"));
+        LocalDate latestAvailable = LocalDate.of(2025, 12, 31);
+        LocalDate expectedFrom = LocalDate.of(2025, 12, 1);
+        LocalDate expectedTo = LocalDate.of(2025, 12, 31);
+
+        when(priceRepository.findLatestDate()).thenReturn(latestAvailable);
+        when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        when(priceRepository.findByIdProductIdAndIdDateBetween(1, expectedFrom, expectedTo))
+                .thenReturn(
+                        new ArrayList<>(
+                                List.of(
+                                TestDataFactory.price(
+                                        1,
+                                        expectedFrom,
+                                        new BigDecimal("90"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100"),
+                                        new BigDecimal("100")),
+                                TestDataFactory.price(
+                                        1,
+                                        expectedTo,
+                                        new BigDecimal("100"),
+                                        new BigDecimal("110"),
+                                        new BigDecimal("110"),
+                                        new BigDecimal("110")))));
+
+        TrendResponse response = analyticsService.calculateTrend(1, expectedFrom, LocalDate.of(2026, 3, 5), false);
+
+        assertEquals(expectedTo, response.period().to());
+        assertEquals("increasing", response.summary().trend());
+    }
+
+    @Test
+    void calculateTrendThrowsWhenRequestedRangeStartsAfterLatestAvailableDate() {
+        Product product = TestDataFactory.product(1, "Arroz", TestDataFactory.category(1, "cat"));
+        LocalDate latestAvailable = LocalDate.of(2025, 12, 31);
+
+        when(priceRepository.findLatestDate()).thenReturn(latestAvailable);
+        when(productRepository.findById(1)).thenReturn(Optional.of(product));
+
+        IllegalArgumentException ex =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                analyticsService.calculateTrend(
+                                        1,
+                                        LocalDate.of(2026, 1, 1),
+                                        LocalDate.of(2026, 3, 1),
+                                        false));
+
+        assertTrue(ex.getMessage().contains("latest available data date"));
     }
 }

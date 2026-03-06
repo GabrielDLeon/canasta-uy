@@ -6,6 +6,7 @@ import type {
   CategoryProductsResponse,
   CategoryStatsResponse,
   ComparisonResponse,
+  DashboardResponse,
   InflationResponse,
   LoginResponse,
   PriceListResponse,
@@ -228,6 +229,14 @@ export const api = {
   ) =>
     request<TopChangesResponse>(
       `/analytics/top-changes${searchParams({ period, type, limit, categoryId })}`,
+      {
+        auth: 'api-key',
+      },
+    ),
+
+  getDashboardSummary: (period: '7d' | '30d' | '90d' | '1y' = '30d', limit = 5) =>
+    request<DashboardResponse>(
+      `/analytics/dashboard${searchParams({ period, limit })}`,
       {
         auth: 'api-key',
       },

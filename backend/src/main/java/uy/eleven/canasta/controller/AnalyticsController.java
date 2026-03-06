@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import uy.eleven.canasta.dto.ApiResponse;
 import uy.eleven.canasta.dto.analytics.ComparisonResponse;
+import uy.eleven.canasta.dto.analytics.DashboardResponse;
 import uy.eleven.canasta.dto.analytics.InflationResponse;
 import uy.eleven.canasta.dto.analytics.TopChangesResponse;
 import uy.eleven.canasta.dto.analytics.TrendResponse;
@@ -188,6 +189,33 @@ public class AnalyticsController {
 
         TopChangesResponse response =
                 analyticsService.getTopChanges(period, type, effectiveLimit, categoryId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(
+            summary = "Resumen para dashboard",
+            description =
+                    "Devuelve un resumen de mercado con top subas/bajas, categorías y volatilidad")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Resumen obtenido exitosamente",
+                content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @GetMapping("/dashboard")
+    public ResponseEntity<ApiResponse<DashboardResponse>> getDashboardSummary(
+            @Parameter(
+                            description = "Período",
+                            example = "30d",
+                            schema = @Schema(allowableValues = {"7d", "30d", "90d", "1y"}))
+                    @RequestParam(defaultValue = "30d")
+                    String period,
+            @Parameter(description = "Cantidad de resultados por ranking (máx 20)", example = "5")
+                    @RequestParam(defaultValue = "5")
+                    int limit) {
+
+        int effectiveLimit = Math.max(1, Math.min(limit, 20));
+        DashboardResponse response = analyticsService.getDashboardSummary(period, effectiveLimit);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -181,6 +181,57 @@ export type TopChangesResponse = {
   }>
 }
 
+export type DashboardResponse = {
+  period: string
+  dateRange: DateRange
+  marketSnapshot: {
+    avgPriceCurrent: number
+    avgPricePrevious: number
+    changePercentage: number
+    changeAbsolute: number
+  }
+  topIncreases: Array<{
+    productId: number
+    productName: string
+    category: string
+    priceBefore: number
+    priceAfter: number
+    changePercentage: number
+    changeAbsolute: number
+    changeDirection: string
+  }>
+  topDecreases: Array<{
+    productId: number
+    productName: string
+    category: string
+    priceBefore: number
+    priceAfter: number
+    changePercentage: number
+    changeAbsolute: number
+    changeDirection: string
+  }>
+  categoryChanges: Array<{
+    category: string
+    avgChangePercentage: number
+    avgChangeAbsolute: number
+    productsCount: number
+  }>
+  volatility: {
+    mostVolatile: Array<{
+      productId: number
+      productName: string
+      category: string
+      coefficientOfVariation: number
+    }>
+    mostStable: Array<{
+      productId: number
+      productName: string
+      category: string
+      coefficientOfVariation: number
+    }>
+  }
+}
+
 export type CategoryProductsResponse = {
   categoryId: number
   categoryName: string
