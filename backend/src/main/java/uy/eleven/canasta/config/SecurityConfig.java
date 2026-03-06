@@ -46,7 +46,7 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .permitAll())
                 .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthFilter, ApiKeyAuthFilter.class);
+                .addFilterAfter(jwtAuthFilter, ApiKeyAuthFilter.class);
 
         return http.build();
     }

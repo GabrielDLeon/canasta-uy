@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ApiKeyBanner } from '@/components/api-key-banner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/api'
 
@@ -16,7 +15,6 @@ export function DashboardPage() {
 
   return (
     <section className="space-y-4">
-      <ApiKeyBanner />
       <h1 className="mb-4 text-2xl font-semibold">Dashboard</h1>
 
       {dashboard.isPending ? <p>Cargando...</p> : null}

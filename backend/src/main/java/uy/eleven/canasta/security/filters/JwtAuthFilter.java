@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -44,26 +45,37 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (existingAuth != null && existingAuth.isAuthenticated()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String jwt = extractJwtToken(request);
         String path = request.getRequestURI();
+        boolean jwtRequired = isJwtRequiredPath(path);
 
         log.debug("JwtAuthFilter processing request to: {}", path);
         log.debug("JWT present in request: {}", jwt != null);
 
         if (jwt == null || jwt.isBlank()) {
-            log.warn("JWT required but not provided for path: {}", path);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
+            if (jwtRequired) {
+                log.warn("JWT required but not provided for path: {}", path);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
 
-            ApiResponse<Void> errorResponse =
-                    ApiResponse.error("JWT token required");
+                ApiResponse<Void> errorResponse = ApiResponse.error("JWT token required");
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(
-                    com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            response.getWriter().write(mapper.writeValueAsString(errorResponse));
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.disable(
+                        com.fasterxml.jackson.databind.SerializationFeature
+                                .WRITE_DATES_AS_TIMESTAMPS);
+                response.getWriter().write(mapper.writeValueAsString(errorResponse));
+                return;
+            }
+
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -104,10 +116,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        // Apply filter to /account/* and /auth/logout (both require JWT)
-        boolean shouldFilter =
-                path.startsWith("/api/v1/account") || path.equals("/api/v1/auth/logout");
+        boolean shouldFilter = isJwtRequiredPath(path) || isJwtOptionalPath(path);
         return !shouldFilter;
+    }
+
+    private boolean isJwtRequiredPath(String path) {
+        return path.startsWith("/api/v1/account") || path.equals("/api/v1/auth/logout");
+    }
+
+    private boolean isJwtOptionalPath(String path) {
+        return path.startsWith("/api/v1/products")
+                || path.startsWith("/api/v1/prices")
+                || path.startsWith("/api/v1/categories")
+                || path.startsWith("/api/v1/analytics")
+                || path.matches("^/api/v1/products/\\d+/prices(?:/.*)?$");
     }
 
     private String extractJwtToken(HttpServletRequest request) {

@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 
-import { ApiKeyBanner } from '@/components/api-key-banner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Item, ItemContent, ItemTitle, ItemActions } from '@/components/ui/item'
@@ -27,7 +26,6 @@ export function CategoriesPage() {
 
   return (
     <section>
-      <ApiKeyBanner />
       <h1 className="mb-4 text-2xl font-semibold">Categorias</h1>
 
       <div className="mb-4">

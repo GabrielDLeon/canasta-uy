@@ -30,7 +30,8 @@ public class OpenApiConfig {
                 .info(apiInfo())
                 .servers(servers())
                 .components(securityComponents())
-                .addSecurityItem(securityRequirement());
+                .addSecurityItem(jwtSecurityRequirement())
+                .addSecurityItem(apiKeySecurityRequirement());
     }
 
     private Info apiInfo() {
@@ -81,9 +82,11 @@ public class OpenApiConfig {
                 .description("API Key para autenticación de clientes. Genera una API key en tu cuenta.");
     }
 
-    private SecurityRequirement securityRequirement() {
-        return new SecurityRequirement()
-                .addList(JWT_SCHEME)
-                .addList(API_KEY_SCHEME);
+    private SecurityRequirement jwtSecurityRequirement() {
+        return new SecurityRequirement().addList(JWT_SCHEME);
+    }
+
+    private SecurityRequirement apiKeySecurityRequirement() {
+        return new SecurityRequirement().addList(API_KEY_SCHEME);
     }
 }

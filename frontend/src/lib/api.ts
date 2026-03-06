@@ -18,9 +18,8 @@ import type {
   TopChangesResponse,
   TrendResponse,
 } from '@/types/api'
-import { getApiKeyValue } from '@/lib/storage'
 
-type AuthMode = 'none' | 'session' | 'api-key'
+type AuthMode = 'none' | 'session'
 
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'DELETE'
@@ -40,15 +39,6 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
   const authMode = options.auth ?? 'none'
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-  }
-
-  if (authMode === 'api-key') {
-    const apiKey = getApiKeyValue()
-    if (!apiKey) {
-      throw new Error('No hay API key activa. Pegala en el header de la app.')
-    }
-
-    headers['Api-Key'] = apiKey
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
@@ -152,15 +142,15 @@ export const api = {
 
   getProducts: (page = 0, size = 20) =>
     request<ProductListResponse>(`/products${searchParams({ page, size })}`, {
-      auth: 'api-key',
+      auth: 'session',
     }),
 
   searchProducts: (query: string, page = 0, size = 20) =>
     request<ProductListResponse>(`/products/search${searchParams({ query, page, size })}`, {
-      auth: 'api-key',
+      auth: 'session',
     }),
 
-  getProductById: (id: number) => request<Product>(`/products/${id}`, { auth: 'api-key' }),
+  getProductById: (id: number) => request<Product>(`/products/${id}`, { auth: 'session' }),
 
   getProductPrices: (
     productId: number,
@@ -171,7 +161,7 @@ export const api = {
     request<PriceListResponse>(
       `/products/${productId}/prices${searchParams({ from, to, granularity })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -179,25 +169,25 @@ export const api = {
     request<PriceSearchResponse>(
       `/prices${searchParams({ productIds, from, to, page, size })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
   getCategories: (page = 0, size = 20) =>
     request<CategoryListResponse>(`/categories${searchParams({ page, size })}`, {
-      auth: 'api-key',
+      auth: 'session',
     }),
 
   searchCategories: (query: string, page = 0, size = 20) =>
     request<CategoryListResponse>(`/categories/search${searchParams({ query, page, size })}`, {
-      auth: 'api-key',
+      auth: 'session',
     }),
 
   getCategoryProducts: (categoryId: number, page = 0, size = 20) =>
     request<CategoryProductsResponse>(
       `/categories/${categoryId}/products${searchParams({ categoryId, page, size })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -205,7 +195,7 @@ export const api = {
     request<CategoryStatsResponse>(
       `/categories/${categoryId}/stats${searchParams({ categoryId, from, to })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -213,7 +203,7 @@ export const api = {
     request<TrendResponse>(
       `/analytics/trend/${productId}${searchParams({ from, to, includeData })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -221,7 +211,7 @@ export const api = {
     request<InflationResponse>(
       `/analytics/inflation/${categoryId}${searchParams({ from, to, includeData })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -229,7 +219,7 @@ export const api = {
     request<ComparisonResponse>(
       `/analytics/compare${searchParams({ productIds, from, to, includeData })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -242,7 +232,7 @@ export const api = {
     request<TopChangesResponse>(
       `/analytics/top-changes${searchParams({ period, type, limit, categoryId })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 
@@ -250,7 +240,7 @@ export const api = {
     request<DashboardResponse>(
       `/analytics/dashboard${searchParams({ period, limit })}`,
       {
-        auth: 'api-key',
+        auth: 'session',
       },
     ),
 }

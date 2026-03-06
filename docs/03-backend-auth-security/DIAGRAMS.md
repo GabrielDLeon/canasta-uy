@@ -416,14 +416,17 @@ This document contains sequence diagrams illustrating the authentication flows i
     /auth/refresh       │             │
            │            │             │
            ▼            ▼             ▼
-    NO AUTH       JWT Auth        API Key Auth
+    NO AUTH       JWT Auth      JWT OR API Key
     REQUIRED      REQUIRED        REQUIRED
            │            │             │
            │            │             ├─▶ RateLimitFilter
            │            │             │      (100 req/hour)
            │            │             │
            │            │             ├─▶ ApiKeyAuthFilter
-           │            │             │      (validate key)
+           │            │             │      (validate Api-Key if present)
+           │            │             │
+           │            │             ├─▶ JwtAuthFilter
+           │            │             │      (validate JWT if present)
            │            │             │
            │            │             ▼
            │            │        Controller
@@ -447,4 +450,4 @@ This document contains sequence diagrams illustrating the authentication flows i
 
 ---
 
-**Last Updated**: 2026-02-14
+**Last Updated**: 2026-03-06

@@ -4,7 +4,6 @@ import { ArrowLeft, Scale } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
-import { ApiKeyBanner } from '@/components/api-key-banner'
 import { PriceChart } from '@/components/price-chart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,7 +70,6 @@ export function ProductDetailPage() {
 
   return (
     <section className="space-y-4">
-      <ApiKeyBanner />
       <div className="flex flex-wrap items-center gap-2">
         <Button asChild variant="outline" size="sm">
           <Link to="/app/products">

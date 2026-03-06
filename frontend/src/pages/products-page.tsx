@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
-import { ApiKeyBanner } from "@/components/api-key-banner";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,6 @@ export function ProductsPage() {
 
   return (
     <section>
-      <ApiKeyBanner />
       <h1 className="mb-4 text-2xl font-semibold">Productos</h1>
 
       <div className="mb-4">

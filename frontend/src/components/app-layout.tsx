@@ -40,7 +40,6 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { api } from '@/lib/api'
-import { setApiKeyValue } from '@/lib/storage'
 
 const items = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard },
@@ -63,7 +62,6 @@ export function AppLayout() {
       // no-op
     } finally {
       queryClient.removeQueries({ queryKey: ['profile'] })
-      setApiKeyValue('')
       navigate('/auth/login')
     }
   }

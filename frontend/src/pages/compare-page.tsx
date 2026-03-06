@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
 
-import { ApiKeyBanner } from "@/components/api-key-banner";
 import { PriceChart } from "@/components/price-chart";
 import { ProductItem } from "@/components/product-item";
 import {
@@ -154,7 +153,6 @@ export function ComparePage() {
 
   return (
     <section className="space-y-4">
-      <ApiKeyBanner />
       <h1 className="text-2xl font-semibold">Comparacion de productos</h1>
 
       <Card>

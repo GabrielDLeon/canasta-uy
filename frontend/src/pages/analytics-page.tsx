@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { ApiKeyBanner } from "@/components/api-key-banner";
 import { PriceChart } from "@/components/price-chart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,7 +59,6 @@ export function AnalyticsPage() {
 
   return (
     <section className="space-y-4">
-      <ApiKeyBanner />
       <h1 className="text-2xl font-semibold">Analytics</h1>
 
       <Tabs defaultValue="trend">

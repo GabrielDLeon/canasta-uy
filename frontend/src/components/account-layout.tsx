@@ -29,7 +29,6 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { api } from '@/lib/api'
-import { setApiKeyValue } from '@/lib/storage'
 
 const accountItems = [
   { to: '/account/profile', label: 'Perfil', icon: ShieldUser },
@@ -48,7 +47,6 @@ export function AccountLayout() {
       // no-op
     } finally {
       queryClient.removeQueries({ queryKey: ['profile'] })
-      setApiKeyValue('')
       navigate('/auth/login')
     }
   }

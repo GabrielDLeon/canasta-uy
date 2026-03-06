@@ -2,6 +2,7 @@ package uy.eleven.canasta.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -32,6 +33,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        if (SecurityContextHolder.getContext().getAuthentication() != null
+                && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String apiKey = request.getHeader(API_KEY_HEADER);
 
@@ -55,6 +61,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.warn("API key validation failed: {}", e.getMessage(), e);
             SecurityContextHolder.clearContext();
+            if (hasJwtSignal(request)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\":\"Invalid or revoked API key\"}");
         }
@@ -67,5 +78,25 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                 && !path.startsWith("/api/v1/prices")
                 && !path.startsWith("/api/v1/categories")
                 && !path.startsWith("/api/v1/analytics");
+    }
+
+    private boolean hasJwtSignal(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            return true;
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return false;
+        }
+
+        for (Cookie cookie : cookies) {
+            if ("canasta_access_token".equals(cookie.getName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
