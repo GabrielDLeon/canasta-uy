@@ -35,8 +35,7 @@ public record DashboardResponse(
             BigDecimal avgChangeAbsolute,
             Integer productsCount) {}
 
-    public record VolatilitySummary(
-            List<VolatilityItem> mostVolatile, List<VolatilityItem> mostStable) {}
+    public record VolatilitySummary(List<VolatilityItem> mostVolatile) {}
 
     public record VolatilityItem(
             Integer productId, String productName, String category, BigDecimal coefficientOfVariation) {}

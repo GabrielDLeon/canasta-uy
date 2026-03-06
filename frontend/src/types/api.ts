@@ -224,12 +224,6 @@ export type DashboardResponse = {
       category: string
       coefficientOfVariation: number
     }>
-    mostStable: Array<{
-      productId: number
-      productName: string
-      category: string
-      coefficientOfVariation: number
-    }>
   }
 }
 

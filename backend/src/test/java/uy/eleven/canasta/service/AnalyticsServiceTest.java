@@ -313,7 +313,6 @@ class AnalyticsServiceTest {
         assertEquals("Producto A", response.topIncreases().get(0).productName());
         assertEquals("Producto B", response.topDecreases().get(0).productName());
         assertTrue(response.volatility().mostVolatile().size() > 0);
-        assertTrue(response.volatility().mostStable().size() > 0);
     }
 
     @Test

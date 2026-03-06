@@ -687,13 +687,8 @@ public class AnalyticsService {
                                                 .compareTo(a.coefficientOfVariation()))
                         .limit(limit)
                         .toList();
-        List<DashboardResponse.VolatilityItem> mostStable =
-                items.stream()
-                        .sorted(Comparator.comparing(DashboardResponse.VolatilityItem::coefficientOfVariation))
-                        .limit(limit)
-                        .toList();
 
-        return new DashboardResponse.VolatilitySummary(mostVolatile, mostStable);
+        return new DashboardResponse.VolatilitySummary(mostVolatile);
     }
 
     private List<ProductChangeMetric> buildProductChanges(

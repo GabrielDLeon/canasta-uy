@@ -104,22 +104,10 @@ export function DashboardPage() {
             <CardHeader>
               <CardTitle>Volatilidad de productos</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-2">
+            <CardContent className="space-y-2">
               <div className="space-y-2">
                 <p className="text-sm font-medium">Mas volatiles (CV %)</p>
                 {dashboard.data.volatility.mostVolatile.map((item) => (
-                  <div key={item.productId} className="flex items-center justify-between rounded-md border p-3">
-                    <div>
-                      <p className="font-medium">{item.productName}</p>
-                      <p className="text-xs text-muted-foreground">{item.category}</p>
-                    </div>
-                    <p className="text-sm font-semibold">{Number(item.coefficientOfVariation).toFixed(2)}%</p>
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Mas estables (CV %)</p>
-                {dashboard.data.volatility.mostStable.map((item) => (
                   <div key={item.productId} className="flex items-center justify-between rounded-md border p-3">
                     <div>
                       <p className="font-medium">{item.productName}</p>
