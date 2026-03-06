@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Footer } from '@/components/footer'
+import { SidebarSearch } from '@/components/sidebar-search'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useCompareProducts } from '@/hooks/use-compare-products'
 import {
@@ -87,6 +88,7 @@ export function AppLayout() {
               <span className="truncate text-xs text-sidebar-foreground/70">Frontend</span>
             </div>
           </div>
+          <SidebarSearch />
         </SidebarHeader>
         <SidebarSeparator />
         <SidebarContent>

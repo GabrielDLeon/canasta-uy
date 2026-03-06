@@ -9,7 +9,6 @@ import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
@@ -61,9 +60,9 @@ export function ProductsPage() {
                   <ItemTitle>
                     <Skeleton className="h-4 w-3/5 bg-muted/60" />
                   </ItemTitle>
-                  <ItemDescription>
+                  <div className="pt-1">
                     <Skeleton className="h-3 w-1/3 bg-muted/60" />
-                  </ItemDescription>
+                  </div>
                 </ItemContent>
                 <ItemActions>
                   <Skeleton className="h-8 w-10 bg-muted/60" />
