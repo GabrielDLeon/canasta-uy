@@ -85,6 +85,7 @@ export type ProfileResponse = {
 }
 
 export type ApiKeyListItem = {
+  id: number
   name: string
   keyPrefix: string
   isActive: boolean

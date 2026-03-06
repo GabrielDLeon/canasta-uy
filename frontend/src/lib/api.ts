@@ -26,6 +26,7 @@ type RequestOptions = {
   method?: 'GET' | 'POST' | 'DELETE'
   auth?: AuthMode
   body?: unknown
+  allowNullData?: boolean
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
@@ -66,8 +67,15 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
 
   const parsed = (await response.json()) as ApiResponse<T>
 
-  if (!response.ok || !parsed.success || parsed.data === null) {
+  if (!response.ok || !parsed.success) {
     throw new Error(parsed.message ?? `Error HTTP ${response.status}`)
+  }
+
+  if (parsed.data === null) {
+    if (options.allowNullData) {
+      return undefined as T
+    }
+    throw new Error(parsed.message ?? 'Response data is null')
   }
 
   return parsed.data
@@ -136,7 +144,11 @@ export const api = {
     }),
 
   revokeApiKey: (id: number) =>
-    request<void>(`/account/api-keys/${id}`, { method: 'DELETE', auth: 'session' }),
+    request<void>(`/account/api-keys/${id}`, {
+      method: 'DELETE',
+      auth: 'session',
+      allowNullData: true,
+    }),
 
   getProducts: (page = 0, size = 20) =>
     request<ProductListResponse>(`/products${searchParams({ page, size })}`, {

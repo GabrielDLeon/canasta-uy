@@ -24,14 +24,15 @@ tests {
     expect(res.body.data).to.be.an('array');
   });
   
-  test("each key should have required fields (without id)", function() {
+  test("each key should have required fields", function() {
     if (res.body.data && res.body.data.length > 0) {
       const key = res.body.data[0];
+      expect(key.id).to.exist;
+      expect(key.id).to.be.a('number');
       expect(key.name).to.exist;
       expect(key.keyPrefix).to.exist;
       expect(key.isActive).to.be.a('boolean');
       expect(key.createdAt).to.exist;
-      expect(key.id).to.not.exist;
       expect(key.keyValue).to.not.exist;
     }
   });

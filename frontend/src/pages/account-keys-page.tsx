@@ -4,11 +4,26 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { api } from '@/lib/api'
 import { getApiKeyValue, setApiKeyValue } from '@/lib/storage'
+import type { ApiKeyListItem } from '@/types/api'
+
+const keyDateFormatter = new Intl.DateTimeFormat('es-UY', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+})
 
 export function AccountKeysPage() {
   const queryClient = useQueryClient()
@@ -16,6 +31,7 @@ export function AccountKeysPage() {
   const [newKeyValue, setNewKeyValue] = useState('')
   const [activeApiKey, setActiveApiKey] = useState(getApiKeyValue())
   const [open, setOpen] = useState(false)
+  const [selectedKey, setSelectedKey] = useState<ApiKeyListItem | null>(null)
 
   const apiKeys = useQuery({
     queryKey: ['api-keys'],
@@ -35,6 +51,23 @@ export function AccountKeysPage() {
     },
   })
 
+  const revokeMutation = useMutation({
+    mutationFn: async (item: ApiKeyListItem) => {
+      await api.revokeApiKey(item.id)
+      return item
+    },
+    onSuccess: async (item) => {
+      const keyStart = item.keyPrefix.split('...')[0]
+      if (activeApiKey && keyStart && activeApiKey.startsWith(keyStart)) {
+        setApiKeyValue('')
+        setActiveApiKey('')
+      }
+      setSelectedKey(null)
+      await queryClient.invalidateQueries({ queryKey: ['api-keys'] })
+      await queryClient.invalidateQueries({ queryKey: ['profile'] })
+    },
+  })
+
   const onCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     await createMutation.mutateAsync()
@@ -49,6 +82,20 @@ export function AccountKeysPage() {
   const onClearActiveApiKey = () => {
     setApiKeyValue('')
     setActiveApiKey('')
+  }
+
+  const closeRevokeDialog = () => {
+    if (revokeMutation.isPending) {
+      return
+    }
+    setSelectedKey(null)
+  }
+
+  const onConfirmRevoke = async () => {
+    if (!selectedKey) {
+      return
+    }
+    await revokeMutation.mutateAsync(selectedKey)
   }
 
   return (
@@ -120,18 +167,77 @@ export function AccountKeysPage() {
           {apiKeys.isError ? (
             <p className="text-sm text-destructive">{(apiKeys.error as Error).message}</p>
           ) : null}
+          {revokeMutation.isError ? (
+            <p className="text-sm text-destructive">
+              {(revokeMutation.error as Error).message}
+            </p>
+          ) : null}
           {apiKeys.data ? (
             <ul className="space-y-2 text-sm">
               {apiKeys.data.map((item) => (
-                <li key={`${item.keyPrefix}-${item.createdAt}`} className="rounded-md border p-3">
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-muted-foreground">Prefijo: {item.keyPrefix}</p>
+                <li
+                  key={item.id}
+                  className="flex items-center justify-between gap-3 rounded-md border p-3"
+                >
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-muted-foreground">Prefijo: {item.keyPrefix}</p>
+                    <p className="text-muted-foreground">
+                      Generada: {keyDateFormatter.format(new Date(item.createdAt))}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => {
+                      revokeMutation.reset()
+                      setSelectedKey(item)
+                    }}
+                    disabled={revokeMutation.isPending}
+                  >
+                    Eliminar
+                  </Button>
                 </li>
               ))}
             </ul>
           ) : null}
         </CardContent>
       </Card>
+
+      <Dialog
+        open={Boolean(selectedKey)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            closeRevokeDialog()
+          }
+        }}
+      >
+        <DialogContent showCloseButton={!revokeMutation.isPending}>
+          <DialogHeader>
+            <DialogTitle>Eliminar API key</DialogTitle>
+            <DialogDescription>
+              Esta accion revocara la key{' '}
+              <span className="font-medium">{selectedKey?.name}</span>. No se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={revokeMutation.isPending}>
+                Cancelar
+              </Button>
+            </DialogClose>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onConfirmRevoke}
+              disabled={revokeMutation.isPending}
+            >
+              {revokeMutation.isPending ? 'Eliminando...' : 'Confirmar eliminacion'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

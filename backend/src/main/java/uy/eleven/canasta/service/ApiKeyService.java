@@ -142,10 +142,11 @@ public class ApiKeyService {
                         .findById(clientId)
                         .orElseThrow(() -> new ClientNotFoundException(clientId));
 
-        return apiKeyRepository.findByClient(client).stream()
+        return apiKeyRepository.findByClientAndIsActiveTrue(client).stream()
                 .map(
                         key ->
                                 new ApiKeyListItem(
+                                        key.getId(),
                                         key.getName(),
                                         maskApiKey(key.getKeyValue()),
                                         key.isActive(),

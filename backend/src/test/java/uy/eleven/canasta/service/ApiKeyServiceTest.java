@@ -138,11 +138,26 @@ class ApiKeyServiceTest {
         Client client = TestDataFactory.client(1L, "user@test.com");
         ApiKey key = TestDataFactory.apiKey(1L, client, "0123456789abcdefghijcdef", true);
         when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
-        when(apiKeyRepository.findByClient(client)).thenReturn(List.of(key));
+        when(apiKeyRepository.findByClientAndIsActiveTrue(client)).thenReturn(List.of(key));
 
         var items = apiKeyService.getClientApiKeyListItems(1L);
 
         assertEquals(1, items.size());
+        assertEquals(1L, items.get(0).id());
         assertTrue(items.get(0).keyPrefix().startsWith("0123456789..."));
+    }
+
+    @Test
+    void getClientApiKeyListItemsReturnsOnlyActiveKeys() {
+        Client client = TestDataFactory.client(1L, "user@test.com");
+        ApiKey activeKey = TestDataFactory.apiKey(1L, client, "sk_live_active", true);
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(apiKeyRepository.findByClientAndIsActiveTrue(client)).thenReturn(List.of(activeKey));
+
+        var items = apiKeyService.getClientApiKeyListItems(1L);
+
+        assertEquals(1, items.size());
+        assertTrue(items.get(0).isActive());
+        verify(apiKeyRepository).findByClientAndIsActiveTrue(client);
     }
 }
