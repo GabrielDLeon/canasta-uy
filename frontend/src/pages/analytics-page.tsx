@@ -7,26 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 
 export function AnalyticsPage() {
   const [trendProductInput, setTrendProductInput] = useState("15");
   const [trendProductId, setTrendProductId] = useState("15");
 
-  const [inflationCategoryInput, setInflationCategoryInput] = useState("1");
-  const [inflationCategoryId, setInflationCategoryId] = useState("1");
-
   const trend = useQuery({
     queryKey: ["analytics-trend", trendProductId],
     queryFn: () => api.getTrend(Number(trendProductId)),
     enabled: Boolean(trendProductId),
-  });
-
-  const inflation = useQuery({
-    queryKey: ["analytics-inflation", inflationCategoryId],
-    queryFn: () => api.getInflation(Number(inflationCategoryId)),
-    enabled: Boolean(inflationCategoryId),
   });
 
   const trendPoints = useMemo(
@@ -38,48 +28,27 @@ export function AnalyticsPage() {
     [trend.data],
   );
 
-  const inflationPoints = useMemo(
-    () =>
-      (inflation.data?.data ?? []).map((item) => ({
-        time: `${item.yearMonth}-01`,
-        value: Number(item.inflationPercentage),
-      })),
-    [inflation.data],
-  );
-
   const onTrendSubmit = (event: FormEvent) => {
     event.preventDefault();
     setTrendProductId(trendProductInput.trim());
-  };
-
-  const onInflationSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    setInflationCategoryId(inflationCategoryInput.trim());
   };
 
   return (
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Analytics</h1>
 
-      <Tabs defaultValue="trend">
-        <TabsList>
-          <TabsTrigger value="trend">Trend</TabsTrigger>
-          <TabsTrigger value="inflation">Inflation</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="trend" className="space-y-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tendencia por producto</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-2 text-sm text-muted-foreground">
-                Ingresa el ID de un producto para ver su evolucion de precio
-                promedio.
-              </p>
-              <form onSubmit={onTrendSubmit} className="flex flex-wrap gap-2">
-                <div className="space-y-2">
-                  <Label htmlFor="trend-product-id">ID de producto</Label>
+      <Card>
+        <CardHeader>
+          <CardTitle>Tendencia por producto</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-2 text-sm text-muted-foreground">
+            Ingresa el ID de un producto para ver su evolucion de precio
+            promedio.
+          </p>
+          <form onSubmit={onTrendSubmit} className="flex flex-wrap gap-2">
+            <div className="space-y-2">
+              <Label htmlFor="trend-product-id">ID de producto</Label>
                 <Input
                   id="trend-product-id"
                   value={trendProductInput}
@@ -87,60 +56,17 @@ export function AnalyticsPage() {
                   placeholder="Ejemplo: 15"
                   className="max-w-xs"
                 />
-                </div>
-                <Button type="submit">Consultar trend</Button>
-              </form>
-            </CardContent>
-          </Card>
-          {trend.isError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {(trend.error as Error).message}
-            </p>
-          ) : null}
-          <PriceChart
-            title="Tendencia de precio promedio"
-            points={trendPoints}
-          />
-        </TabsContent>
-
-        <TabsContent value="inflation" className="space-y-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inflacion por categoria</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-2 text-sm text-muted-foreground">
-                Ingresa el ID de una categoria para ver su serie de inflacion
-                mensual.
-              </p>
-              <form
-                onSubmit={onInflationSubmit}
-                className="flex flex-wrap gap-2"
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="inflation-category-id">ID de categoria</Label>
-                <Input
-                  id="inflation-category-id"
-                  value={inflationCategoryInput}
-                  onChange={(event) =>
-                    setInflationCategoryInput(event.target.value)
-                  }
-                  placeholder="Ejemplo: 1"
-                  className="max-w-xs"
-                />
-                </div>
-                <Button type="submit">Consultar inflation</Button>
-              </form>
-            </CardContent>
-          </Card>
-          {inflation.isError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {(inflation.error as Error).message}
-            </p>
-          ) : null}
-          <PriceChart title="Inflacion mensual (%)" points={inflationPoints} />
-        </TabsContent>
-      </Tabs>
+            </div>
+            <Button type="submit">Consultar trend</Button>
+          </form>
+        </CardContent>
+      </Card>
+      {trend.isError ? (
+        <p role="alert" className="text-sm text-destructive">
+          {(trend.error as Error).message}
+        </p>
+      ) : null}
+      <PriceChart title="Tendencia de precio promedio" points={trendPoints} />
     </section>
   );
 }

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
+import { PriceChart } from '@/components/price-chart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -28,6 +29,21 @@ export function CategoryDetailPage() {
     enabled: Number.isFinite(categoryId),
   })
 
+  const inflation = useQuery({
+    queryKey: ['category-inflation', categoryId, from, to],
+    queryFn: () => api.getInflation(categoryId, from || undefined, to || undefined),
+    enabled: Number.isFinite(categoryId),
+  })
+
+  const inflationPoints = useMemo(
+    () =>
+      (inflation.data?.data ?? []).map((item) => ({
+        time: `${item.yearMonth}-01`,
+        value: Number(item.inflationPercentage),
+      })),
+    [inflation.data],
+  )
+
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
@@ -38,7 +54,9 @@ export function CategoryDetailPage() {
           </Link>
         </Button>
       </div>
-      <h1 className="text-2xl font-semibold">Categoria #{categoryId}</h1>
+      <h1 className="text-2xl font-semibold">
+        {stats.data?.categoryName ?? inflation.data?.categoryName ?? `Categoria #${categoryId}`}
+      </h1>
 
       <Card>
         <CardHeader>
@@ -75,6 +93,19 @@ export function CategoryDetailPage() {
               <li>Max: {Number(stats.data.stats.maxPrice).toFixed(2)}</li>
             </ul>
           ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Inflacion mensual (%)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {inflation.isPending ? <p>Cargando...</p> : null}
+          {inflation.isError ? (
+            <p className="text-sm text-destructive">{(inflation.error as Error).message}</p>
+          ) : null}
+          <PriceChart title="Inflacion mensual (%)" points={inflationPoints} />
         </CardContent>
       </Card>
 

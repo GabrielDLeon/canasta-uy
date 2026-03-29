@@ -31,11 +31,15 @@ type RequestOptions = {
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const data = await performRequest<T>(path, options)
+  const data = await performRequest<T>(path, options, false)
   return data
 }
 
-async function performRequest<T>(path: string, options: RequestOptions): Promise<T> {
+async function performRequest<T>(
+  path: string,
+  options: RequestOptions,
+  refreshAttempted: boolean,
+): Promise<T> {
   const authMode = options.auth ?? 'none'
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -48,14 +52,14 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
     body: options.body ? JSON.stringify(options.body) : undefined,
   })
 
-  if (response.status === 401 && authMode === 'session') {
+  if ((response.status === 401 || response.status === 403) && authMode === 'session' && !refreshAttempted) {
     const refreshed = await tryRefreshToken()
     if (refreshed) {
-      return performRequest(path, options)
+      return performRequest(path, options, true)
     }
   }
 
-  const parsed = (await response.json()) as ApiResponse<T>
+  const parsed = await parseApiResponse<T>(response)
 
   if (!response.ok || !parsed.success) {
     throw new Error(parsed.message ?? `Error HTTP ${response.status}`)
@@ -69,6 +73,33 @@ async function performRequest<T>(path: string, options: RequestOptions): Promise
   }
 
   return parsed.data
+}
+
+async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T>> {
+  const contentType = response.headers.get('content-type') ?? ''
+
+  if (contentType.toLowerCase().includes('application/json')) {
+    try {
+      return (await response.json()) as ApiResponse<T>
+    } catch {
+      return {
+        success: false,
+        message: `Error HTTP ${response.status}`,
+        data: null,
+        timestamp: new Date().toISOString(),
+      }
+    }
+  }
+
+  const text = await response.text()
+  const message = text.trim() || `Error HTTP ${response.status}`
+
+  return {
+    success: false,
+    message,
+    data: null,
+    timestamp: new Date().toISOString(),
+  }
 }
 
 async function tryRefreshToken(): Promise<boolean> {
