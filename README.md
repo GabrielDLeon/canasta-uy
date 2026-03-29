@@ -4,7 +4,7 @@
 
 API REST para consulta y análisis histórico de precios de productos al consumidor en Uruguay. El proyecto recopila datos desde 2016 hasta 2025, procesándolos mediante técnicas de detección de outliers para garantizar la calidad de la información.
 
-El objetivo es proporcionar una fuente de datos confiable para análisis de tendencias de precios, comparativas entre productos, y métricas de inflación por categoría. La API permite acceder a más de 774 mil registros de precios diarios mediante endpoints REST documentados con OpenAPI.
+El objetivo es proporcionar una fuente de datos confiable para análisis de tendencias de precios, comparativas entre productos, y métricas de inflación por categoría. La API permite acceder a más de 793 mil registros de precios diarios mediante endpoints REST documentados con OpenAPI.
 
 **Fuente de datos:** Los datos provienen del [Sistema de Información de Precios al Consumidor del Ministerio de Economía y Finanzas](https://catalogodatos.gub.uy/dataset/defensa-del-consumidor-sistema-de-informacion-de-precios-al-consumidor-2025), publicados en el Catálogo Nacional de Datos Abiertos de Uruguay.
 
@@ -23,15 +23,16 @@ El objetivo es proporcionar una fuente de datos confiable para análisis de tend
 
 ## Stack Tecnológico
 
-| Componente    | Tecnología                  |
-| ------------- | --------------------------- |
-| Backend       | Spring Boot 4.0.2 + Java 21 |
-| Base de datos | PostgreSQL 16               |
-| Cache         | Redis 7                     |
-| Migraciones   | Flyway                      |
-| Autenticación | JWT + API Keys              |
-| Documentación | OpenAPI/Swagger             |
-| Data Science  | Python 3.12 + Pandas        |
+| Componente    | Tecnología                   |
+| ------------- | ---------------------------- |
+| Backend       | Spring Boot 4.0.2 + Java 21  |
+| Base de datos | PostgreSQL 16                |
+| Cache         | Redis 7                      |
+| Migraciones   | Flyway                       |
+| Autenticación | JWT + API Keys               |
+| Documentación | OpenAPI/Swagger              |
+| Frontend      | React 19 + Vite + TypeScript |
+| Data Science  | Python 3.12 + Pandas         |
 
 ---
 
@@ -43,9 +44,11 @@ canasta-uy/
 │   ├── src/              # Código fuente
 │   ├── justfile          # Comandos de desarrollo
 │   └── docker-compose.yml
+├── frontend/             # App web React
 ├── scripts/              # Pipeline de datos Python
 ├── docs/                 # Documentación completa
-└── bruno/                # Colección de API tests
+├── bruno/                # Colección de API tests
+└── docker-compose.yml    # Stack completo (frontend + backend + infra)
 ```
 
 ---
@@ -64,11 +67,19 @@ canasta-uy/
 
 ```bash
 git clone https://github.com/GabrielDLeon/canasta-uy.git canasta-uy
-cd canasta-uy/backend
-cp .env.example .env
+cd canasta-uy
+cp backend/.env.example backend/.env
 ```
 
 ### 2. Levantar infraestructura
+
+Opción A (stack completo desde raíz: frontend + backend + infra):
+
+```bash
+docker compose up --build -d
+```
+
+Opción B (flujo actual backend separado):
 
 ```bash
 cd backend
@@ -77,17 +88,26 @@ just infra-up
 
 Se levantarán los siguientes servicios:
 
-- PostgreSQL: http://localhost:5432
-- Redis: http://localhost:6379
-- pgAdmin: http://localhost:5050
+- PostgreSQL: <http://localhost:5432>
+- Redis: <http://localhost:6379>
+- pgAdmin: <http://localhost:5050>
 
 ### 3. Importar datos
 
-Luego de levantar la infraestructura por primera vez, debe cargar los datos provistos para la base de datos ejecutando el siguiente comando:
+La carga de datos es manual y explícita para mantener el flujo simple. Después de levantar servicios, corré:
 
 ```bash
-just import-data
+bash scripts/processing/import_db_data.sh
 ```
+
+Este script importa desde `data/processed/db_import/*.csv`.
+
+### 4. Usuario demo
+
+Por defecto se crea un usuario demo si no existe:
+
+- Email: `admin@canasta.uy`
+- Password: `admin`
 
 ---
 
@@ -95,20 +115,20 @@ just import-data
 
 Todos los comandos se ejecutan desde el directorio `backend/`:
 
-| Comando            | Descripción                                    |
-| ------------------ | ---------------------------------------------- |
-| `just infra-up`    | Levantar PostgreSQL, Redis y pgAdmin           |
-| `just infra-down`  | Detener infraestructura                        |
-| `just infra-logs`  | Ver logs de servicios                          |
-| `just dev`         | Ejecutar Spring Boot en modo dev               |
-| `just build`       | Compilar proyecto                              |
-| `just unit`        | Ejecutar tests unitarios (`mvn test`)          |
-| `just it`          | Ejecutar suite completa (`mvn verify`)         |
-| `just test`        | Alias de `just unit`                           |
-| `just import-data` | Importar datos CSV a PostgreSQL                |
-| `just setup`       | Crear archivo .env desde template              |
-| `just clean`       | Limpiar contenedores, volúmenes y build        |
-| `just cache-clear` | Limpiar cache de Redis                         |
+| Comando            | Descripción                             |
+| ------------------ | --------------------------------------- |
+| `just infra-up`    | Levantar PostgreSQL, Redis y pgAdmin    |
+| `just infra-down`  | Detener infraestructura                 |
+| `just infra-logs`  | Ver logs de servicios                   |
+| `just dev`         | Ejecutar Spring Boot en modo dev        |
+| `just build`       | Compilar proyecto                       |
+| `just unit`        | Ejecutar tests unitarios (`mvn test`)   |
+| `just it`          | Ejecutar suite completa (`mvn verify`)  |
+| `just test`        | Alias de `just unit`                    |
+| `just import-data` | Importar datos CSV a PostgreSQL         |
+| `just setup`       | Crear archivo .env desde template       |
+| `just clean`       | Limpiar contenedores, volúmenes y build |
+| `just cache-clear` | Limpiar cache de Redis                  |
 
 Los tests de integración usan Testcontainers (PostgreSQL y Redis) y se ejecutan con `*IT` durante `mvn verify`.
 Si Docker no está disponible, esos tests se omiten automáticamente.
@@ -136,7 +156,8 @@ just dev
 
 ## Endpoints
 
-Todos los endpoints de datos requieren autenticación con API Key.
+Todos los endpoints de datos requieren autenticación.
+La app web usa sesión JWT y los clientes externos pueden usar API Keys.
 Ver documentación completa en Swagger/OpenAPI.
 
 ---
