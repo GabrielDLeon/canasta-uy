@@ -10,6 +10,10 @@ wheels/
 .venv
 
 # Data files (CSVs are too large for git)
-data/
+data/*
+!data/processed/
+data/processed/*
+!data/processed/db_import/
+!data/processed/db_import/*.csv
 
 visualizations

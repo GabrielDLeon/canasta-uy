@@ -1,0 +1,307 @@
+product_id,name,specification,category_id,brand
+1,Aceite de girasol Óptimo Envase 900 cc,Envase 900 cc,1,Óptimo
+2,Aceite de girasol Río de la Plata Envase 900 cc,Envase 900 cc,1,Río de la Plata
+3,Aceite de girasol Uruguay Envase 900 cc,Envase 900 cc,1,Uruguay
+4,Aceite de maíz Delicia Envase 900 cc,Envase 900 cc,2,Delicia
+5,Aceite de maíz Río de la Plata Envase 900 cc,Envase 900 cc,2,Río de la Plata
+6,Aceite de maíz Salad Envase 900 cc,Envase 900 cc,2,Salad
+7,Aceite de soja Condesa Envase 900 cc,Envase 900 cc,3,Condesa
+8,Aceite de soja Río de la Plata Envase 900 cc,Envase 900 cc,3,Río de la Plata
+9,Aceite de soja Salad Envase 900 cc,Envase 900 cc,3,Salad
+10,Agua de mesa con gas Matutina Envase 2 lt.,Envase 2 lt.,5,Matutina
+11,Agua de mesa con gas Nativa Envase 2 lt.,Envase 2 lt.,5,Nativa
+12,"Agua de mesa con gas Salus Envase 2,25 lt.","Envase 2,25 lt.",5,Salus
+13,Aguja vacuna Con Hueso - Sin Marca 1 kg.,1 kg.,9,Con Hueso - Sin Marca
+14,Aguja vacuna Sin Hueso - Sin Marca 1 kg.,1 kg.,9,Sin Hueso - Sin Marca
+15,Arroz blanco Blue Patna Bolsa 1 kg.,Bolsa 1 kg.,14,Blue Patna
+16,Arroz blanco Green Chef Bolsa 1 kg.,Bolsa 1 kg.,14,Green Chef
+17,Arroz blanco Saman Blanco Bolsa 1 kg.,Bolsa 1 kg.,14,Saman Blanco
+18,Arroz blanco Aruba tipo Patna Bolsa 1 kg.,Bolsa 1 kg.,14,Aruba tipo Patna
+19,Arroz blanco Pony Bolsa 1 kg.,Bolsa 1 kg.,14,Pony
+20,Arroz blanco Vidarroz Bolsa 1 kg.,Bolsa 1 kg.,14,Vidarroz
+21,Arvejas en conserva Campero Lata 300 grs.,Lata 300 grs.,15,Campero
+22,Arvejas en conserva Cololó Lata 380 grs.,Lata 380 grs.,15,Cololó
+23,Arvejas en conserva Nidemar Lata 300 grs.,Lata 300 grs.,15,Nidemar
+24,Azúcar blanco Azucarlito Paquete 1 kg.,Paquete 1 kg.,16,Azucarlito
+25,Azúcar blanco Bella Unión Paquete 1 kg.,Paquete 1 kg.,16,Bella Unión
+26,Café envasado (no instantáneo) Águila Paquete 250 grs.,Paquete 250 grs.,21,Águila
+27,Café envasado (no instantáneo) Chaná Paquete 250 grs.,Paquete 250 grs.,21,Chaná
+28,Café envasado (no instantáneo) Saint Paquete 250 grs.,Paquete 250 grs.,21,Saint
+29,Carne picada vacuna Con Hasta 5% de grasa 1 kg.,1 kg.,22,Con Hasta 5% de grasa
+30,Carne picada vacuna Con Hasta 20% de grasa 1 kg.,1 kg.,22,Con Hasta 20% de grasa
+31,Cerveza Patricia Botella 960 ml.,Botella 960 ml.,25,Patricia
+32,Cerveza Pilsen Botella 960 ml.,Botella 960 ml.,25,Pilsen
+33,Cerveza Zillertal Botella 1 lt.,Botella 1 lt.,25,Zillertal
+34,Champú Fructis Envase 350 ml.,Envase 350 ml.,26,Fructis
+35,Champú Sedal Envase 350 ml.,Envase 350 ml.,26,Sedal
+36,Champú Suave Envase 930 ml.,Envase 930 ml.,26,Suave
+37,Chorizos mezcla sueltos - Cattivelli  - Extra 1 kg.,1 kg.,27,sueltos - Cattivelli  - Extra
+38,Chorizos mezcla sueltos - Centenario - Extra 1 kg.,1 kg.,27,sueltos - Centenario - Extra
+39,Chorizos mezcla sueltos - La Familia - Hilo amarillo 1 kg.,1 kg.,27,sueltos - La Familia - Hilo amarillo
+40,Cocoa Copacabana Envase 500 grs.,Envase 500 grs.,29,Copacabana
+41,Cocoa Vascolet Envase 500 grs.,Envase 500 grs.,29,Vascolet
+42,Desodorante en aerosol Axe Musk Envase 113 grs.,Envase 113 grs.,41,Axe Musk
+43,Desodorante en aerosol Dove Original Envase 100 grs.,Envase 100 grs.,41,Dove Original
+44,Desodorante en aerosol Rexona Active Emotion Envase 105 grs.,Envase 105 grs.,41,Rexona Active Emotion
+45,Detergente para vajilla Deterjane limón Envase 1.250 lt.,Envase 1.250 lt.,42,Deterjane limón
+46,Detergente para vajilla Hurra Nevex Limón Envase 1.250 lt.,Envase 1.250 lt.,42,Hurra Nevex Limón
+47,Detergente para vajilla Protergente limón Envase 1 lt.,Envase 1 lt.,42,Protergente limón
+48,Dulce de leche Conaprole Envase 1 kg.,Envase 1 kg.,43,Conaprole
+49,Dulce de leche Los Nietitos Envase 1 kg.,Envase 1 kg.,43,Los Nietitos
+50,Dulce de leche Manjar Envase 1 kg.,Envase 1 kg.,43,Manjar
+51,Dulce de membrillo Los Nietitos Envase 400 grs.,Envase 400 grs.,44,Los Nietitos
+52,Fideos secos al huevo Adria Paquete 500 grs.,Paquete 500 grs.,45,Adria
+53,Fideos secos al huevo Cololó Paquete 500 grs.,Paquete 500 grs.,45,Cololó
+54,Fideos secos al huevo Las Acacias Paquete 500 grs.,Paquete 500 grs.,45,Las Acacias
+55,Fideos secos semolados Adria Paquete 500 grs.,Paquete 500 grs.,46,Adria
+56,Fideos secos semolados Las Acacias - franja celeste Paquete 500 grs.,Paquete 500 grs.,46,Las Acacias - franja celeste
+57,Fideos secos semolados Puritas Paquete 500 grs.,Paquete 500 grs.,46,Puritas
+58,Frankfurters cortos Centenario Paquete 8 us.,Paquete 8 us.,47,Centenario
+59,Frankfurters cortos Ottonello Paquete 8 us.,Paquete 8 us.,47,Ottonello
+60,Frankfurters cortos Schneck Paquete 8 us.,Paquete 8 us.,47,Schneck
+61,Galletitas al agua Famosa Paquete 140 grs.,Paquete 140 grs.,48,Famosa
+62,Galletitas al agua Maestro Cubano Paquete 120 grs.,Paquete 120 grs.,48,Maestro Cubano
+63,"Gaseosa tipo cola (env. no ret.) Coca Cola Botella 1,5 lt.","Botella 1,5 lt.",50,Coca Cola
+64,"Gaseosa tipo cola (env. no ret.) Coca Cola_ Botella 2,25.lt.","Botella 2,25.lt.",50,Coca Cola_
+65,"Gaseosa tipo cola (env. no ret.) Nix Botella 1,5 lt.","Botella 1,5 lt.",50,Nix
+66,Gaseosa tipo cola (env. no ret.) Pepsi Botella 2 lt.,Botella 2 lt.,50,Pepsi
+67,"Gaseosa tipo cola (env. no ret.) Pepsi Botella 1,5 lt.","Botella 1,5 lt.",50,Pepsi
+68,Hamburguesas carne vacun Burgy Paquete 3 unidades,Paquete 3 unidades,52,Burgy
+69,Hamburguesas carne vacun Paty Paquete2 unidades,Paquete2 unidades,52,Paty
+70,Hamburguesas carne vacun Schneck Paquete2 unidades,Paquete2 unidades,52,Schneck
+71,Harina de maíz Gourmet Paquete 450 grs.,Paquete 450 grs.,53,Gourmet
+72,Harina de maíz Presto Pronta Arcor Paquete 500 grs.,Paquete 500 grs.,53,Presto Pronta Arcor
+73,Harina de maíz Puritas Paquete 450 grs.,Paquete 450 grs.,53,Puritas
+74,Harina trigo común 000 Cañuelas Paquete 1 kg.,Paquete 1 kg.,54,Cañuelas
+75,Harina trigo común 000 Cololó Paquete 1 kg.,Paquete 1 kg.,54,Cololó
+76,Harina trigo común 0000 Cañuelas Paquete 1 kg.,Paquete 1 kg.,55,Cañuelas
+77,Harina trigo común 0000 Cololó Paquete 1 kg.,Paquete 1 kg.,55,Cololó
+78,Harina trigo común 0000 Primor Paquete 1 kg.,Paquete 1 kg.,55,Primor
+79,Helado familiar Conaprole Envase 1lt.,Envase 1lt.,56,Conaprole
+80,Helado familiar Crufi Envase 1lt.,Envase 1lt.,56,Crufi
+81,Helado familiar Gebetto Envase 1lt.,Envase 1lt.,56,Gebetto
+82,Hipoclorito de sodio Agua Jane Botella 1 lt.,Botella 1 lt.,57,Agua Jane
+83,Hipoclorito de sodio Sello Rojo Botella 1 lt.,Botella 1 lt.,57,Sello Rojo
+84,Hipoclorito de sodio Solución Cristal Botella 1 lt.,Botella 1 lt.,57,Solución Cristal
+85,Huevos colorados El Jefe Envase 1/2 docena,Envase 1/2 docena,61,El Jefe
+86,Huevos colorados Prodhin Envase 1/2 docena,Envase 1/2 docena,61,Prodhin
+87,Huevos colorados Super huevo Envase 1/2 docena,Envase 1/2 docena,61,Super huevo
+88,Jabón de tocador Astral plata Unidad 125 grs.,Unidad 125 grs.,63,Astral plata
+89,Jabón de tocador Palmolive Unidad 125 grs.,Unidad 125 grs.,63,Palmolive
+90,Jabón de tocador Rexona Unidad 125 grs.,Unidad 125 grs.,63,Rexona
+91,Jabón en polvo máquina Drive Paquete 800 grs.,Paquete 800 grs.,64,Drive
+92,Jabón en polvo máquina Nevex Paquete 800 grs.,Paquete 800 grs.,64,Nevex
+93,Jabón en polvo máquina Skip - Paquete azul Paquete 800 grs.,Paquete 800 grs.,64,Skip - Paquete azul
+94,Jabón para ropa en barra Bull Dog Unidad 300 grs.,Unidad 300 grs.,65,Bull Dog
+95,Jabón para ropa en barra Nevex Unidad 200 grs.,Unidad 200 grs.,65,Nevex
+96,Jabón para ropa en barra Primor Unidad 300 grs.,Unidad 200 grs.,65,Primor
+97,Jamón cocido no artesanal Cattivelli 1 kg.,1 kg.,66,Cattivelli
+98,Jamón cocido no artesanal Ottonello 1 kg.,1 kg.,66,Ottonello
+99,Leonesa La Constancia 1 kg.,1 kg.,70,La Constancia
+100,Leonesa Ottonello 1 kg.,1 kg.,70,Ottonello
+101,Leonesa Schneck 1 kg.,1 kg.,70,Schneck
+102,Manteca Calcar Envase 200 grs.,Envase 200 grs.,76,Calcar
+103,Manteca Conaprole sin sal Envase 200 grs.,Envase 200 grs.,76,Conaprole sin sal
+104,Manteca Kasdorf Envase 200 grs.,Envase 200 grs.,76,Kasdorf
+105,Margarina Doriana nueva Envase 250 grs.,Envase 250 grs.,85,Doriana nueva
+106,Margarina Flor Envase 200 grs.,Envase 200 grs.,85,Flor
+107,Margarina Primor Envase 250 grs.,Envase 250 grs.,85,Primor
+108,Mayonesa común Fanacoa Envase 500 grs.,Envase 500 grs.,86,Fanacoa
+109,Mayonesa común Hellmans Envase 500 grs.,Envase 500 grs.,86,Hellmans
+110,Mayonesa común Uruguay Envase 500 grs.,Envase 500 grs.,86,Uruguay
+111,Mermelada de durazno Dulciora Envase 500 grs.,Envase 500 grs.,87,Dulciora
+112,Mermelada de durazno El Hogar Envase 500 grs.,Envase 500 grs.,87,El Hogar
+113,Mermelada de durazno Los Nietitos Envase 500 grs.,Envase 500 grs.,87,Los Nietitos
+114,Nalga vacuna Con Hueso - Sin Marca 1 kg.,1 kg.,88,Con Hueso - Sin Marca
+115,Nalga vacuna Sin Hueso - Sin Marca 1 kg.,1 kg.,88,Sin Hueso - Sin Marca
+116,Paleta vacuna Con Hueso - Sin Marca 1 kg.,1 kg.,91,Con Hueso - Sin Marca
+117,Paleta vacuna Sin Hueso - Sin Marca 1 kg.,1 kg.,91,Sin Hueso - Sin Marca
+118,Pan de molde lacteado Los Sorchantes Paquete 330 grs.,Paquete 330 grs.,92,Los Sorchantes
+119,Pan de molde lacteado Bimbo Paquete 330 grs.,Paquete 330 grs.,92,Bimbo
+120,Pan de molde lacteado Pan Catalán Paquete 330 grs.,Paquete 330 grs.,92,Pan Catalán
+121,Pan flauta Sin marca Unidad aprox215 grs.,Unidad aprox215 grs.,93,Sin marca
+122,Papel higiénico hoja simple Elite 4 rollos de 30 mts.,4 rollos de 30 mts.,96,Elite
+123,Papel higiénico hoja simple Higienol Export 4 rollos de 30 mts.,4 rollos de 30 mts.,96,Higienol Export
+124,Papel higiénico hoja simple Sin Fin 4 rollos de 50 mts.,4 rollos de 50 mts.,96,Sin Fin
+125,Pasta dental Colgate Herbal Blanqueador Unidad 90 grs.,Unidad 90 grs.,97,Colgate Herbal Blanqueador
+126,Pasta dental Kolynos Triple acción Unidad 90 grs.,Unidad 90 grs.,97,Kolynos Triple acción
+127,Pasta dental Pico Jenner Plus Unidad 90 grs.,Unidad 90 grs.,97,Pico Jenner Plus
+128,Peceto vacuno Sin Marca 1 kg.,1 kg.,100,Sin Marca
+129,Pescado fresco bifes de merluz - sin marca 1 kg.,1 kg.,102,bifes de merluz - sin marca
+130,Pollo entero fresco con menudos Avícola del Oeste 1 kg.,1 kg.,104,Avícola del Oeste
+131,Pollo entero fresco con menudos Tenent 1 kg.,1 kg.,104,Tenent
+132,Pollo entero fresco con menudos Tres Arroyos 1 kg.,1 kg.,104,Tres Arroyos
+133,Pulpa de tomate Conaprole Envase 1 lt.,Envase 1 lt.,111,Conaprole
+134,"Pulpa de tomate De Ley Envase 1,020 lt.","Envase 1,020 lt.",111,De Ley
+135,Pulpa de tomate Gourmet Envase 1 lt.,Envase 1 lt.,111,Gourmet
+136,Queso rallado Artesano Paquete 80 grs.,Paquete 80 grs.,112,Artesano
+137,Queso rallado Conaprole Paquete 80 grs.,Paquete 80 grs.,112,Conaprole
+138,Queso rallado Milky Paquete 80 grs.,Paquete 80 grs.,112,Milky
+139,Rueda Vacuna Con Hueso - Sin Marca 1 kg,1 kg,118,Con Hueso - Sin Marca
+140,Sal fina yodada fluorada Sek Paquete 500 grs.,Paquete 500 grs.,120,Sek
+141,Sal fina yodada fluorada Torrevieja Paquete 500 grs.,Paquete 500 grs.,120,Torrevieja
+142,Sal fina yodada fluorada Urusal Paquete 500 grs.,Paquete 500 grs.,120,Urusal
+143,Té negro en saquitos Hornimans Caja 10 us.,Caja 10 us.,129,Hornimans
+144,Té negro en saquitos La Virginia Caja 10 us.,Caja 10 us.,129,La Virginia
+145,Té negro en saquitos President Caja 10 us.,Caja 10 us.,129,President
+146,Vino tinto común tetrabrick Faisán Envase 1 lt.,Envase 1 lt.,130,Faisán
+147,Vino tinto común tetrabrick Santa Teresa Clásico Envase 1 lt.,Envase 1 lt.,130,Santa Teresa Clásico
+148,Vino tinto común tetrabrick Tango Envase 1 lt.,Envase 1 lt.,130,Tango
+149,Yerba mate común Baldo Paquete1 kg.,Paquete1 kg.,131,Baldo
+150,Yerba mate común Canarias Paquete1 kg.,Paquete1 kg.,131,Canarias
+151,Yerba mate común Del Cebador Paquete1 kg.,Paquete1 kg.,131,Del Cebador
+152,Yogur Calcar Sachet 1 lt.,Sachet 1 lt.,132,Calcar
+153,"Yogur Conaprole BIO TOP Sachet1,200 lt.","Sachet1,200 lt.",132,Conaprole BIO TOP
+154,Yogur Parmalat Bio Yogur Sachet 1 lt.,Sachet 1 lt.,132,Parmalat Bio Yogur
+155,"Lápiz Negro Bic,  4.0 unidades",4 unidades,75,Bic
+156,"Crayolas Acrilex,  12.0 unidades",12 unidades,32,Acrilex
+157,"Lápiz Negro Faber,  6.0 unidades",6 unidades,75,Faber
+158,"Lápiz Negro Maped,  3.0 unidades",3 unidades,75,Maped
+159,"Lápiz Negro Stabilo,  3.0 unidades",3 unidades,75,Stabilo
+161,"Lápices de colores Largos Bic,   12.0 unidades",12 unidades,72,Bic
+162,"Lápices de colores Largos Faber,  12.0 unidades",12 unidades,72,Faber
+163,"Lápices de colores Largos Maped,  12.0 unidades",12 unidades,72,Maped
+164,"Lápices de colores Largos Teoría,  12.0 unidades",12 unidades,72,Teoría
+166,"Lápices de colores Largos School,  12.0 unidades",12 unidades,73,School
+167,"Bolígrafo 1mm (azul  negro   rojo  verde) Bic,  4.0 unidades",4 unidades,20,Bic
+168,"Bolígrafo 1mm Pilot,  2.0 unidades",2 unidades,20,Pilot
+169,"Bolígrafo 1mm Stabilo,  6.0 unidades",6 unidades,20,Stabilo
+170,"Bolígrafo 1mm Teoría,  6.0 unidades",6 unidades,20,Teoría
+171,"Crayolas o pasteles Bic,  12.0 unidades",12 unidades,33,Bic
+172,"Crayolas Bic,  12.0 unidades",12 unidades,32,Bic
+173,"Crayolas Faber,  12.0 unidades",12 unidades,32,Faber
+174,"Pincel School,  6.0 unidades",6 unidades,103,School
+175,"Pincel Sin Marca,  3.0 unidades",3 unidades,103,Sin Marca
+176,Barra Adhesiva UHU,Not specified,19,UHU
+177,"Cascola Acrilex,  100.0 gramos",100 grs.,24,Acrilex
+178,"Cascola Bic,  90.0 gramos",90 grs.,24,Bic
+180,"Goma lápiz Stadler,  2.0 unidades",2 unidades,51,Stadler
+181,Goma lápiz Bic,Not specified,51,Bic
+182,"Goma lápiz Maped,  3.0 unidades",3 unidades,51,Maped
+183,"Tijera Punta Roma Maped,  13.0 centímetros",13 cm.,124,Maped
+184,Compás Maped,1 unidad,31,Maped
+185,Sacapuntas plástico Maped,1 unidad,119,Maped
+187,"Marcadores delgados Bic,  10.0 unidades",10 unidades,82,Bic
+188,"Marcadores delgados Faber,  6.0 unidades",6 unidades,82,Faber
+190,"Marcadores delgados School,  12.0 unidades",12 unidades,82,School
+192,"Marcadores delgados Longlory,  24.0 unidades",24 unidades,82,Longlory
+193,"Marcadores delgados Sylvapen,  12.0 unidades",12 unidades,82,Sylvapen
+194,"Marcadores delgados Stabilo,  12.0 unidades",12 unidades,82,Stabilo
+195,"Marcadores gruesos Sylvapen,  6.0 unidades",6 unidades,84,Sylvapen
+196,"Marcadores gruesos Longlory,  6.0 unidades",6 unidades,84,Longlory
+197,Marcador flúor Bic,1 unidad,81,Bic
+198,Marcador flúor Stabilo,1 unidad,81,Stabilo
+199,Lápiz Corrector Teoría,1 unidad,74,Teoría
+200,Lápiz Corrector Bic,1 unidad,74,Bic
+201,Lápiz Corrector Liquid Paper,1 unidad,74,Liquid Paper
+202,"Hojas de Garbanzo Papiros,  0.0 unidades",Not specified,60,Papiros
+203,"Hojas de Garbanzo Tabaré,  0.0 unidades",Not specified,60,Tabaré
+204,"Hojas de Garbanzo Caballito,  0.0 unidades",Not specified,60,Caballito
+205,"Hojas de Garbanzo Tilibra,  0.0 unidades",Not specified,60,Tilibra
+206,"Juego de Geometría completo (sólo reglas, escuadra, sin compás) Maped",1 unidad,67,Maped
+207,"Hojas Tabaré,  48.0 unidades",48 unidades,58,Tabaré
+208,Carpeta tamaño hojas A4 Papiros,A4,23,Papiros
+209,"Cuaderno Rayado Papiros,  48.0 hojas",48 hojas,35,Papiros
+210,"Cuaderno rayado Extreme,  48.0 hojas",48 hojas,35,Extreme
+212,Hojas cuadriculadas Tabaré,Not specified,59,Tabaré
+213,"Cuadernola Papiros Tapa Dura,  100.0 hojas",100 hojas,39,Papiros
+214,Cuadernola Multiahorro,Not specified,37,Multiahorro
+215,Cuadernola Extreme,Not specified,37,Extreme
+216,Cuadernola Tilibra,Not specified,37,Tilibra
+217,"Libreta para anotaciones Papiros,  48.0 hojas",48 hojas,71,Papiros
+222,"Marcadores Flúor Stabilo,  4.0 unidades",4 unidades,83,Stabilo
+223,"Cuaderno Rayado Papiros Espiral,  48.0 hojas",48 hojas,36,Papiros
+224,"Cuaderno Rayado Papiros,  96.0 hojas",96 hojas,35,Papiros
+238,"Lechuga Crespa,  1.0 unidad",1 unidad,68,Unknown Brand
+239,"Lechuga Mantecosa,  1.0 unidad",1 unidad,69,Unknown Brand
+244,"Papa Blanca, 1.0 kilogramos",1 kg.,94,Unknown Brand
+245,"Papa Rosada, 1.0 kilogramos",1 kg.,95,Unknown Brand
+253,"Tomate Americano,  1.0 kilogramos",1 kg.,127,Unknown Brand
+254,"Tomate Perita,  1.0 kilogramos",1 kg.,128,Unknown Brand
+255,"Banana Ecuador,  1.0 kilogramos",1 kg.,18,Unknown Brand
+257,"Banana Brasil,  1.0 kilogramos",1 kg.,17,Unknown Brand
+262,"Zapallo Calabacín,  1.0 kilogramos",1 kg.,133,Unknown Brand
+264,"Zapallo Criollo,  1.0 kilogramos",1 kg.,134,Unknown Brand
+275,"Manzana Fuji,  1.0 kilogramos",1 kg.,77,Unknown Brand
+276,"Manzana Granny Smith,  1.0 kilogramos",1 kg.,78,Unknown Brand
+277,"Manzana Red Deliciosa,  1.0 kilogramos",1 kg.,80,Unknown Brand
+278,"Manzana Red Chieff,  1.0 kilogramos",1 kg.,79,Unknown Brand
+286,"Naranja Navel,  1.0 kilogramos",1 kg.,89,Unknown Brand
+287,"Naranja Valencia,  1.0 kilogramos",1 kg.,90,Unknown Brand
+298,"Cuadernola Papiros Tapa Blanda,  100.0 hojas",100 hojas,38,Papiros
+299,"Cuadernola Papiros Tapa Blanda,  70.0 hojas",70 hojas,38,Papiros
+300,"Cuadernola Extreme Tapa Blanda,  96.0 hojas",96 hojas,38,Extreme
+301,"Cuadernola Extreme Tapa Blanda,  70.0 hojas",70 hojas,38,Extreme
+303,"Libreta para anotaciones Papiros,  100.0 hojas",100 hojas,71,Papiros
+304,"Lápices de colores Largos Pelican,  12.0 unidades",12 unidades,72,Pelican
+305,Lápiz Negro Staedler,1 unidad,75,Staedler
+306,Marcador Flúor Faber,1 unidad,81,Faber
+307,Marcador Flúor Pelican,1 unidad,81,Pelican
+308,"Off! Family Crema,  200.0 gramos",200 grs.,115,Off!
+309,"Off! Family Spray,  165 cm3",165 cm3,117,Off!
+310,"Off! Family Aerosol,  144cm3",144 cm3,114,Off!
+311,"Explorador Gel,  175.0 gramos",175 grs.,116,Explorador
+312,"Off! Kids Crema,  90.0 gramos",90 grs.,115,Off!
+313,"Júpiter Crema,  80.0 gramos",80 grs.,115,Júpiter
+314,"Júpiter Aerosol,  165 cm3",165 cm3,114,Júpiter
+315,"Off! Larga Duración,  165 cm3",165 cm3,114,Off!
+316,"Explorador Aerosol,  145.0 mililitros",145 ml.,114,Explorador
+318,"Afeitadora Gillette Mach3 Dispenser X2, 2.0 unidades",2 unidades,4,Gillette
+319,"Afeitadora Xtreme3 Piel Delicada X1, 1.0 unidad",1 unidad,4,Xtreme3
+320,"Champú Dove, 400.0 mililitros",400 ml.,26,Dove
+321,"Champú Pantene, 400.0 mililitros",400 ml.,26,Pantene
+322,"Crema Facial Revitalift Filler Dia, 50.0 mililitros",50 ml.,34,Revitalift
+323,"Asepxia Emergencia Color Piel, 28.0 gramos",28 grs.,34,Asepxia
+324,"Jabón de Tocador Neutrogena Deep Clean, 80.0 gramos",80 grs.,63,Neutrogena
+325,"Apositos Cotidian Post Parto, 20.0 unidades",20 unidades,13,Cotidian
+326,"Pañales Adultos Readysec Grande, 24.0 unidades",24 unidades,99,Readysec
+327,"Pañales Babysec Premium Extra Extra Grande, 48.0 unidades",48 unidades,98,Babysec
+328,"Pañales Huggies Primeros 100 Dias Pequeño, 40.0 unidades",40 unidades,98,Huggies
+331,"Bebe & Co Colonia + Talco, 120.0 mililitros",120 ml.,30,Bebe & Co 
+332,"Toallitas Femeninas Ladysoft Basica, 16.0 unidades",16 unidades,126,Ladysoft
+333,"Toallitas Femenias Siempre Libre Nocturna Max Con Alas, 8.0 unidades",8 unidades,126,Siempre Libre
+335,"Talco Xanapie Bolsa Repuesto, 180.0 gramos",180 grs.,121,Xanapie
+336,"Talco Xanapie Aerosol, 175.0 mililitros",175 ml.,121,Xanapie
+337,"Talco J&J Regular, 200.0 gramos",200 grs.,121,J&J
+338,"Jabón de Tocador Dove Blanco, 90.0 gramos",90 grs.,63,Dove
+339,"Jabón de Glicerina Ann Bow, 140.0 gramos",140 grs. ,62,Ann Bow
+340,"Perfume Delice Candy, 50.0 mililitros",50 ml.,101,Délice
+341,"Perfume Casapueblo 24 Heures Blue Edt, 100.0 mililitros",100 ml.,101,Casapueblo
+342,"Tinta Excellence Tinta N.9, 1.0 unidad",1 unidad,125,Excellence
+343,"Tinta Issue Decolorante Semilla Lino 30 Grs., 1.0 unidad",1 unidad,125,Issue
+344,"Tinta Garnier Nutrisse Intense N.8.0, 1.0 unidad",1 unidad,125,Garnier
+345,Agua oxigenada 10 volumen Droguería Paysandú 100 mililitros,100 ml.,8,Droguería Paysandú
+346,Alcohol rectificado Droguería Paysandú 250 mililitros ,250 ml. ,11,Droguería Paysandú
+347,Alcohol en gel Bioset 250 mililitros ,250 ml. ,10,Bioset 
+348,Algodón Zig Zag Cisne 100 gramos,100 gramos,12,Zig Zag Cisne 
+349,Cinta adhesiva Ready Plast 1 unidad ,1 unidad ,28,Ready Plast 
+350,Curitas Ready Plast 8 unidades ,8 unidades ,40,Ready Plast 
+351,Gasa estéril 40 unidades ,40 unidades,49,Unknown Brand
+352,Protector solar SPF 20  Dermaglós 250 milimetros  ,250 ml. ,105,Dermaglós 
+353,Protector solar SPF 40  Dermaglós 250 milimetros  ,250 ml. ,107,Dermaglós 
+354,Protector solar SPF 30 Hawaiian Tropic 180 ml. ,180 ml. ,106,Hawaiian Tropic
+355,Protector solar SPF 50 Eucerin 150 ml. ,150 ml ,108,Eucerin
+356,Protector solar SPF 60 Soundown 120 ml.,120 ml. ,109,Soundown
+357,Protector solar SPF 80 Hawaiian Tropic 240 ml.,240 ml. ,110,Hawaiian Tropic
+358,Harina trigo común 0000 Tata Paquete 1 kg.,1 kg.,55,Tata
+359,Aceite de girasol Tata Envase 900 cc,900 cc,1,Tata
+360,Harina trigo común 0000 Precio Líder Paquete 1 kg.,1 kg.,55,Precio Líder(Grupo Casino)
+361,Aceite de girasol Precio Líder Envase 900 cc,900 cc,1,Precio Líder(Grupo Casino)
+363,Harina trigo común 0000 Granja La Sonrisa Paquete 1 kg.,1 kg.,55,Granja La Sonrisa(El Dorado)
+364,Harina trigo común 0000 Tienda Inglesa Paquete 1 kg.,1 kg.,55,Tienda Inglesa
+365,Aceite de girasol Tienda Inglesa Envase 900 cc,900 cc,1,Tienda Inglesa
+366,Agua de mesa Sin Gas - Salus,2.25lt.,6,Salus
+367,Agua de mesa Sin Gas - Matutina,2.25lt.,6,Matutina
+368,Agua de mesa Sin Gas - Vitale,2.5lt.,6,Vitale
+369,Agua mineral Sin Gas (bidón) - Salus,6.25lt.,7,Salus
+370,Agua mineral Sin Gas (bidón) - Nativa,6lt.,7,Nativa
+371,Cuadernola Teoría Tapa Dura 100 hojas,100 hojas,37,Teoria
+372,Lápiz Evolution Bic Hb Nº 2 Unidad,1 unidad,75,Bic
+373,Lápiz Faber Castell 1210 Brasilero Unidad,1 unidad,75,Faber
+374,Marcadores delgados Giotto-caja 12 unidades,12 unidades,82,Giotto
+375,Marcadores gruesos Giotto- caja 12 unidades,12 unidades,84,Giotto
+376,Regla Maped Cristal FP 30 cm,1 unidad,113,Maped
+377,Temperas surtidas Faber Castell- caja 6 unidades,6 unidades,123,Faber
+378,Temperas surtidas Acrilex- caja 6 unidades,6 unidades,122,Acrilex
+380,Margarina Adorita Envase 250 grs.,Envase 250 grs.,85,Adorita
+381,Margarina Qualy Envase 250 grs.,Envase 250 grs.,85,Qualy
