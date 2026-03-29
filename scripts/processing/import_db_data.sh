@@ -15,7 +15,7 @@ DB_USER="${DB_USER:-canastauy_user}"
 DB_PASS="${DB_PASSWORD:-canastauy_pass}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 IMPORT_DIR="$PROJECT_DIR/data/processed/db_import"
 
 echo "============================================"
@@ -50,7 +50,7 @@ EOF
 # Check if container is running
 if ! docker ps | grep -q canasta-postgres; then
 	echo "ERROR: Container canasta-postgres is not running"
-	echo "Run first: just infra-up"
+	echo "Run first: docker compose up -d postgres"
 	exit 1
 fi
 

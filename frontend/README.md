@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# CanastaUY Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend web de CanastaUY construido con React + Vite + TypeScript.
 
-Currently, two official plugins are available:
+Permite:
+- autenticacion de usuario,
+- exploracion de productos y categorias,
+- visualizacion de analytics (tendencia, inflacion, comparativas, top cambios),
+- gestion de API keys de cuenta.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack
 
-## React Compiler
+- React 19
+- TypeScript
+- Vite 7
+- TanStack Query
+- React Router
+- Tailwind CSS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requisitos
 
-## Expanding the ESLint configuration
+- Node.js 20+
+- pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Desarrollo local
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Desde `frontend/`:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+App disponible en <http://localhost:5173>.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Por defecto, Vite proxea `/api` y `/v3/api-docs` a `http://localhost:8080`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Variables de entorno
+
+- `VITE_API_BASE_URL` (default: `/api/v1`)
+- `VITE_PROXY_TARGET` (default: `http://localhost:8080`)
+
+Ejemplo:
+
+```bash
+VITE_PROXY_TARGET=http://localhost:8080 pnpm dev
 ```
+
+## Docker (stack completo)
+
+El flujo recomendado es usar el `docker-compose.yml` en la raiz del repositorio para levantar frontend + backend + PostgreSQL + Redis + pgAdmin.
+
+Desde la raiz:
+
+```bash
+docker compose up --build
+```
+
+## Scripts
+
+- `pnpm dev`: servidor de desarrollo
+- `pnpm build`: build de produccion
+- `pnpm preview`: previsualizar build
+- `pnpm lint`: lint

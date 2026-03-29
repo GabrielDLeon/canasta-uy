@@ -1,0 +1,103 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: canasta-postgres
+    environment:
+      POSTGRES_DB: ${DATABASE_DB:-canastauy}
+      POSTGRES_USER: ${DATABASE_USER:-canastauy_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-canastauy_pass}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-canastauy_user} -d ${DATABASE_DB:-canastauy}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - canasta-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: canasta-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - canasta-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: canastauy-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@canasta.uy}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - '5050:80'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - canasta-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: canastauy-backend
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${DATABASE_DB:-canastauy}
+      DATABASE_USER: ${DATABASE_USER:-canastauy_user}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-canastauy_pass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUY=}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      PORT: 8080
+      DEMO_USER_ENABLED: ${DEMO_USER_ENABLED:-true}
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-admin@canasta.uy}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-admin}
+    ports:
+      - '8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - canasta-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: canastauy-frontend
+    environment:
+      VITE_PROXY_TARGET: http://backend:8080
+      VITE_API_BASE_URL: /api/v1
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - canasta-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  frontend_node_modules:
+
+networks:
+  canasta-network:
+    driver: bridge

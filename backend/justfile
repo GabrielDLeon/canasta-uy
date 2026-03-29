@@ -56,7 +56,7 @@ setup:
     fi
 
 import-data:
-    cd .. && ./scripts/import_db_data.sh
+    cd .. && ./scripts/processing/import_db_data.sh
 
 clean:
     docker compose down -v

@@ -52,6 +52,10 @@ canasta:
       secret: "${JWT_SECRET}"
       access-token-ttl: 900000
       refresh-token-ttl: 604800000
+  demo-user:
+    enabled: ${DEMO_USER_ENABLED:false}
+    email: ${DEMO_USER_EMAIL:admin@canasta.uy}
+    password: ${DEMO_USER_PASSWORD:admin}
   cache:
     prices:
       ttl: 300000
