@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ProductItem } from '@/components/product-item'
+import { usePageTitle } from '@/hooks/use-page-title'
 import { api } from '@/lib/api'
 
 export function CategoryDetailPage() {
@@ -34,6 +35,11 @@ export function CategoryDetailPage() {
     queryFn: () => api.getInflation(categoryId, from || undefined, to || undefined),
     enabled: Number.isFinite(categoryId),
   })
+
+  const pageTitle = Number.isFinite(categoryId)
+    ? stats.data?.categoryName ?? inflation.data?.categoryName ?? `Categoria #${categoryId}`
+    : 'Detalle de categoria'
+  usePageTitle(pageTitle)
 
   const inflationPoints = useMemo(
     () =>

@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { usePageTitle } from '@/hooks/use-page-title'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { api } from '@/lib/api'
@@ -25,6 +26,8 @@ const keyDateFormatter = new Intl.DateTimeFormat('es-UY', {
 })
 
 export function AccountKeysPage() {
+  usePageTitle('API Keys')
+
   const queryClient = useQueryClient()
   const [newKeyName, setNewKeyName] = useState('Integration key')
   const [newKeyValue, setNewKeyValue] = useState('')

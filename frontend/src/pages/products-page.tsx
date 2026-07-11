@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,8 @@ import { ProductItem } from "@/components/product-item";
 import { api } from "@/lib/api";
 
 export function ProductsPage() {
+  usePageTitle("Productos");
+
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const search = useDebouncedValue(query.trim(), 500);

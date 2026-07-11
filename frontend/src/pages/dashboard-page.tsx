@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { usePageTitle } from '@/hooks/use-page-title'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/api'
 
@@ -8,6 +9,8 @@ function formatCurrency(value: number): string {
 }
 
 export function DashboardPage() {
+  usePageTitle('Dashboard')
+
   const dashboard = useQuery({
     queryKey: ['dashboard-summary', '30d', 5],
     queryFn: () => api.getDashboardSummary('30d', 5),

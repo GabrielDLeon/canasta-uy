@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 
+import { usePageTitle } from '@/hooks/use-page-title'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Item, ItemContent, ItemTitle, ItemActions } from '@/components/ui/item'
@@ -11,6 +12,8 @@ import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { api } from '@/lib/api'
 
 export function CategoriesPage() {
+  usePageTitle('Categorias')
+
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(0)
   const debouncedQuery = useDebouncedValue(query.trim().toLowerCase(), 500)

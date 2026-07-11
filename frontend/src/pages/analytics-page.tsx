@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { PriceChart } from "@/components/price-chart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 
 export function AnalyticsPage() {
+  usePageTitle("Analytics");
+
   const [trendProductInput, setTrendProductInput] = useState("15");
   const [trendProductId, setTrendProductId] = useState("15");
 

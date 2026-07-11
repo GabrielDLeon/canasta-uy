@@ -11,12 +11,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCompareProducts } from '@/hooks/use-compare-products'
+import { usePageTitle } from '@/hooks/use-page-title'
 import { api } from '@/lib/api'
 
 export function ProductDetailPage() {
   const params = useParams()
   const productId = Number(params.id)
   const { addProduct } = useCompareProducts()
+
+  const pageTitle = Number.isFinite(productId)
+    ? productId > 0
+      ? `Producto #${productId}`
+      : 'Detalle de producto'
+    : 'Detalle de producto'
 
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
@@ -27,6 +34,7 @@ export function ProductDetailPage() {
     queryFn: () => api.getProductById(productId),
     enabled: Number.isFinite(productId),
   })
+  usePageTitle(product.data?.name ?? pageTitle)
 
   const prices = useQuery({
     queryKey: ['product-prices', productId, from, to, granularity],

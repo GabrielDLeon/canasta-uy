@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 
+import { usePageTitle } from '@/hooks/use-page-title'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export function LandingPage() {
+  usePageTitle('Inicio')
+
   return (
     <main className="min-h-screen bg-muted/20 px-4 py-14">
       <section className="mx-auto w-full max-w-4xl space-y-10">

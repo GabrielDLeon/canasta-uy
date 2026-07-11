@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { usePageTitle } from '@/hooks/use-page-title'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/api'
 
 export function AccountProfilePage() {
+  usePageTitle('Perfil')
+
   const profile = useQuery({
     queryKey: ['profile'],
     queryFn: () => api.getProfile(),

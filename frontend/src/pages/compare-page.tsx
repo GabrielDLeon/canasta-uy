@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
 
+import { usePageTitle } from "@/hooks/use-page-title";
 import { PriceChart } from "@/components/price-chart";
 import { ProductItem } from "@/components/product-item";
 import {
@@ -41,6 +42,8 @@ function toUtcTime(date: string): number {
 }
 
 export function ComparePage() {
+  usePageTitle("Comparar productos");
+
   const { products: selectedCompareProducts, addProduct, removeProduct } =
     useCompareProducts();
   const [compareSearchInput, setCompareSearchInput] = useState("");

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { usePageTitle } from '@/hooks/use-page-title'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,6 +11,8 @@ import { Label } from '@/components/ui/label'
 import { api } from '@/lib/api'
 
 export function RegisterPage() {
+  usePageTitle('Crear cuenta')
+
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
