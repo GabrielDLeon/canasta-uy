@@ -192,8 +192,8 @@ public class AuthController {
     private static String buildCookie(String name, String value, long maxAgeSeconds, boolean secure) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(secure)
-                .sameSite("Lax")
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(maxAgeSeconds)
                 .build()
@@ -203,8 +203,8 @@ public class AuthController {
     private static String clearCookie(String name, boolean secure) {
         return ResponseCookie.from(name, "")
                 .httpOnly(true)
-                .secure(secure)
-                .sameSite("Lax")
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(0)
                 .build()
