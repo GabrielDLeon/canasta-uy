@@ -30,6 +30,44 @@ type RequestOptions = {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 
+// Token storage in memory + localStorage
+let accessToken: string | null = null
+let refreshToken: string | null = null
+
+function setTokens(access: string, refresh: string) {
+  accessToken = access
+  refreshToken = refresh
+  localStorage.setItem('canasta_access_token', access)
+  localStorage.setItem('canasta_refresh_token', refresh)
+}
+
+function clearTokens() {
+  accessToken = null
+  refreshToken = null
+  localStorage.removeItem('canasta_access_token')
+  localStorage.removeItem('canasta_refresh_token')
+}
+
+function getAccessToken(): string | null {
+  if (accessToken) return accessToken
+  const stored = localStorage.getItem('canasta_access_token')
+  if (stored) {
+    accessToken = stored
+    return stored
+  }
+  return null
+}
+
+function getRefreshToken(): string | null {
+  if (refreshToken) return refreshToken
+  const stored = localStorage.getItem('canasta_refresh_token')
+  if (stored) {
+    refreshToken = stored
+    return stored
+  }
+  return null
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const data = await performRequest<T>(path, options, false)
   return data
@@ -45,10 +83,17 @@ async function performRequest<T>(
     'Content-Type': 'application/json',
   }
 
+  // Add Authorization header if auth is required
+  if (authMode === 'session') {
+    const token = getAccessToken()
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
     method: options.method ?? 'GET',
     headers,
-    credentials: 'include',
     body: options.body ? JSON.stringify(options.body) : undefined,
   })
 
@@ -103,26 +148,35 @@ async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T>> 
 }
 
 async function tryRefreshToken(): Promise<boolean> {
+  const currentRefreshToken = getRefreshToken()
+  if (!currentRefreshToken) {
+    return false
+  }
+
   try {
     const response = await fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ refreshToken: currentRefreshToken }),
     })
 
     if (!response.ok) {
+      clearTokens()
       return false
     }
 
     const parsed = (await response.json()) as ApiResponse<RefreshResponse>
     if (!parsed.success || !parsed.data) {
+      clearTokens()
       return false
     }
 
+    setTokens(parsed.data.accessToken, parsed.data.refreshToken)
     return true
   } catch {
+    clearTokens()
     return false
   }
 }
@@ -148,10 +202,31 @@ export const api = {
   register: (email: string, password: string) =>
     request('/auth/register', { method: 'POST', body: { email, password } }),
 
-  login: (email: string, password: string) =>
-    request<LoginResponse>('/auth/login', { method: 'POST', body: { email, password } }),
+  login: async (email: string, password: string) => {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
 
-  logout: () => request('/auth/logout', { method: 'POST', auth: 'session' }),
+    const parsed = await parseApiResponse<LoginResponse>(response)
+    if (!response.ok || !parsed.success) {
+      throw new Error(parsed.message ?? `Error HTTP ${response.status}`)
+    }
+
+    if (parsed.data) {
+      setTokens(parsed.data.accessToken, parsed.data.refreshToken)
+    }
+    return parsed.data
+  },
+
+  logout: async () => {
+    try {
+      await request('/auth/logout', { method: 'POST', auth: 'session' })
+    } finally {
+      clearTokens()
+    }
+  },
 
   getProfile: () => request<ProfileResponse>('/account/profile', { auth: 'session' }),
 
